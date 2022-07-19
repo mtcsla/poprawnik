@@ -1,0 +1,49 @@
+import { AddBox, Article, Feed, Gavel } from "@mui/icons-material";
+import { Accordion, AccordionSummary, Typography } from "@mui/material";
+import { useRouter } from "next/router";
+import React from "react";
+import ArticlesList from "./sidebar-lists/ArticlesList";
+import ForLawyerList from "./sidebar-lists/ForLawyerList";
+
+const sx = { fontSize: '1.05rem !important' }
+
+export const NavigationMenu = () => {
+  const [expanded, setExpanded] = React.useState<number>(-1);
+
+
+  return <div className={'flex flex-col w-full pl-1'}>
+    <MenuAccordion linkFragment={'documents'} icon={<Article {...{ sx }} color={'primary'} className={'mr-4'} />}
+      title={'Pisma'} onChange={() => setExpanded(0)} expanded={expanded == 0} />
+    <MenuAccordion linkFragment={'calculators'} icon={<AddBox {...{ sx }} color={'primary'} className={'mr-4'} />}
+      title={'Kalkulatory'} onChange={() => setExpanded(1)} expanded={expanded == 1} />
+    <MenuAccordion linkFragment={'articles'} icon={<Feed {...{ sx }} color={'primary'} className={'mr-4'} />}
+      title={'Artykuły'} onChange={() => setExpanded(2)} expanded={expanded == 2} >
+      <ArticlesList />
+    </MenuAccordion>
+    <MenuAccordion linkFragment={'lawyer'} icon={<Gavel {...{ sx }} color={'primary'} className={'mr-4'} />} title={'Prawnicy'} onChange={() => setExpanded(3)} expanded={expanded == 3}>
+      <ForLawyerList />
+    </MenuAccordion>
+  </div>
+}
+
+export const MenuAccordion = ({
+  icon,
+  title,
+  children,
+  linkFragment,
+  onChange,
+  expanded
+}: { icon: React.ReactNode, children?: React.ReactNode, title: string, linkFragment?: string, onChange: () => void, expanded: boolean }) => {
+  const router = useRouter();
+
+  return <Accordion defaultExpanded={router.pathname.includes(linkFragment as string)} expanded={expanded} onChange={onChange}
+    className={'w-full mt-2 pl-1  border-none'}
+    style={{ marginRight: 3, borderTop: 'none !important' }}>
+    <AccordionSummary className={(expanded ? 'bg-slate-50 cursor-default' : '') + ' pl-4 pr-0'} id={title}>
+      <span className={'flex w-full items-center justify-between'}>
+        <Typography className={'text-sm '} sx={{ fontWeight: 400 }} component={'p'}>{title}</Typography> {icon}
+      </span>
+    </AccordionSummary>
+    {children}
+  </Accordion>
+}

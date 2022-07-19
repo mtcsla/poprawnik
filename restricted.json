@@ -1,0 +1,4 @@
+[
+  ["^/articles/creator/?.*$", "/articles/creator", "+"],
+  ["^/account/?.*$", "/account", "+"]
+]

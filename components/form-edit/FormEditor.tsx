@@ -49,7 +49,7 @@ const FormEditor = () => {
   const selectStep = (step: string): void => {
     const newQuery = cloneDeep(router.query)
     newQuery['step'] = step;
-    router.push({ pathname: router.pathname, query: newQuery })
+    router.replace({ pathname: router.pathname, query: newQuery })
   }
   const currentDescriptionRef = React.useRef(currentDescription)
   React.useEffect(() => { currentDescriptionRef.current = currentDescription }, [currentDescription])

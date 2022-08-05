@@ -1,11 +1,12 @@
 import { ArrowBack, Delete, Edit, List } from "@mui/icons-material";
-import { Alert, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material';
+import { Alert, Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material';
 import { ErrorMessage, Field, Formik } from "formik";
 import { cloneDeep } from 'lodash';
 import { useRouter } from "next/router";
 import React from "react";
 import { FieldDescription, getDefaultField, useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import EditorField from "../form/EditorField";
+import ConditionEditor, { comparatorsForNotRequiredValuesPolish, comparatorsPolish, Condition, ConditionCalculationSequence } from "./ConditionCalculationEditor";
 import { useFormEditorLocation } from './FormEditor';
 
 const FieldEditor = () => {
@@ -14,6 +15,7 @@ const FieldEditor = () => {
   const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(false);
   const [newOptionDialogOpen, setNewOptionDialogOpen] = React.useState<boolean>(false);
+  const [editingCondition, setEditingCondition] = React.useState<boolean>(false);
 
   const [newOption, setNewOption] = React.useState<string>('');
   const [errorOpen, setErrorOpen] = React.useState<boolean>(false);
@@ -54,7 +56,7 @@ const FieldEditor = () => {
     fieldDescription ||
     getDefaultField() as FieldDescription
   } onSubmit={(values, actions) => {
-    if (!fieldDescription)
+    if (!fieldDescription && router.query.new == '1')
       modifyDescription(['fragment_append_field', [step as number, fragment as number, values]]);
     else {
       modifyDescription(['field_set', [step as number, fragment as number, field as number, values]]);
@@ -146,110 +148,148 @@ const FieldEditor = () => {
           }
         </div>
 
-        <div className="flex-1 h-full bg-slate-50 sm:p-8 md:p-12 border-l flex-col flex items-start justify-center">
-          <h1 className="flex items-center"><Edit color='primary' className="mr-2" />Edytujesz pole</h1>
-          <p className="mb-8">Naciśnij 'gotowe' kiedy skończysz.</p>
+        <div className="flex-1 sm:p-8 md:p-12 overflow-y-auto h-full bg-slate-50  border-l flex-col flex items-start ">
+          <div className="flex flex-col w-full m-auto">
+            <h1 className="flex items-center"><Edit color='primary' className="mr-2" />Edytujesz pole</h1>
+            <p className="mb-8">Naciśnij 'gotowe' kiedy skończysz.</p>
 
 
-          <div className="flex flex-col w-full">
-            <Field as={TextField} error={errors.name && touched.name}
-              placeholder={'np. imie_wnioskodawcy'}
-              disabled={router?.query?.new != '1'}
-              validate={
-                (value: string) => {
-                  if (!value)
-                    return 'To pole jest wymagane.'
-                  if (!value.match(/^[a-z_0-9]*$/))
-                    return 'Dozwolone są tylko małe litery alfabetu łacińskiego, liczby oraz znak "_".'
-                  return names.map(obj => obj.name).includes(value) ? 'Ta nazwa jest już w użyciu w tym formularzu.' : null;
+            <div className="flex flex-col w-full">
+              <Field as={TextField} error={errors.name && touched.name}
+                placeholder={'np. imie_wnioskodawcy'}
+                disabled={router?.query?.new != '1'}
+                validate={
+                  router?.query?.new != '1' ? () => null :
+                    (value: string) => {
+                      console.log(names);
+                      if (!value)
+                        return 'To pole jest wymagane.'
+                      if (!value.match(/^[a-z_0-9]*$/))
+                        return 'Dozwolone są tylko małe litery alfabetu łacińskiego, liczby oraz znak "_".'
+                      return names.map(obj => obj.name).includes(value) ? 'Ta nazwa jest już w użyciu w tym formularzu.' : null;
+                    }
                 }
-              }
-              name='name' label='nazwa pola' className="w-full bg-white" />
-            <ErrorMessage name='name'>{ErrorMessageCallback}</ErrorMessage>
-            <div className='flex mt-8 items-start w-full flex-wrap'>
+                name='name' label='nazwa pola' className="w-full bg-white" />
+              <ErrorMessage name='name'>{ErrorMessageCallback}</ErrorMessage>
+              <div className='flex mt-8 items-start w-full flex-wrap'>
 
-              <span className="flex flex-col flex-1">
-                <Field as={TextField} error={errors.label && touched.label}
-                  validate={
-                    (value: string) => !value ? 'To pole jest wymagane.' : null
-                  }
-                  label='tytuł pola'
-                  name='label' className='bg-white' size='small'
-                />
-                <ErrorMessage name='label'>{ErrorMessageCallback}</ErrorMessage>
-              </span>
-              <div className="w-4" />
-              <span className="flex flex-col flex-1">
-                <Field as={TextField} disabled={values.type !== 'text'} error={values.type === 'text' && errors.placeholder && touched.placeholder}
-                  validate={
-                    (value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null
-                  }
-                  label='placeholder pola'
-                  name='placeholder' className='bg-white' size='small'
-                />
-                <ErrorMessage name='placeholder'>{ErrorMessageCallback}</ErrorMessage>
-              </span>
-            </div>
+                <span className="flex flex-col flex-1">
+                  <Field as={TextField} error={errors.label && touched.label}
+                    validate={
+                      (value: string) => !value ? 'To pole jest wymagane.' : null
+                    }
+                    label='tytuł pola'
+                    name='label' className='bg-white' size='small'
+                  />
+                  <ErrorMessage name='label'>{ErrorMessageCallback}</ErrorMessage>
+                </span>
+                <div className="w-4" />
+                <span className="flex flex-col flex-1">
+                  <Field as={TextField} disabled={values.type !== 'text'} error={values.type === 'text' && errors.placeholder && touched.placeholder}
+                    validate={
+                      (value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null
+                    }
+                    label='placeholder pola'
+                    name='placeholder' className='bg-white' size='small'
+                  />
+                  <ErrorMessage name='placeholder'>{ErrorMessageCallback}</ErrorMessage>
+                </span>
+              </div>
 
 
-            <div className='flex mt-4 items-start w-full flex-wrap'>
-              <FormControl size='small' className="flex-1">
-                <InputLabel>typ pola</InputLabel>
-                <Field as={Select} name='type' onChange={(e: { target: { value: string } }) => { setFieldValue('valueType', null); setFieldValue('type', e.target.value) }} validate={(value: string) => !value ? 'To pole jest wymagane.' : null} label='typ pola' placeholder="wybierz..." className="w-full bg-white" size='small' >
-                  <MenuItem value={'text'}>tekst</MenuItem>
-                  <MenuItem value={'date'}>data</MenuItem>
-                  <MenuItem value={'select'}>wybór</MenuItem>
-                </Field>
-              </FormControl>
-              <ErrorMessage name='type'>{ErrorMessageCallback}</ErrorMessage>
-              <div className="w-4" />
-
-              <span className="flex-1 flex flex-col">
-                <FormControl disabled={values.type !== 'text'} error={(errors.valueType && touched.valueType) as boolean} size='small' className="w-full">
-                  <InputLabel>wartość pola</InputLabel>
-                  <Field as={Select} variant='outlined' name='valueType' defaultValue={null} validate={(value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null} label='wartość pola' placeholder="wybierz..." className="w-full bg-white" size='small' >
+              <div className='flex mt-4 items-start w-full flex-wrap'>
+                <FormControl size='small' className="flex-1">
+                  <InputLabel>typ pola</InputLabel>
+                  <Field as={Select} name='type' onChange={(e: { target: { value: string } }) => { setFieldValue('valueType', null); setFieldValue('type', e.target.value) }} validate={(value: string) => !value ? 'To pole jest wymagane.' : null} label='typ pola' placeholder="wybierz..." className="w-full bg-white" size='small' >
                     <MenuItem value={'text'}>tekst</MenuItem>
-                    <MenuItem value={'number'}>liczba</MenuItem>
+                    <MenuItem value={'date'}>data</MenuItem>
+                    <MenuItem value={'select'}>wybór</MenuItem>
                   </Field>
                 </FormControl>
-                <ErrorMessage name='valueType'>{ErrorMessageCallback}</ErrorMessage>
+                <ErrorMessage name='type'>{ErrorMessageCallback}</ErrorMessage>
+                <div className="w-4" />
+
+                <span className="flex-1 flex flex-col">
+                  <FormControl disabled={values.type !== 'text'} error={(errors.valueType && touched.valueType) as boolean} size='small' className="w-full">
+                    <InputLabel>wartość pola</InputLabel>
+                    <Field as={Select} variant='outlined' name='valueType' defaultValue={null} validate={(value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null} label='wartość pola' placeholder="wybierz..." className="w-full bg-white" size='small' >
+                      <MenuItem value={'text'}>tekst</MenuItem>
+                      <MenuItem value={'number'}>liczba</MenuItem>
+                    </Field>
+                  </FormControl>
+                  <ErrorMessage name='valueType'>{ErrorMessageCallback}</ErrorMessage>
+                </span>
+              </div>
+
+              <span className="flex-1 flex flex-col">
+                <Field as={TextField} error={errors.description && touched.description}
+                  label='krótki opis pola'
+                  placeholder="np. Imię i nazwisko wnioskodawcy."
+                  name='description' className='bg-white mt-4' size='small'
+                  validate={(value: string) => !value ? 'To pole jest wymagane.' : null}
+                />
+                <ErrorMessage name='description'>
+                  {ErrorMessageCallback}
+                </ErrorMessage>
               </span>
+
+              <Field as={TextField} error={errors.hint && touched.hint}
+                label='tekst wskazówki'
+                name='hint' className='bg-white mt-4' size='small'
+              />
+              <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
+
+              <FormControlLabel className="mt-5" control={<Checkbox checked={values.required} onChange={(e, value) => { setFieldValue('required', value) }} name='required' />} label='Pole wymagane' />
+              <FormControlLabel control={<Checkbox name='fullWidth' checked={values.fullWidth} onChange={(e, value) => { setFieldValue('fullWidth', value) }} />} label='Pełna szerokość' />
+
+
+              <span className="items-center mt-6 justify-between flex w-full">
+                <pre className="text-base" >Aktywne</pre>
+                <div className="border-b flex-1 ml-4 mr-4" />
+                <p className="uppercase text-sm font-bold">{!values.condition.components.length ? 'zawsze' : 'warunkowo'}</p>
+
+              </span>
+
+              <ConditionDisplay first sequence={values.condition} />
+              <Button onClick={() => setEditingCondition(true)} className="self-end border-none p-0" size='small' >Zmień</Button>
+              {editingCondition ?
+                <ConditionEditor
+                  type='condition'
+                  exit={() => setEditingCondition(false)}
+                  save={condition => { setFieldValue('condition', condition); setEditingCondition(false) }}
+                  initValue={values.condition}
+                />
+                : null
+              }
             </div>
 
 
-            <Field as={TextField} error={errors.hint && touched.hint}
-              label='tekst wskazówki'
-              name='hint' className='bg-white mt-4' size='small'
-            />
-            <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
-          </div>
-          <FormControlLabel className="mt-5" control={<Checkbox checked={values.required} onChange={(e, value) => { setFieldValue('required', value) }} name='required' />} label='Pole wymagane' />
-          <FormControlLabel control={<Checkbox name='fullWidth' checked={values.fullWidth} onChange={(e, value) => { setFieldValue('fullWidth', value) }} />} label='Pełna szerokość' />
-          <Button className="w-full mt-8 bg-white"
-            onClick={() => {
-              if (!isValid)
-                alertError()
-              if (values.type === 'select' && values.options.length < 2)
-                return
-
-              submitForm()
-            }}
-          >
-            Gotowe
-          </Button>
-          {router?.query?.new === '1' ? null :
-            <Button size='small' color='error' className="w-full mt-2 bg-white"
+            <Button className="w-full mt-8 bg-white"
               onClick={() => {
-                setDeleteDialogOpen(true)
+                if (!isValid)
+                  alertError()
+                if (values.type === 'select' && values.options.length < 2)
+                  return
+
+                submitForm()
               }}
             >
-              Usuń pole
+              Gotowe
             </Button>
-          }
-          <Button className="border-none self-end" size='small' color='error' onClick={() => setDialogOpen(true)}>
-            <ArrowBack className='mr-2' />
-            Anuluj
-          </Button>
+            {router?.query?.new === '1' ? null :
+              <Button size='small' color='error' className="w-full mt-2 bg-white"
+                onClick={() => {
+                  setDeleteDialogOpen(true)
+                }}
+              >
+                Usuń pole
+              </Button>
+            }
+            <Button className="border-none self-end" size='small' color='error' onClick={() => setDialogOpen(true)}>
+              <ArrowBack className='mr-2' />
+              Anuluj
+            </Button>
+          </div>
         </div>
       </div>
     }}
@@ -260,5 +300,70 @@ const FieldEditor = () => {
 
 export const ErrorMessageCallback = (message: string) => <p className="w-full text-right text-red-500 text-xs">{message}</p>
 
+const ConditionDisplay = ({ sequence, first }: { sequence: ConditionCalculationSequence, first?: true }) => {
+  const { names } = useFormDescription();
+
+  const Wrapper = ({ children, first }: { children: React.ReactNode, first?: true }) => {
+    return first
+      ? <span className="inline-flex gap-1 items-center flex-wrap justify-center">
+        {children}
+      </span>
+      : <>
+        {children}
+      </>
+  }
+
+  return <Wrapper first>
+    {sequence.components.map((element, index) => <> <>
+      {(element as ConditionCalculationSequence).components
+        ? <ConditionDisplay sequence={element as ConditionCalculationSequence} />
+        : <div className='border border-transparent inline-flex gap-2 items-center rounded-lg  p-2'>
+          {index === 0 && !first ? <div className="bg-gray-400 p-2 rounded"><pre className="inline text-white">(</pre></div> : null}
+          {
+            (element as Condition).variable?.endsWith('~')
+              ? <p className='text-xs'>długość listy</p>
+              : null
+          }
+
+          <Chip
+            color={(element as Condition).variable?.endsWith('~')
+              ? 'warning'
+              : names.find(name => name.name == (element as Condition).variable)?.list != null
+                ? 'error'
+                : 'info'
+            }
+            label={
+              !(element as Condition).variable?.endsWith('~')
+                ? (element as Condition).variable
+                : `Krok ${parseInt((element as Condition).variable?.slice(4, -7) ?? '-1') + 1}`
+            } />
+
+          {comparatorsPolish.concat(comparatorsForNotRequiredValuesPolish).find(comp => comp[0] === (element as Condition).comparator)?.[1]}
+
+          {
+            (element as Condition).value.type != null && (element as Condition).value.value != null
+              ? (element as Condition).value.type === 'variable'
+                ? <Chip label={(element as Condition).value.value} />
+                : (element as Condition).value.type === 'constant'
+                  ? <p className='text-sm'>{(element as Condition).value.value}<p className='inline text-xs italic ml-2'>(wartość stała)</p> </p>
+                  : null //to be replaced 
+              : null
+
+          }</div>}
+
+      {index === sequence.components.length - 1 && !first ? <div className="p-2 bg-gray-400 rounded"><pre className="inline text-white">)</pre></div> : null}
+    </>
+      {
+        index < sequence.components.length - 1
+          ? <Chip size='small' color='secondary'
+            label={sequence.operators[index] == '&' ? '∧' : sequence.operators[index] == '|' ? '∨' : '⊻'} />
+          : null
+      }
+    </>)
+    }
+  </Wrapper>
+}
+
 export default FieldEditor;
+
 

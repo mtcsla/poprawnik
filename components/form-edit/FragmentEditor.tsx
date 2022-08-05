@@ -13,7 +13,7 @@ import { useFormEditorLocation } from './FormEditor';
 
 const FragmentEditor = () => {
   const { location } = useFormEditorLocation();
-  const { description, currentDescription, modifyDescription, modifyCurrentDescription } = useFormDescription();
+  const { description, currentDescription, modifyDescription, modifyCurrentDescription, updateFirestoreDoc } = useFormDescription();
   const [dialogOpen, setDialogOpen] = React.useState<boolean>(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(false)
 
@@ -60,20 +60,17 @@ const FragmentEditor = () => {
     newDescription[step as number].children = newDescription[step as number].children.filter((v, i) => i != fragment)
 
     setSaving(true);
-    modifyCurrentDescription(['form_set_description', newDescription,
-      {
-        then: () => {
-          setSaving(false);
-          router.back()
-          router.replace({ pathname: router.pathname, query: { id: router.query.id, step: step as number } });
-        },
-        catch: () => {
-          setSaving(false);
-          setError(true);
-          setTimeout(() => setError(false), 5000)
-        }
-      }
-    ]);
+    modifyCurrentDescription(['form_set_description', newDescription,]);
+    updateFirestoreDoc(newDescription).then(() => {
+      setSaving(false);
+      router.back()
+      router.replace({ pathname: router.pathname, query: { id: router.query.id, step: step as number } });
+    }).catch(() => {
+      setSaving(false);
+      setError(true);
+      setTimeout(() => setError(false), 5000)
+    })
+
   }
 
 
@@ -154,19 +151,18 @@ const FragmentEditor = () => {
               [
                 'form_set_description',
                 description,
-                {
-                  then: () => {
-                    setSaving(false);
-                    router.back()
-                  },
-                  catch: () => {
-                    setSaving(false);
-                    setError(true);
-                    setTimeout(() => setError(false), 5000)
-                  }
-                }
               ],
             )
+            updateFirestoreDoc(description)
+              .then(() => {
+                setSaving(false);
+                router.back();
+              }).
+              catch(() => {
+                setSaving(false);
+                setError(true);
+                setTimeout(() => setError(false), 5000)
+              })
           }
         }>Zapisz</LoadingButton>
         {

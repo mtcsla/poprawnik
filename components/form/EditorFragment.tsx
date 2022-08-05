@@ -23,6 +23,7 @@ const EditorFragment = ({ fragment, editor, }: { editor: boolean, fragment: Frag
         ({ values, errors, touched }) =>
           <div className='inline-flex justify-between items-start flex-wrap w-full'>
             {fragment.children.map((field, index) =>
+
               <span onClick={() => {
                 const newQuery = cloneDeep(router.query)
                 newQuery.field = (index).toString()

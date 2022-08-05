@@ -256,7 +256,7 @@ export namespace FormDescriptionFunctions {
     ]
   ): FormDescription => {
     const newState = cloneDeep(state);
-    newState[stepIndex].children[fragmentIndex].children[stepIndex] = value;
+    newState[stepIndex].children[fragmentIndex].children[fieldIndex] = value;
     return newState;
   };
 

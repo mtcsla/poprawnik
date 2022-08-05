@@ -44,6 +44,10 @@ a {
   text-decoration: none;
 }
 
+.MuiSelect-select {
+  @apply inline-flex gap-6 items-center justify-between;
+}
+
 *::after {
   box-sizing: border-box;
   border-color: #e5e7eb !important;

@@ -2,10 +2,11 @@ import { doc, updateDoc } from '@firebase/firestore';
 import { cloneDeep } from 'lodash';
 import React from "react";
 import { firestore } from "../../buildtime-deps/firebase";
+import { ConditionCalculationSequence } from '../../components/form-edit/ConditionCalculationEditor';
 import { FormDescriptionFunctions } from "./FormDescriptionStateModifierFunctions";
 
-export type FieldType = 'text' | 'select' | 'checkbox' | 'date';
-export type FieldValueType = 'text' | 'number' | null;
+export type FieldType = 'text' | 'select' | 'date';
+export type FieldValueType = 'text' | 'number' | 'date' | null;
 
 export type FormDescription = StepDescription[];
 export type StepDescription = {
@@ -29,7 +30,9 @@ export type FieldDescription = {
   type: FieldType;
   valueType: FieldValueType | null;
   options: string[];
+  description: string;
   hint: string;
+  condition: ConditionCalculationSequence;
 };
 
 
@@ -69,14 +72,16 @@ export type FormActionWithoutSave =
   | ['field_set_option', [number, number, number, number, string]]
   | ['field_set', [number, number, number, FieldDescription]]
 
-export type FormAction = [...FormActionWithoutSave, { then: () => void, catch: () => void }] | FormActionWithoutSave
-export type NameType = { name: string, step: number, fragment: number, field: number, inList: boolean };
+export type FormAction = FormActionWithoutSave;
+export type NameType = {
+  name: string, required: boolean, step: number, fragment: number, field: number, list: number | null, valueType: FieldValueType
+};
 
 
 export const getDefaultForm = (): FormDescription => [];
 export const getDefaultStep = (): StepDescription => ({ subtitle: '', type: 'step', children: [] });
 export const getDefaultFragment = (): FragmentDescription => ({ title: '', subtitle: '', icon: '', children: [] });
-export const getDefaultField = (): FieldDescription => ({ label: '', fullWidth: false, required: true, name: '', placeholder: '', icon: '', type: 'text', valueType: null, options: [], hint: '' });
+export const getDefaultField = (): FieldDescription => ({ label: '', description: '', fullWidth: false, required: true, name: '', placeholder: '', icon: '', type: 'text', valueType: null, options: [], hint: '', condition: { components: [], operators: [] } });
 
 const formDescriptionContext = React.createContext<{
   description: FormDescription, modifyDescription: React.Dispatch<FormAction>,
@@ -105,11 +110,8 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
   }
   const [names, setNames] = React.useState<NameType[]>([])
 
-  function formDescriptionReducer(state: FormDescription, [actionType, actionValue, save]: FormAction): FormDescription {
+  function formDescriptionReducer(state: FormDescription, [actionType, actionValue]: FormAction): FormDescription {
     let newState: FormDescription = getDefaultForm();
-    const saveFn = async (description: FormDescription) => {
-      await updateDoc(doc(firestore, `forms/${id}`), { formData: description })
-    }
 
     switch (actionType) {
       //form actions
@@ -193,20 +195,13 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
         break;
     }
 
-    if (save) {
-      saveFn(
-        newState
-      ).then(save.then).catch(save.catch);
-    }
-
-    console.log(actionType, newState)
     return newState;
   }
 
   const value = { description, names, modifyDescription, currentDescription, modifyCurrentDescription, updateFirestoreDoc }
 
   React.useEffect(() => {
-    const newNames = []
+    const newNames: NameType[] = []
     currentDescription.forEach(
       (step, stepIndex) => {
         step.children.forEach((fragment, fragmentIndex) => {
@@ -216,12 +211,15 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
               step: stepIndex,
               fragment: fragmentIndex,
               field: fieldIndex,
-              inList: step.type === 'list'
+              required: field.required,
+              list: step.type === 'list' ? stepIndex : null,
+              valueType: getActualValueType(field)
             })
           })
         })
       }
     )
+    setNames(newNames as NameType[]);
   }, [currentDescription])
 
   return <formDescriptionContext.Provider {...{ value }}>
@@ -229,4 +227,21 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
   </formDescriptionContext.Provider>
 
 }
+
+export const getActualValueType = (field: FieldDescription): FieldValueType => {
+  const { type, valueType } = field;
+
+  if (type === 'text') return valueType;
+  if (type === 'date') return 'date';
+  if (type === 'select') return 'text';
+
+  return valueType;
+}
+export const valueTypeToPolish = (type: FieldValueType): string => {
+  if (type === 'text') return 'tekst';
+  if (type === 'number') return 'liczba';
+  if (type === 'date') return 'data';
+  return 'tekst';
+}
+
 export default FormDescriptionProvider;

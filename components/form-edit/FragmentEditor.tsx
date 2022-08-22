@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { getDefaultFragment, useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import Fragment from '../form/EditorFragment';
+import { FormNormalize } from "./condition-calculation-editor/normalizers/FormNormalize";
 import FieldEditor from "./FieldEditor";
 import { useFormEditorLocation } from './FormEditor';
 
@@ -56,16 +57,17 @@ const FragmentEditor = () => {
 
   const deleteFragment = () => {
     const newDescription = cloneDeep(currentDescription);
+    const lastDescription = cloneDeep(currentDescription);
 
-    newDescription[step as number].children = newDescription[step as number].children.filter((v, i) => i != fragment)
 
     setSaving(true);
-    modifyCurrentDescription(['form_set_description', newDescription,]);
+    modifyCurrentDescription(['form_set_description', FormNormalize.conditions(newDescription, location, true)]);
     updateFirestoreDoc(newDescription).then(() => {
       setSaving(false);
       router.back()
       router.replace({ pathname: router.pathname, query: { id: router.query.id, step: step as number } });
     }).catch(() => {
+      modifyCurrentDescription(['form_set_description', lastDescription])
       setSaving(false);
       setError(true);
       setTimeout(() => setError(false), 5000)
@@ -122,12 +124,14 @@ const FragmentEditor = () => {
 
     </Dialog>
 
-    <div className="flex-1 h-full flex-col sm:p-8 md:p-12 justify-center flex">
-      <Fragment editor={true} fragment={description[step as number].children[fragment as number]} />
-      <Button className="mt-8 self-end border-none" size='small' onClick={newField}>
-        <Add className='mr-2' />
-        dodaj pole
-      </Button>
+    <div className="flex-1 h-full overflow-y-auto flex-col sm:p-8 md:p-12 flex">
+      <span className='m-auto w-full flex flex-col'>
+        <Fragment editor={true} fragment={description[step as number].children[fragment as number]} />
+        <Button className="mt-8 self-end border-none" size='small' onClick={newField}>
+          <Add className='mr-2' />
+          dodaj pole
+        </Button>
+      </span>
     </div>
     <div className="flex-1 h-full bg-slate-50 sm:p-8 md:p-12 border-l flex-col flex items-start justify-center">
       <span className="w-full flex flex-col">
@@ -146,6 +150,8 @@ const FragmentEditor = () => {
       <div className='flex flex-col mt-8 w-full'>
         <LoadingButton disabled={description[step as number]?.children[fragment as number]?.children?.length < 1} loading={saving} className="bg-white w-full mb-4" onClick={
           () => {
+            const lastDescription = cloneDeep(currentDescription);
+
             setSaving(true)
             modifyCurrentDescription(
               [
@@ -159,6 +165,7 @@ const FragmentEditor = () => {
                 router.back();
               }).
               catch(() => {
+                modifyCurrentDescription(['form_set_description', lastDescription])
                 setSaving(false);
                 setError(true);
                 setTimeout(() => setError(false), 5000)

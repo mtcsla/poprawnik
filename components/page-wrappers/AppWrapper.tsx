@@ -70,7 +70,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       >
 
         <AppBar
-          className="border-l-0 border-t-0 border-r-0"
+          className="border-l-0 border-b-0 border-t-0 border-r-0"
           variant="outlined"
           position="fixed"
           elevation={0}
@@ -92,7 +92,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
             {width && width <= 1100 ? (
               <LogoHeader
                 noText={true}
-                border={true}
+                border={false}
                 openSidebar={() => setOpen(true)}
               />
             ) : (

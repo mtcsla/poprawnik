@@ -183,20 +183,20 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const { displayName, photoURL, email, uid } = user;
 
         let roles: string[];
-        if (!userProfile) {
+        if (!userProfile?.roles) {
           roles = ['user'];
           const decodedToken: IdTokenResult = await auth.currentUser?.getIdTokenResult() as IdTokenResult;
 
           roles.push(...possibleRoles.filter(key => decodedToken.claims[key]));
         } else {
-          roles = userProfile.roles;
+          roles = userProfile?.roles;
         }
         setUserProfile({ displayName, photoURL, email, uid, roles } as UserProfile);
 
         nookies.set(
           undefined,
           '--user-profile',
-          `${JSON.stringify(user)}`,
+          `${JSON.stringify({ displayName, photoURL, email, uid, roles })}`,
           {
             maxAge: 60 * 60 * 24,
             path: '/'
@@ -277,13 +277,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               setRedirecting(true)
               router.push('/').then(() => {
                 setRedirecting(false);
+                setConfirmLogoutOpen(false);
               });
-
-              setUserProfile(null);
-              destroyCookie({}, '--user-profile', { path: '/' });
-
-              setConfirmLogoutOpen(false);
             }
+            setUserProfile(null);
+            destroyCookie({}, '--user-profile', { path: '/' });
+            setConfirmLogoutOpen(false);
           }
           }>
             TAK

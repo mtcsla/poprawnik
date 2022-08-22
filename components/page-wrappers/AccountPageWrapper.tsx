@@ -19,7 +19,7 @@ const AccountPageWrapper = ({ children }: { children: React.ReactNode }) => {
 
 
 
-    <div style={{ height: '4rem', backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)" }} className=' fixed z-50 w-full border-b flex items-center p-3 pl-0 pr-0 justify-between'>
+    <div style={{ height: '4rem', backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)" }} className=' fixed z-50 w-full  flex items-center p-3 pl-0 pr-0 justify-between'>
       <LogoHeader
         noText={(width && width < 1100) as boolean}
         border={false}

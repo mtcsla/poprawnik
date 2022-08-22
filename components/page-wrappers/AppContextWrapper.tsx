@@ -4,18 +4,21 @@ import AuthProvider from "../../providers/AuthProvider";
 import { SidenavProvider } from "../../providers/SidenavProvider";
 import NoInternetWrapper from "./NoInternetWrapper";
 
+import { LocalizationProvider } from '@mui/x-date-pickers-pro';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import colors from "tailwindcss/colors";
 
 const AppContextWrapper = ({ children }: { children: React.ReactNode }) => {
-  return <SidenavProvider>
-    <AuthProvider>
-      <ThemeProvider theme={theme}>
-        <NoInternetWrapper>
-          {children}
-        </NoInternetWrapper>
-      </ThemeProvider>
-    </AuthProvider>
-  </SidenavProvider>;
+  return <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <SidenavProvider>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <NoInternetWrapper>
+            {children}
+          </NoInternetWrapper>
+        </ThemeProvider>
+      </AuthProvider>
+    </SidenavProvider></LocalizationProvider>;
 }
 export default AppContextWrapper;
 
@@ -93,6 +96,13 @@ const theme = createTheme({
           background: 'rgba(0, 0, 0, 0.8) !important',
           borderRadius: '10px !important',
           color: 'white !important',
+        }
+      }
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          background: 'transparent !important'
         }
       }
     },

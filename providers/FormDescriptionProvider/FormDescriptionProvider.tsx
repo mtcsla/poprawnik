@@ -1,9 +1,12 @@
 import { doc, updateDoc } from '@firebase/firestore';
 import { cloneDeep } from 'lodash';
+import { useRouter } from 'next/router';
 import React from "react";
 import { firestore } from "../../buildtime-deps/firebase";
-import { ConditionCalculationSequence } from '../../components/form-edit/ConditionCalculationEditor';
+import { ConditionCalculationSequence } from '../../components/form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
+import { FormRandom } from '../../components/utility/FormRandom';
 import { FormDescriptionFunctions } from "./FormDescriptionStateModifierFunctions";
+
 
 export type FieldType = 'text' | 'select' | 'date';
 export type FieldValueType = 'text' | 'number' | 'date' | null;
@@ -13,6 +16,7 @@ export type StepDescription = {
   subtitle: string;
   type: 'step' | 'list';
   children: FragmentDescription[]
+  name: string,
 };
 export type FragmentDescription = {
   title: string;
@@ -26,11 +30,13 @@ export type FieldDescription = {
   label: string;
   name: string;
   placeholder: string;
-  icon: string;
   type: FieldType;
   valueType: FieldValueType | null;
   options: string[];
   description: string;
+  numberType: 'integer' | 'real' | null;
+  min: string | null;
+  max: string | null;
   hint: string;
   condition: ConditionCalculationSequence;
 };
@@ -79,9 +85,9 @@ export type NameType = {
 
 
 export const getDefaultForm = (): FormDescription => [];
-export const getDefaultStep = (): StepDescription => ({ subtitle: '', type: 'step', children: [] });
+export const getDefaultStep = (): StepDescription => ({ subtitle: '', name: '', type: 'step', children: [] });
 export const getDefaultFragment = (): FragmentDescription => ({ title: '', subtitle: '', icon: '', children: [] });
-export const getDefaultField = (): FieldDescription => ({ label: '', description: '', fullWidth: false, required: true, name: '', placeholder: '', icon: '', type: 'text', valueType: null, options: [], hint: '', condition: { components: [], operators: [] } });
+export const getDefaultField = (): FieldDescription => ({ label: '', description: '', fullWidth: false, min: null, max: null, numberType: null, required: true, name: '', placeholder: '', type: 'text', valueType: null, options: [], hint: '', condition: { components: [], operators: [] } });
 
 const formDescriptionContext = React.createContext<{
   description: FormDescription, modifyDescription: React.Dispatch<FormAction>,
@@ -97,18 +103,30 @@ export type FormDescriptionProviderProps = {
 }
 
 const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionProviderProps) => {
+  const random = React.useMemo<FormDescription>(() => FormRandom.formDescription(), []);
+  const router = useRouter();
+
   const [description, modifyDescription] = React.useReducer(
     formDescriptionReducer,
-    cloneDeep(initValue) ?? getDefaultForm()
+    initValue ?? getDefaultForm()
   );
   const [currentDescription, modifyCurrentDescription] = React.useReducer(
     formDescriptionReducer,
-    cloneDeep(initValue) ?? getDefaultForm()
+    initValue ?? getDefaultForm()
   );
   const updateFirestoreDoc = async (description: FormDescription) => {
     await updateDoc(doc(firestore, `forms/${id}`), { formData: description })
   }
   const [names, setNames] = React.useState<NameType[]>([])
+
+  React.useEffect(() => {
+    if (router.isReady) {
+      if (router.query.random === 'true') {
+        modifyDescription(['form_set_description', random])
+        modifyCurrentDescription(['form_set_description', random])
+      }
+    }
+  }, [router.isReady])
 
   function formDescriptionReducer(state: FormDescription, [actionType, actionValue]: FormAction): FormDescription {
     let newState: FormDescription = getDefaultForm();

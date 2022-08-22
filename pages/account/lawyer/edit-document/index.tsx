@@ -1,5 +1,5 @@
 import { doc, getDoc, updateDoc } from '@firebase/firestore';
-import { Bookmark } from "@mui/icons-material";
+import { Bookmark, DoneAll, Warning } from "@mui/icons-material";
 import { LoadingButton } from '@mui/lab';
 import { Button, Skeleton, TextField } from '@mui/material';
 import { useRouter } from 'next/router';
@@ -72,7 +72,7 @@ const EditForm = () => {
         }
       </span>
       {!editingTitle
-        ? <p className="p-2 border rounded-lg">{form.title || 'BRAK'}</p>
+        ? <p className="p-4 border rounded-lg">{form.title || 'BRAK'}</p>
         : <TextField size='small' defaultValue={title} onChange={({ target }) => setTitle(target.value)} />
       }
 
@@ -90,25 +90,34 @@ const EditForm = () => {
         }
       </span>
       {!editingDescription
-        ? <p className="p-2 border rounded-lg text-sm" style={{ minHeight: 150 }}>{form.description || 'BRAK'}</p>
-        : <textarea className='border rounded-lg p-2' defaultValue={description} maxLength={750} style={{ minHeight: 150 }}
+        ? <p className="p-4 border rounded-lg" style={{ minHeight: 150 }}>{form.description || 'BRAK'}</p>
+        : <textarea className='border rounded-lg p-4' defaultValue={description} maxLength={750} style={{ minHeight: 150 }}
           onChange={({ target }) => setDescription(target.value)} />
       }
-      <h1 className='mt-4'>Ważne</h1>
+      <h1 className='mt-4 inline-flex gap-2'><Warning color='primary' className='translate-y-0.5' /> Ważne</h1>
       <p className='text-sm mb-4'>
-        Najpierw utwórz formularz, a dopiero potem wzór pisma!
+        Najpierw wykonaj w całości formularz pisma, a dopiero potem zabierz się za jego wzór.
       </p>
-      <pre className='mt-2 mb-2 text-sm'>
+      <pre className='mt-2 mb-2 text-sm inline-flex gap-4 items-center justify-between'>
         Formularz
+        <div className='border-b flex-1' />
+        <Button size='small' className='border-none'
+          onClick={() => router.push(`/account/lawyer/edit-document/form?id=${form.id}`)}>
+          edytuj
+        </Button>
       </pre>
-      <Button onClick={() => router.push(`/account/lawyer/edit-document/form?id=${form.id}`)}>
-        edytuj formularz
-      </Button>
-      <pre className='mt-2 mb-2 text-sm'>
+      <pre className='mt-2 mb-2 text-sm inline-flex gap-4 items-center justify-between'>
         Wzór pisma
+        <div className='border-b flex-1' />
+        <Button size='small' className='border-none'
+          disabled={JSON.stringify(form.formData) === '[]'} onClick={() => router.push(`/account/lawyer/edit-document/template?id=${form.id}`)}>
+          edytuj
+        </Button>
       </pre>
-      <Button disabled={JSON.stringify(form.formData) === '[]'} onClick={() => router.push(`/account/lawyer/edit-document/template?id=${form.id}`)}>
-        edytuj wzór pisma
+
+      <Button className='mt-4 p-4 bg-blue-500 hover:bg-blue-400 text-white'>
+        <DoneAll className='mr-2' />
+        Oddaj do weryfikacji
       </Button>
 
     </> : <>

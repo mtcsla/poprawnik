@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "export NODE_ENV=development && next dev",
     "build": "next build",
-    "start": "export NODE_ENV=production && next start",
+    "start": "export NODE_ENV=production && next start -p 8080",
+    "deploy": "next build && gcloud app deploy --quiet &&  afplay /System/Library/Sounds/Glass.aiff && say \"Google Cloud deploy complete.\"",
     "lint": "next lint",
     "test": "jest --verbose"
   },
@@ -13,21 +14,24 @@
     "@date-io/date-fns": "^1.3.13",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
+    "@faker-js/faker": "^7.4.0",
     "@mui/icons-material": "^5.6.1",
     "@mui/lab": "^5.0.0-alpha.77",
     "@mui/material": "^5.6.1",
     "@mui/x-date-pickers": "^5.0.0-alpha.1",
+    "@mui/x-date-pickers-pro": "^5.0.0-beta.4",
     "@types/debounce": "^1.2.1",
     "@types/jest": "^27.4.1",
     "@types/nprogress": "^0.2.0",
     "@types/tailwindcss": "^3.0.10",
     "chalk": "^5.0.1",
-    "date-fns": "^2.28.0",
+    "date-fns": "^2.29.1",
     "debounce": "^1.2.1",
     "firebase": "^9.6.11",
     "firebase-admin": "^10.0.2",
     "formik": "^2.2.9",
     "jest": "^27.5.1",
+    "mathjs": "^11.0.1",
     "next": "12.1.5",
     "nookies": "^2.5.2",
     "nprogress": "^0.2.0",
@@ -35,7 +39,8 @@
     "react-dnd": "^16.0.1",
     "react-dom": "^17.0.2",
     "react-use-scroll-position": "^2.0.0",
-    "rich-markdown-editor": "^11.21.3"
+    "rich-markdown-editor": "^11.21.3",
+    "tailwindcss": "^3.1.7"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.4",
@@ -50,7 +55,6 @@
     "prettier": "^2.6.2",
     "prosemirror-tables": "1.1.1",
     "prosemirror-utils": "latest",
-    "tailwindcss": "^3.0.24",
     "typescript": "4.6.3"
   },
   "overrides": {

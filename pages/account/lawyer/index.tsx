@@ -93,7 +93,7 @@ const YourForms = ({ }) => {
     <h1>
       <Article className='-translate-y-0.5 mr-2' color='primary' /> Twoje pisma
     </h1>
-    <p className='mb-3'>
+    <p >
       Tutaj możesz tworzyć pisma, które sprzedasz w naszym serwisie
     </p>
     {userProfile && forms ? <>
@@ -114,7 +114,7 @@ const YourForms = ({ }) => {
 
         forms.map((form: IFormData) =>
           <div
-            className={"p-4 flex flex-col rounded-lg justify-between border h-32 mt-2 "}
+            className={"p-4 flex flex-col rounded-lg justify-between border h-32 mt-8 "}
           >
             <div className={'flex justify-between'}>
               <p className={'truncate'}>
@@ -149,12 +149,12 @@ const YourForms = ({ }) => {
 
       }
 
-      <LoadingButton className='mt-6' onClick={newForm} disabled={deleting} loading={creatingForm}>Nowe pismo</LoadingButton>
+      <LoadingButton className='mt-8' onClick={newForm} disabled={deleting} loading={creatingForm}>Nowe pismo</LoadingButton>
       {error ? <p className='text-red-500 text-xs'>{error}</p> : null}
     </>
       :
       <>
-        <Skeleton variant='rectangular' className='rounded' height={110} />
+        <Skeleton variant='rectangular' className='rounded mt-8' height={110} />
         <span className='flex items-center w-full mt-1'>
           <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
         </span>

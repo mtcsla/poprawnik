@@ -7,6 +7,7 @@ import React from 'react';
 import BodyScrollLock from '../../providers/BodyScrollLock';
 import { useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import EditorFragment from '../form/EditorFragment';
+import { FormNormalize } from './condition-calculation-editor/normalizers/FormNormalize';
 import { useFormEditorLocation } from './FormEditor';
 import FragmentEditor from './FragmentEditor';
 export type StepEditorProps = {
@@ -26,6 +27,7 @@ const StepEditor = () => {
 
   const textareaRef = React.useRef<HTMLTextAreaElement>()
   const router = useRouter();
+
 
   const save = () => {
     setSaving(true);
@@ -47,7 +49,7 @@ const StepEditor = () => {
       catch(
         () => {
           setError(true);
-          modifyDescription?.(['step_set_subtitle', [step as number, lastSubtitle]])
+          modifyCurrentDescription?.(['step_set_subtitle', [step as number, lastSubtitle]])
           setSaving(false);
           setEditing(false)
           setTimeout(() => setError(false), 5000)
@@ -57,10 +59,8 @@ const StepEditor = () => {
   const deleteStep = () => {
     setSaving(true);
 
-    const newDescription = cloneDeep(currentDescription);
+    const newDescription = FormNormalize.conditions(cloneDeep(currentDescription), location, true)
     const lastDescription = cloneDeep(currentDescription);
-
-    newDescription.splice(step as number, 1);
 
     updateFirestoreDoc(newDescription).
       then(
@@ -149,13 +149,13 @@ const StepEditor = () => {
     {currentDescription[step as number].children.length ?
       currentDescription[step as number].children.map((fragment, index) =>
 
-        <div onClick={() => {
+        <Button onClick={() => {
           router.push({ pathname: router.pathname, query: Object.assign(router.query, { fragment: index.toString() }) })
-        }} className='w-full hover:border-blue-500 rounded-lg border mb-4  hover:bg-blue-50  cursor-pointer p-4 '>
-          <div className='w-full pointer-events-none'>
+        }} className='w-full normal-case text-left hover:border-blue-500 rounded-lg border mb-4  hover:bg-blue-50  cursor-pointer p-4 '>
+          <div className='text-black w-full pointer-events-none'>
             <EditorFragment fragment={fragment} editor={false} />
           </div>
-        </div>)
+        </Button>)
       : <div className='rounded border h-16 mt-2 flex items-center justify-center p-4'>
         <pre>Brak fragmentów</pre>
       </div>

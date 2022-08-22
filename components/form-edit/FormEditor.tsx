@@ -1,8 +1,11 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Tab, Tabs } from '@mui/material';
+import { DoneAll } from '@mui/icons-material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Tab, Tabs, TextField } from '@mui/material';
+import { ErrorMessage, Field, Formik } from 'formik';
 import { cloneDeep } from 'lodash';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { ErrorMessageCallback } from './FieldEditor';
 import StepEditor from './StepEditor';
 
 export const URLtoQueryObject = (url: string): { [key: string]: string } => {
@@ -37,13 +40,14 @@ const FormEditor = () => {
   const { currentDescription, modifyCurrentDescription } = useFormDescription();
   const [selectedStep, setSelectedStep] = React.useState('-1');
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [nameDialogOpen, setNameDialogOpen] = React.useState(false);
   const [location, setLocation] = React.useState<FormEditorLocation>([null, null, null]);
   const locationProviderValue = { location, setLocation }
 
   const router = useRouter();
 
-  const newStep = (type: 'step' | 'list') => {
-    modifyCurrentDescription(['form_append_step', { subtitle: '', type, children: [] }]);
+  const newStep = (type: 'step' | 'list', name?: string) => {
+    modifyCurrentDescription(['form_append_step', { subtitle: '', type, children: [], name: type === 'list' ? (name || '') : '' }]);
     setDialogOpen(false);
   }
   const selectStep = (step: string): void => {
@@ -103,11 +107,41 @@ const FormEditor = () => {
           <Button onClick={() => newStep('step')} className='border-none'>
             Krok
           </Button>
-          <Button onClick={() => newStep('list')} className='border-none'>
+          <Button onClick={() => { setNameDialogOpen(true); setDialogOpen(false) }} className='border-none'>
             Lista
           </Button>
         </span>
       </DialogActions>
+    </Dialog>
+    <Dialog open={nameDialogOpen}>
+      <DialogTitle className='font-mono uppercase text-slate-500 text-sm'>Dodajesz listę</DialogTitle>
+      <Formik initialValues={{ name: '' }}
+        onSubmit={(values) => { newStep('list', values.name); setNameDialogOpen(false) }}
+        validateOnChange>
+        {({ values, submitForm, errors }) => {
+          return <> <DialogContent style={{ width: 300 }}>
+            <p className='text-sm'>
+              Dodaj nazwę listy.
+            </p>
+            <Field as={TextField} size='small' placeholder='np. lista' error={errors.name} name='name' className='w-full mt-2' validate={(value: any) => !value
+              ? 'To pole jest wymagane.'
+              : !value.match(/^[a-z_0-9]*$/)
+                ? 'Dozwolone są tylko małe litery alfabetu łacińskiego, liczby oraz znak "_".'
+                : null
+            } />
+            <ErrorMessage name='name'>{ErrorMessageCallback}</ErrorMessage>
+          </DialogContent>
+            <DialogActions>
+              <Button onClick={() => submitForm()} className='border-none'>
+                Dodaj
+              </Button>
+              <Button onClick={() => setNameDialogOpen(false)} color='error' className='border-none'>
+                Anuluj
+              </Button>
+            </DialogActions>
+          </>
+        }}
+      </Formik>
     </Dialog>
 
     <span className='flex justify-end'>
@@ -116,7 +150,7 @@ const FormEditor = () => {
     {currentDescription.length ?
       <Tabs className='border rounded-lg mb-6' onChange={(e, value) => selectStep(value)} value={parseInt(selectedStep)}>
         {currentDescription.map((step, index) =>
-          <Tab label={`KROK ${index + 1}`} value={index} />
+          <Tab label={step.type === 'list' ? step.name : `KROK ${index + 1}`} value={index} />
         )}
       </Tabs>
       : <div className='mb-6 border rounded-lg w-full h-12 items-center flex justify-center' >
@@ -127,11 +161,19 @@ const FormEditor = () => {
     }
     <locationContext.Provider value={locationProviderValue}>
       {
-        location[0] != null
+        location[0] != null && location[0] === parseInt(selectedStep)
           ? <StepEditor />
           : null
       }
     </locationContext.Provider>
+    {
+      selectedStep === '-1' ?
+        <div className='p-10 rounded-lg border flex justify-center items-center'>
+          <DoneAll className='mr-3 text-4xl -translate-y-1' fontSize='inherit' color='primary' />
+          <p>Wybierz z listy powyżej lub dodaj krok, aby edytować.</p>
+        </div>
+        : null
+    }
   </>
 }
 export default FormEditor;

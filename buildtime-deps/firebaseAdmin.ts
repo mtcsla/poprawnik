@@ -4,7 +4,7 @@ import * as firebaseAdmin from "firebase-admin";
 // get this JSON from the Firebase board
 // you can also store the values in environment variables
 
-const dev = process.env.NODE_ENV == "development";
+const dev = false;
 
 const serviceAccount = JSON.parse(
   dev
@@ -14,11 +14,7 @@ const serviceAccount = JSON.parse(
 
 if (!firebaseAdmin.apps.length) {
   firebaseAdmin.initializeApp({
-    credential: firebaseAdmin.credential.cert({
-      privateKey: serviceAccount.private_key,
-      clientEmail: serviceAccount.client_email,
-      projectId: serviceAccount.project_id,
-    }),
+    credential: firebaseAdmin.credential.cert(serviceAccount),
   });
 }
 

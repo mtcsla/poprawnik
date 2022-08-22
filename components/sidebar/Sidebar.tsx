@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
-import { QuestionMark } from "@mui/icons-material";
-import { Avatar, Box, Paper, Typography } from "@mui/material";
+import { Edit, Gavel, QuestionMark, Shield, SupervisorAccount } from '@mui/icons-material';
+import { Avatar, Badge, Box, Chip, Paper, Tooltip, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import useWindowSize from '../../hooks/WindowSize';
@@ -19,8 +19,10 @@ const Sidebar = ({ }) => {
   return <SidebarPaper variant='outlined' style={{ width: '18rem', paddingRight: 2, maxWidth: 320 }}
     className='flex flex-col items-center justify-between h-full border-0 rounded-none'>
     <div className={'flex flex-col items-center'}>
-      <LogoHeader border={(width && (width >= 1100)) as boolean} />
-      <LoggedInUserDisplay />
+      <LogoHeader border={false} />
+      <div className="w-full pl-2 mt-3">
+        <LoggedInUserDisplay />
+      </div>
       <NavigationMenu />
     </div>
     <div className={'w-full mt-4 flex flex-col'}>
@@ -42,41 +44,100 @@ const Sidebar = ({ }) => {
 
 export default Sidebar;
 
+const Wrapper = ({ children, roles }: { children: React.ReactNode, roles: string[] }) => {
+  return roles.length > 1
+    ? <Badge color={roles.includes('admin')
+      ? 'error'
+      : roles.includes('lawyer')
+        ? 'primary'
+        : roles.includes('editor')
+          ? 'warning'
+          : roles.includes('supervisor')
+            ? 'secondary'
+            : undefined
+    }
+      badgeContent={
+        roles.includes('admin')
+          ? <Shield />
+          : roles.includes('lawyer')
+            ? <Gavel />
+            : roles.includes('editor')
+              ? <Edit />
+              : roles.includes('supervisor')
+                ? <SupervisorAccount />
+                : ''
+      }
+    >
+      {children}
+    </Badge>
+    : <>{children}</>
+}
+
 export function LoggedInUserDisplay() {
   const { userProfile } = useAuth();
   const router = useRouter();
 
-  return <div style={{ width: 'calc(100% - 1.5rem)' }}
-    className={'border p-2 rounded-xl self-center  flex items-center justify-start pl-2 mr-2 ml-2 pr-4 mt-4 mb-2'}>
-    {userProfile ?
-      <Avatar src={userProfile.photoURL} variant="circular" />
-      :
-      <Box sx={{
-        borderColor: 'primary.main',
-        borderWidth: 1,
-        borderRadius: '10px',
-        width: 40,
-        height: 40,
-        fontSize: '1.2rem'
-      }}
-        className={'flex items-center justify-center bg-white'}
-      >
-        {<QuestionMark color={'primary'} className='absolute z-0' />}
-      </Box>}
-    <div className='flex flex-col ml-3'>
-      {userProfile ?
-        <>
-          <p className={'text-sm'}>{userProfile?.displayName} </p>
-          <Typography component={'p'} color={'primary'}
-            className={'text-xs '}>Zalogowano.</Typography>
-        </>
-        : <>
-          <p className='text-sm'>Nie jesteś zalogowany/a.</p>
-          <Link href={`/login?redirect=${router.pathname}`} passHref>
-            <Typography component={'a'} className={'text-sm'} color={'primary'}>Zaloguj się
-              tutaj.</Typography>
-          </Link>
-        </>}
-    </div>
-  </div>;
+  return <Link passHref href={userProfile ? '/account' : `/login?redirect=${router.pathname}`}>
+    <a className="w-full pr-6 pl-1.5 flex flex-col">
+      <Wrapper roles={userProfile?.roles ?? []}>
+        <Tooltip placement="right-start" sx={{ background: 'transparent !important' }} title={
+          userProfile && userProfile.roles.length > 1 ?
+            <div className="inline-flex flex-col gap-3 items-center flex-wrap">
+              {
+                userProfile.roles.filter(role => role !== 'user').map(role =>
+                  <Chip className="p-1 rounded" label={roleToPolish(role).text} color={roleToPolish(role).color as any} size='small' />
+                )
+              }
+            </div>
+            : ''
+        }>
+          <div
+            className={'w-full border p-2 hover:border-blue-500 hover:bg-blue-50 cursor-pointer rounded-xl self-center  flex items-center justify-start pl-2  ml-2 pr-4 mb-2'}>
+            {userProfile ?
+              <Avatar src={userProfile.photoURL} variant="circular" />
+              :
+              <Box sx={{
+                borderWidth: 1,
+                borderRadius: '10px',
+                width: 40,
+                height: 40,
+                fontSize: '1.2rem'
+              }}
+                className={'cursor-pointer flex items-center justify-center'}
+              >
+                <QuestionMark color={'primary'} className='absolute z-0' />
+              </Box>}
+            <div className='flex flex-col ml-3'>
+              {userProfile ?
+                <>
+                  <p className={'text-sm'}>{userProfile?.displayName} </p>
+                  <Typography component={'p'} color={'primary'}
+                    className={'text-xs '}>Zalogowano.</Typography>
+                </>
+                : <>
+                  <p className='text-sm'>Nie jesteś zalogowany/a.</p>
+                  <Link href={`/login?redirect=${router.pathname}`} passHref>
+                    <Typography component={'a'} className={'text-sm'} color={'primary'}>Zaloguj się
+                      tutaj.</Typography>
+                  </Link>
+                </>}
+            </div>
+          </div>
+        </Tooltip>
+      </Wrapper>
+    </a>
+  </Link>;
+}
+
+
+const roleToPolish = (role: string) => {
+  if (role === 'admin')
+    return { text: 'administrator', color: 'error' }
+  if (role === 'lawyer')
+    return { text: 'prawnik', color: 'primary' }
+  if (role === 'supervisor')
+    return { text: 'weryfikator', color: 'secondary' }
+  if (role === 'editor')
+    return { text: 'edytor', color: 'warning' }
+  return { text: '' }
 }

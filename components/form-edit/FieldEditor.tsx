@@ -1,12 +1,15 @@
 import { ArrowBack, Delete, Edit, List } from "@mui/icons-material";
-import { Alert, Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material';
+import { Alert, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material';
+import { DatePicker } from "@mui/x-date-pickers";
 import { ErrorMessage, Field, Formik } from "formik";
 import { cloneDeep } from 'lodash';
 import { useRouter } from "next/router";
 import React from "react";
 import { FieldDescription, getDefaultField, useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import EditorField from "../form/EditorField";
-import ConditionEditor, { comparatorsForNotRequiredValuesPolish, comparatorsPolish, Condition, ConditionCalculationSequence } from "./ConditionCalculationEditor";
+import { ConditionCalculationDisplay } from "./condition-calculation-editor/ConditionCalculationDisplay";
+import ConditionEditor from "./condition-calculation-editor/ConditionCalculationEditorProvider";
+import { FormNormalize } from "./condition-calculation-editor/normalizers/FormNormalize";
 import { useFormEditorLocation } from './FormEditor';
 
 const FieldEditor = () => {
@@ -28,9 +31,7 @@ const FieldEditor = () => {
   const fieldDescription = description[step as number].children[fragment as number].children[field as number]
   const deleteField = () => {
     const newDescription = cloneDeep(description);
-    newDescription[step as number].children[fragment as number].children = newDescription[step as number].children[fragment as number].children.filter((v, i) => i != field as number);
-    modifyDescription(['form_set_description', newDescription]);
-
+    modifyDescription(['form_set_description', FormNormalize.conditions(newDescription, location, true)]);
     router.back();
   }
 
@@ -63,7 +64,7 @@ const FieldEditor = () => {
     }
     router.back();
   }} validateOnChange>
-    {({ values, errors, touched, isValid, submitForm, setFieldValue }) => {
+    {({ values, errors, touched, isValid, submitForm, setFieldValue, setFieldTouched }) => {
       return <div
         style={{ zIndex: 70 }}
         className="mount flex fixed top-0 left-0 w-screen h-screen bg-white"
@@ -171,7 +172,59 @@ const FieldEditor = () => {
                 }
                 name='name' label='nazwa pola' className="w-full bg-white" />
               <ErrorMessage name='name'>{ErrorMessageCallback}</ErrorMessage>
-              <div className='flex mt-8 items-start w-full flex-wrap'>
+              <div className='flex mt-4 items-start w-full flex-wrap'>
+                <FormControl size='small' className="flex-1">
+                  <InputLabel>typ pola</InputLabel>
+                  <Field
+                    as={Select}
+                    name='type'
+                    disabled={router?.query?.new != '1'}
+                    onChange={(e: { target: { value: string } }) => {
+                      setFieldValue('valueType', null);
+                      setFieldValue('numberType', null);
+
+                      setFieldValue('min', '');
+                      setFieldValue('max', '');
+
+                      setFieldValue('type', e.target.value)
+                    }} validate={(value: string) => !value ? 'To pole jest wymagane.' : null}
+                    label='typ pola'
+                    placeholder="wybierz..."
+                    className="w-full bg-white"
+                    size='small'>
+                    <MenuItem value={'text'}>tekst</MenuItem>
+                    <MenuItem value={'date'}>data</MenuItem>
+                    <MenuItem value={'select'}>wybór</MenuItem>
+                  </Field>
+                </FormControl>
+                <ErrorMessage name='type'>{ErrorMessageCallback}</ErrorMessage>
+                <div className="w-4" />
+
+                <span className="flex-1 flex flex-col">
+                  <FormControl disabled={values.type !== 'text' || router?.query?.new != '1'} error={(errors.valueType && touched.valueType) as boolean} size='small' className="w-full">
+                    <InputLabel>wartość pola</InputLabel>
+                    <Field as={Select} variant='outlined'
+                      disabled={values.type !== 'text' || router?.query?.new != '1'}
+                      name='valueType'
+                      defaultValue={null}
+                      onChange={({ target }: { target: { value: string } }) => {
+                        setFieldValue('valueType', target.value);
+                        setFieldValue('numberType', null);
+                        setFieldValue('min', '');
+                        setFieldValue('max', '');
+                      }}
+                      validate={(value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null}
+                      label='wartość pola'
+                      placeholder="wybierz..."
+                      className="w-full bg-white" size='small' >
+                      <MenuItem value={'text'}>tekst</MenuItem>
+                      <MenuItem value={'number'}>liczba</MenuItem>
+                    </Field>
+                  </FormControl>
+                  <ErrorMessage name='valueType'>{ErrorMessageCallback}</ErrorMessage>
+                </span>
+              </div>
+              <div className='flex mt-4 items-start w-full flex-wrap'>
 
                 <span className="flex flex-col flex-1">
                   <Field as={TextField} error={errors.label && touched.label}
@@ -185,7 +238,9 @@ const FieldEditor = () => {
                 </span>
                 <div className="w-4" />
                 <span className="flex flex-col flex-1">
-                  <Field as={TextField} disabled={values.type !== 'text'} error={values.type === 'text' && errors.placeholder && touched.placeholder}
+                  <Field as={TextField}
+                    disabled={values.type !== 'text'}
+                    error={values.type === 'text' && errors.placeholder && touched.placeholder}
                     validate={
                       (value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null
                     }
@@ -197,29 +252,6 @@ const FieldEditor = () => {
               </div>
 
 
-              <div className='flex mt-4 items-start w-full flex-wrap'>
-                <FormControl size='small' className="flex-1">
-                  <InputLabel>typ pola</InputLabel>
-                  <Field as={Select} name='type' onChange={(e: { target: { value: string } }) => { setFieldValue('valueType', null); setFieldValue('type', e.target.value) }} validate={(value: string) => !value ? 'To pole jest wymagane.' : null} label='typ pola' placeholder="wybierz..." className="w-full bg-white" size='small' >
-                    <MenuItem value={'text'}>tekst</MenuItem>
-                    <MenuItem value={'date'}>data</MenuItem>
-                    <MenuItem value={'select'}>wybór</MenuItem>
-                  </Field>
-                </FormControl>
-                <ErrorMessage name='type'>{ErrorMessageCallback}</ErrorMessage>
-                <div className="w-4" />
-
-                <span className="flex-1 flex flex-col">
-                  <FormControl disabled={values.type !== 'text'} error={(errors.valueType && touched.valueType) as boolean} size='small' className="w-full">
-                    <InputLabel>wartość pola</InputLabel>
-                    <Field as={Select} variant='outlined' name='valueType' defaultValue={null} validate={(value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null} label='wartość pola' placeholder="wybierz..." className="w-full bg-white" size='small' >
-                      <MenuItem value={'text'}>tekst</MenuItem>
-                      <MenuItem value={'number'}>liczba</MenuItem>
-                    </Field>
-                  </FormControl>
-                  <ErrorMessage name='valueType'>{ErrorMessageCallback}</ErrorMessage>
-                </span>
-              </div>
 
               <span className="flex-1 flex flex-col">
                 <Field as={TextField} error={errors.description && touched.description}
@@ -239,19 +271,148 @@ const FieldEditor = () => {
               />
               <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
 
-              <FormControlLabel className="mt-5" control={<Checkbox checked={values.required} onChange={(e, value) => { setFieldValue('required', value) }} name='required' />} label='Pole wymagane' />
+              <FormControl disabled={values.valueType !== 'number'} error={(errors.numberType && touched.numberType) as boolean} size='small' className="w-full">
+                <InputLabel>rodzaj liczby</InputLabel>
+                <Field as={Select} variant='outlined'
+                  disabled={values.valueType !== 'number'}
+                  name='numberType'
+                  defaultValue={null}
+                  validate={values.valueType !== 'number'
+                    ? () => { }
+                    : (value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null}
+                  label='wartość pola'
+                  placeholder="wybierz..."
+                  className="w-full bg-white" size='small' >
+                  <MenuItem value={'real'}>liczba rzeczywista</MenuItem>
+                  <MenuItem value={'integer'}>liczba całkowita</MenuItem>
+                </Field>
+              </FormControl>
+              <ErrorMessage name='numberType'>{ErrorMessageCallback}</ErrorMessage>
+
+              {values.type === 'date'
+                ? <span className="inline-flex mt-4 items-start gap-3">
+                  <span className="flex-1">
+                    <FormControl className='w-full' size={'small'}>
+                      <Field as={DatePicker}
+                        name='min'
+                        value={values.min ? new Date(values.min) : null}
+                        onChange={(date: Date) => setFieldValue('min', date.toString())}
+                        renderInput={(params: any) =>
+                          <TextField
+                            size='small'
+                            className="bg-white"
+                            {...Object.assign(params, { error: touched['min'] && errors['min'] })}
+                          />
+                        }
+                        className='w-full' label='wartość minimalna' />
+                    </FormControl>
+                  </span>
+                  <span className="flex flex-col flex-1">
+                    <Field as={DatePicker}
+                      name='max'
+                      value={values.max ? new Date(values.max) : null}
+                      onChange={(date: Date) => setFieldValue('max', date.toString())}
+                      validate={(date: string) => {
+                        if (!date || !values.min)
+                          return null;
+                        if (new Date(values.min as string) >= new Date(date)) {
+                          return 'Wartość maksymalna musi być większa od wartości minimalnej.'
+                        }
+                        return null
+                      }}
+                      renderInput={(params: any) =>
+                        <TextField
+                          onBlur={() => setFieldTouched('max', true)}
+                          size='small'
+                          className="bg-white"
+                          {...Object.assign(params, { error: errors.max && touched.max })}
+                        />
+                      }
+                      className='w-full' label='wartość maksymalna' />
+                    <ErrorMessage name='max'>{ErrorMessageCallback}</ErrorMessage>
+                  </span>
+                </span>
+                : <>
+
+                  <span className="inline-flex items-start gap-3">
+                    <span className="flex flex-col flex-1">
+                      <Field as={TextField} disabled={!values.numberType || values.valueType !== 'number'} error={errors.min && touched.min}
+                        label='wartość minimalna'
+                        validate={
+                          values.valueType !== 'number' || !values.numberType ? () => { } :
+                            (value: string) => {
+                              if (!value)
+                                return null;
+                              if (value === '0')
+                                return null;
+                              if (values.numberType === 'real') {
+                                if (!value.match(/^\-?[1-9][0-9]*[,.]?[0-9]+$/) && !value.match(/^\-?[1-9][0-9]*$/))
+                                  return 'To pole musi zawierać poprawną liczbę rzeczywistą lub całkowitą.'
+                              }
+                              else if (!value.match(/^\-?[1-9][0-9]*$/))
+                                return 'To pole musi zawierać poprawną liczbę całkowitą.'
+                              return null;
+                            }
+                        }
+                        name='min' className='bg-white mt-4 flex-1' size='small'
+                      />
+                      <ErrorMessage name='min'>{ErrorMessageCallback}</ErrorMessage>
+                      <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
+                    </span>
+                    <span className="flex flex-col flex-1">
+                      <Field as={TextField} disabled={!values.numberType || values.valueType !== 'number'} error={errors.max && touched.max}
+                        validate={
+                          values.valueType !== 'number' || !values.numberType ? () => { } :
+                            (value: string) => {
+                              if (!value)
+                                return null;
+                              if (value === '0')
+                                return null;
+                              if (values.numberType === 'real') {
+                                if (!value.match(/^\-?[1-9][0-9]*[,.]?[0-9]+$/) && !value.match(/^\-?[1-9][0-9]*$/))
+                                  return 'To pole musi zawierać poprawną liczbę rzeczywistą lub całkowitą.'
+                              }
+                              else if (!value.match(/^\-?[1-9][0-9]*$/))
+                                return 'To pole musi zawierać poprawną liczbę całkowitą.'
+
+                              if (values.numberType === 'real'
+                                ? parseFloat(value.replaceAll(',', '.')) <= parseFloat((values.min as string).replaceAll(',', '.'))
+                                : parseInt(value.replaceAll(',', '.')) <= parseInt((values.min as string).replaceAll(',', '.'))
+                              )
+                                return 'Wartość maksymalna musi być większa od wartości minimalnej.'
+                              return null;
+                            }
+                        }
+                        label='wartość maksymalna'
+                        name='max' className='bg-white mt-4 flex-1' size='small'
+                      />
+                      <ErrorMessage name='max'>{ErrorMessageCallback}</ErrorMessage>
+                      <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
+                    </span>
+                  </span>
+                </>}
+
+
+
+
+              {/*<FormControlLabel className="mt-5" control={<Checkbox checked={values.required} onChange={(e, value) => { setFieldValue('required', value) }} name='required' />} label='Pole wymagane' />*/}
               <FormControlLabel control={<Checkbox name='fullWidth' checked={values.fullWidth} onChange={(e, value) => { setFieldValue('fullWidth', value) }} />} label='Pełna szerokość' />
 
 
-              <span className="items-center mt-6 justify-between flex w-full">
+
+
+              <span className="items-center mt-6 justify-between mb-4 flex w-full">
                 <pre className="text-base" >Aktywne</pre>
                 <div className="border-b flex-1 ml-4 mr-4" />
                 <p className="uppercase text-sm font-bold">{!values.condition.components.length ? 'zawsze' : 'warunkowo'}</p>
 
               </span>
 
-              <ConditionDisplay first sequence={values.condition} />
-              <Button onClick={() => setEditingCondition(true)} className="self-end border-none p-0" size='small' >Zmień</Button>
+              {values.condition.components.length ?
+                <ConditionCalculationDisplay first type='condition' sequence={values.condition} />
+                : null
+              }
+              <Button onClick={() => setEditingCondition(true)} className="self-end mt-4 border-none p-0" size='small' >Zmień</Button>
               {editingCondition ?
                 <ConditionEditor
                   type='condition'
@@ -295,75 +456,9 @@ const FieldEditor = () => {
     }}
 
 
-  </Formik>
+  </Formik >
 }
 
 export const ErrorMessageCallback = (message: string) => <p className="w-full text-right text-red-500 text-xs">{message}</p>
 
-const ConditionDisplay = ({ sequence, first }: { sequence: ConditionCalculationSequence, first?: true }) => {
-  const { names } = useFormDescription();
-
-  const Wrapper = ({ children, first }: { children: React.ReactNode, first?: true }) => {
-    return first
-      ? <span className="inline-flex gap-1 items-center flex-wrap justify-center">
-        {children}
-      </span>
-      : <>
-        {children}
-      </>
-  }
-
-  return <Wrapper first>
-    {sequence.components.map((element, index) => <> <>
-      {(element as ConditionCalculationSequence).components
-        ? <ConditionDisplay sequence={element as ConditionCalculationSequence} />
-        : <div className='border border-transparent inline-flex gap-2 items-center rounded-lg  p-2'>
-          {index === 0 && !first ? <div className="bg-gray-400 p-2 rounded"><pre className="inline text-white">(</pre></div> : null}
-          {
-            (element as Condition).variable?.endsWith('~')
-              ? <p className='text-xs'>długość listy</p>
-              : null
-          }
-
-          <Chip
-            color={(element as Condition).variable?.endsWith('~')
-              ? 'warning'
-              : names.find(name => name.name == (element as Condition).variable)?.list != null
-                ? 'error'
-                : 'info'
-            }
-            label={
-              !(element as Condition).variable?.endsWith('~')
-                ? (element as Condition).variable
-                : `Krok ${parseInt((element as Condition).variable?.slice(4, -7) ?? '-1') + 1}`
-            } />
-
-          {comparatorsPolish.concat(comparatorsForNotRequiredValuesPolish).find(comp => comp[0] === (element as Condition).comparator)?.[1]}
-
-          {
-            (element as Condition).value.type != null && (element as Condition).value.value != null
-              ? (element as Condition).value.type === 'variable'
-                ? <Chip label={(element as Condition).value.value} />
-                : (element as Condition).value.type === 'constant'
-                  ? <p className='text-sm'>{(element as Condition).value.value}<p className='inline text-xs italic ml-2'>(wartość stała)</p> </p>
-                  : null //to be replaced 
-              : null
-
-          }</div>}
-
-      {index === sequence.components.length - 1 && !first ? <div className="p-2 bg-gray-400 rounded"><pre className="inline text-white">)</pre></div> : null}
-    </>
-      {
-        index < sequence.components.length - 1
-          ? <Chip size='small' color='secondary'
-            label={sequence.operators[index] == '&' ? '∧' : sequence.operators[index] == '|' ? '∨' : '⊻'} />
-          : null
-      }
-    </>)
-    }
-  </Wrapper>
-}
-
 export default FieldEditor;
-
-

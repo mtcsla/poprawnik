@@ -19,6 +19,7 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
       articles.push({ id: doc.id, ...doc.data() } as IArticleContents)
     );
 
+
     return {
       props: {
         articles,
@@ -30,7 +31,9 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
   }
 };
 
+
 const Articles = ({ articles }: { articles: IArticleContents[] }) => {
+
   return (
     <>
       <h1>Wszystkie artykuły</h1>

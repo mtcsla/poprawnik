@@ -18,7 +18,9 @@ const EditDocumentForm = () => {
 
   React.useEffect(() => {
     if (router.isReady) {
-      const newQuery = { id: router.query.id }
+      const newQuery = router.query.random === 'true' ? { id: router.query.id, random: true } : { id: router.query.id }
+
+
       router.replace({ pathname: router.pathname, query: newQuery })
     }
     if (userProfile && router.isReady && router.query['id']) {

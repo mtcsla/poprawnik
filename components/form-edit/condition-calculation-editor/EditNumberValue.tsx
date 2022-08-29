@@ -2,15 +2,17 @@ import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormCo
 import { DatePicker } from '@mui/x-date-pickers';
 import { Field, Formik } from 'formik';
 import React from 'react';
-import { FieldValueType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { FieldType, FieldValueType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { useFormEditorLocation } from '../FormEditor';
 import { ConditionCalculationDisplay } from './ConditionCalculationDisplay';
 import ConditionCalculationEditor, { ConditionCalculationSequence, ConditionValue } from './ConditionCalculationEditorProvider';
 
 
 
-export const EditNumberValue = ({ type, save, cancel, initValue, nested }: {
+export const EditNumberValue = ({ type, inputType, save, cancel, initValue, nested, options }: {
   type: FieldValueType;
+  inputType?: FieldType;
+  options?: string[];
   initValue: ConditionValue;
   save: (value: ConditionValue) => void;
   cancel: () => void;
@@ -22,6 +24,8 @@ export const EditNumberValue = ({ type, save, cancel, initValue, nested }: {
   const [step, fragment, field] = location as [number, number, number];
 
   const [editingCalcualtion, setEditingCalculation] = React.useState<boolean>(false);
+
+
 
   const globalVariableNames = React.useMemo(() => names.filter(item => (item.step < step || (item.step === step && item.fragment < fragment))
     && item.list == null && item.valueType === type
@@ -94,16 +98,27 @@ export const EditNumberValue = ({ type, save, cancel, initValue, nested }: {
                 </Field>
               </FormControl>
               : values.type === 'constant'
-                ? <Field as={type === 'date' ? DatePicker : TextField}
-                  onChange={(value: any) => setFieldValue('value', value)}
-                  value={values.value}
-                  placeholder={`wprowadź ${type === 'text'
-                    ? 'tekst'
-                    : type == 'number'
-                      ? 'liczbę'
-                      : 'datę'}`} name='value'
-                  renderInput={type === 'date' ? (props: any) => <TextField {...props} /> : undefined}
-                />
+                ? inputType === 'select' && options
+                  ?
+                  <>
+                    <FormControl>
+                      <InputLabel>stała</InputLabel>
+                      <Field as={Select} value={values.value} name='value' label='stała' >
+                        {options.map(option => <MenuItem value={option}>{option}</MenuItem>)}
+                      </Field>
+                    </FormControl>
+                  </>
+                  : <Field as={type === 'date' ? DatePicker : TextField}
+                    onChange={(value: any) => setFieldValue('value', type === 'date' ? value : value.target.value)}
+                    value={values.value}
+                    label='stała'
+                    placeholder={`wprowadź ${type === 'text'
+                      ? 'tekst'
+                      : type == 'number'
+                        ? 'liczbę'
+                        : 'datę'}`} name='value'
+                    renderInput={type === 'date' ? (props: any) => <TextField {...props} /> : undefined}
+                  />
                 : values.type
                   ? <>
                     {

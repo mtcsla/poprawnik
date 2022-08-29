@@ -37,7 +37,27 @@ const theme = createTheme({
       contrastText: '#fff',
     }
   },
+
   components: {
+    MuiSnackbar: {
+      styleOverrides: {
+        root: {
+        }
+      }
+    },
+    MuiDialog: {
+      styleOverrides: {
+        root: {
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+        },
+        paper: {
+          maxWidth: '100vw !important',
+          margin: 0
+        }
+      }
+
+    },
     MuiTextField: {
       styleOverrides: {
         root: {
@@ -102,7 +122,8 @@ const theme = createTheme({
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          background: 'transparent !important'
+          background: 'transparent !important',
+          zIndex: 1000,
         }
       }
     },

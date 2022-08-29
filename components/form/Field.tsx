@@ -3,20 +3,24 @@ import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/mater
 import { DatePicker } from '@mui/x-date-pickers';
 import { ErrorMessage, Field } from 'formik';
 import React from 'react';
-import { FormikContextValue, useFormValue } from '../../pages/forms/[id]/form';
+import { FormikContextValue, FormValues, NestedFormValue, useFormValue } from '../../pages/forms/[id]/form';
 import { FieldDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { ErrorMessageCallback } from '../form-edit/FieldEditor';
+import { Validators } from '../utility/ValidatorFactories';
 
 export type UserFieldProps = {
   field: FieldDescription,
   fullWidth?: true,
   display?: true,
+  context?: React.Context<FormikContextValue>,
+  valueDisplay?: true,
+  values?: FormValues<NestedFormValue>
 }
 
 /**
  * Make sure the field is a child to formik!
 */
-const UserField = ({ field, fullWidth, display }: UserFieldProps): JSX.Element => {
+const UserField = ({ field, fullWidth, display, valueDisplay, context, values }: UserFieldProps): JSX.Element => {
   const FieldWrapper = styled.span`
     ${field.fullWidth ? 'flex: 1; min-width: 100%;' : 'width: 49%; max-width: 49%;'}
     @media (max-width: 700px) {
@@ -29,23 +33,34 @@ const UserField = ({ field, fullWidth, display }: UserFieldProps): JSX.Element =
 
   const TypedField = React.useMemo(() => {
     if (field.type === 'date')
-      return <UserDateField {...{ field, display }} />
+      return <UserDateField {...{ field, display, context }} />
     else if (field.type === 'select')
-      return <UserSelectField {...{ field }} />
-    else return <UserTextField {...{ field }} />
+      return <UserSelectField {...{ field, context }} />
+    else return <UserTextField {...{ field, context }} />
   }, []
   )
 
   return <FieldWrapper className='flex w-full flex-col items-start  mb-4'>
-    {TypedField}
-    <ErrorMessage name={field.name}>{ErrorMessageCallback}</ErrorMessage>
+    {
+      valueDisplay
+        ? <div className='border rounded px-2 py-2 w-full flex flex-col'>
+          <p className='text-sm bg-white px-1 -mt-5  text-slate-500 self-start'>{field.label}</p>
+          <p className='px-1 py-0 my-0 truncate'>{values?.[field.name as string] as any}</p>
+        </div>
+        : <>
+          {TypedField}
+          <ErrorMessage name={field.name}>{ErrorMessageCallback}</ErrorMessage>
+        </>
+    }
   </FieldWrapper>
 }
 
 
 interface FieldProps extends FormikContextValue { field: FieldDescription };
-const UserDateField = ({ field, display }: UserFieldProps) => {
-  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = useFormValue();
+const UserDateField = ({ field, display, context }: UserFieldProps) => {
+  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = context ? React.useContext(context) : useFormValue();
+
+  const validatorFunction = React.useMemo(() => Validators.factory(field).date(), [field]);
 
   return <FormControl className='w-full' size={field.fullWidth ? 'medium' : 'small'}>
     <Field as={DatePicker}
@@ -53,31 +68,31 @@ const UserDateField = ({ field, display }: UserFieldProps) => {
       maxDate={field.max ? new Date(field.max) : undefined}
       minDate={field.min ? new Date(field.min) : undefined}
       value={display ? null : values[field.name]}
-      onChange={(date: Date) => setFieldValue(field.name, date)}
-      validate={(date: Date) => {
-        if (field.required)
-          if (!date)
-            return 'To pole jest wymagane.';
-        return null
+      onChange={(date: Date) => {
+        setFieldValue(field.name, date, true);
       }}
+      validate={validatorFunction}
       renderInput={(params: any) =>
         <TextField
-          size={field.fullWidth ? 'medium' : 'small'} {...Object.assign(params, { error: touched[field.name] && errors[field.name] })} />}
+          onBlur={() => setFieldTouched(field.name, true)}
+          size={field.fullWidth ? 'medium' : 'small'} {...Object.assign(params, { error: !!(touched[field.name] && errors[field.name]) })} />}
       className='w-full' label={field.label} />
   </FormControl>
 
 }
-const UserSelectField = ({ field }: UserFieldProps) => {
-  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = useFormValue();
+const UserSelectField = ({ field, context }: UserFieldProps) => {
+  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = context ? React.useContext(context) : useFormValue();
+
+  const validatorFunction = React.useMemo(() => Validators.factory(field).select(), [field]);
 
   return <FormControl className='w-full'
-    error={(touched[field.name] && errors[field.name]) as boolean}
+    error={!!(touched[field.name] && errors[field.name]) as boolean}
     size={field.fullWidth ? 'medium' : 'small'}>
     <InputLabel>{field.label}</InputLabel>
     <Field
       className='w-full'
       as={Select}
-      validate={(value: string) => !value ? 'To pole jest wymagane.' : null}
+      validate={validatorFunction}
       label={field.label}
       name={field.name}>
       {field.options.map(option => <MenuItem value={option}>{option}</MenuItem>)}
@@ -85,38 +100,18 @@ const UserSelectField = ({ field }: UserFieldProps) => {
     </Field>
   </FormControl>
 }
-const UserTextField = ({ field }: UserFieldProps) => {
-  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = useFormValue();
+const UserTextField = ({ field, context }: UserFieldProps) => {
+  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = context ? React.useContext(context) : useFormValue();
+
+  const validatorFunction = React.useMemo(() => Validators.factory(field).text(), [field]);
+
   return <>
-    <Field validate={(value: string) => {
-      if (field.required)
-        if (!value)
-          return 'To pole jest wymagane.'
-
-      const parser = field.numberType === 'real' ? parseFloat : parseInt
-
-      const min = field.min ? parser((field.min as string).replaceAll(',', '.')) : -1000000000000000000000000000000000000000000000;
-      const max = field.max ? parser((field.max as string).replaceAll(',', '.')) : 1000000000000000000000000000000000000000000000;
-
-      if (values.numberType === 'real') {
-        if (!value.match(/^\-?[1-9][0-9]*[,.]?[0-9]+$/) && !value.match(/^\-?[1-9][0-9]*$/))
-          return 'To pole musi zawierać poprawną liczbę rzeczywistą lub całkowitą.'
-      }
-      else if (!value.match(/^\-?[1-9][0-9]*$/))
-        return 'To pole musi zawierać poprawną liczbę całkowitą.'
-
-      if (parser(value) < min)
-        return `Wartość pola musi być większa od ${min}.`
-      if (parser(value) > max)
-        return `Wartość pola muse być mniejsza od ${max}.`
-
-      return null;
-    }
-    } size={field.fullWidth ? 'medium' : 'small'} label={field.label} placeholder={field.placeholder} helperText={field.hint}
-
-      className='w-full' as={TextField} name={field.name} error={touched[field.name] && errors[field.name]} />
+    <Field validate={validatorFunction}
+      size={field.fullWidth ? 'medium' : 'small'} label={field.label} placeholder={field.placeholder} helperText={field.hint}
+      className='w-full' as={TextField} name={field.name} error={!!(touched[field.name] && errors[field.name]) as boolean} />
   </>
 }
 
 
 export default UserField;
+

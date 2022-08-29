@@ -1,5 +1,5 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, query, where } from '@firebase/firestore';
-import { Article } from '@mui/icons-material';
+import { Add, Article } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton } from '@mui/material';
 import Link from 'next/link';
@@ -149,7 +149,15 @@ const YourForms = ({ }) => {
 
       }
 
-      <LoadingButton className='mt-8' onClick={newForm} disabled={deleting} loading={creatingForm}>Nowe pismo</LoadingButton>
+      {!deleting
+        ? <LoadingButton className='mt-8 p-4 bg-blue-500 text-white' onClick={newForm} disabled={deleting} loading={creatingForm}>
+          <Add className='mr-2' /> Nowe pismo
+        </LoadingButton>
+        :
+        <LoadingButton className='mt-8 p-4' onClick={newForm} disabled loading={creatingForm}>
+          <Add className='mr-2' /> Nowe pismo
+        </LoadingButton>
+      }
       {error ? <p className='text-red-500 text-xs'>{error}</p> : null}
     </>
       :

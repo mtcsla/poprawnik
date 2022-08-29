@@ -18,6 +18,7 @@ const FieldEditor = () => {
   const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(false);
   const [newOptionDialogOpen, setNewOptionDialogOpen] = React.useState<boolean>(false);
+  const [deleteConditionOpen, setDeleteConditionOpen] = React.useState<boolean>(false);
   const [editingCondition, setEditingCondition] = React.useState<boolean>(false);
 
   const [newOption, setNewOption] = React.useState<string>('');
@@ -135,9 +136,11 @@ const FieldEditor = () => {
               }
               {!values.options.length ? <div className="h-14 p-4 flex items-center justify-center border bg-red-50 border-red-500 rounded-lg mt-2"><pre className="text-red-500">brak</pre></div>
                 : values.options.map((option, index) =>
-                  <div className="flex items-center mt-4 justify-between "><p><b className="inline mr-2 text-blue-500">{index + 1}</b>
-                    <div className="inline p-2 pl-4 pr-4 rounded-lg border bg-slate-50">{option}</div>
-                  </p>
+                  <div className="flex items-center mt-4 justify-between ">
+                    <p>
+                      <p className="inline mr-2 bg-slate-100 p-2 px-3  rounded-3xl">{index + 1}</p>
+                      <div className="inline p-2 pl-4 pr-4 ">{option}</div>
+                    </p>
                     <Button className="border-none">
                       <Delete color='error' onClick={() => setFieldValue('options', values.options.filter((v, i) => index != i))} />
                     </Button></div>
@@ -271,131 +274,137 @@ const FieldEditor = () => {
               />
               <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
 
-              <FormControl disabled={values.valueType !== 'number'} error={(errors.numberType && touched.numberType) as boolean} size='small' className="w-full">
-                <InputLabel>rodzaj liczby</InputLabel>
-                <Field as={Select} variant='outlined'
-                  disabled={values.valueType !== 'number'}
-                  name='numberType'
-                  defaultValue={null}
-                  validate={values.valueType !== 'number'
-                    ? () => { }
-                    : (value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null}
-                  label='wartość pola'
-                  placeholder="wybierz..."
-                  className="w-full bg-white" size='small' >
-                  <MenuItem value={'real'}>liczba rzeczywista</MenuItem>
-                  <MenuItem value={'integer'}>liczba całkowita</MenuItem>
-                </Field>
-              </FormControl>
-              <ErrorMessage name='numberType'>{ErrorMessageCallback}</ErrorMessage>
+              {values.valueType === 'number' ? <>
+                <FormControl disabled={values.valueType !== 'number'} error={(errors.numberType && touched.numberType) as boolean} size='small' className="w-full">
+                  <InputLabel>rodzaj liczby</InputLabel>
+                  <Field as={Select} variant='outlined'
+                    disabled={values.valueType !== 'number'}
+                    name='numberType'
+                    defaultValue={null}
+                    validate={values.valueType !== 'number'
+                      ? () => { }
+                      : (value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null}
+                    label='wartość pola'
+                    placeholder="wybierz..."
+                    className="w-full bg-white" size='small' >
+                    <MenuItem value={'real'}>liczba rzeczywista</MenuItem>
+                    <MenuItem value={'integer'}>liczba całkowita</MenuItem>
+                  </Field>
+                </FormControl>
+                <ErrorMessage name='numberType'>{ErrorMessageCallback}</ErrorMessage>
+              </>
+                : null
+              }
 
-              {values.type === 'date'
-                ? <span className="inline-flex mt-4 items-start gap-3">
-                  <span className="flex-1">
-                    <FormControl className='w-full' size={'small'}>
+              {values.type === 'date' || values.valueType === 'number'
+                ? values.type === 'date'
+                  ? <span className="inline-flex mt-4 items-start gap-3">
+                    <span className="flex-1">
+                      <FormControl className='w-full' size={'small'}>
+                        <Field as={DatePicker}
+                          name='min'
+                          value={values.min ? new Date(values.min) : null}
+                          onChange={(date: Date) => setFieldValue('min', date.toString())}
+                          renderInput={(params: any) =>
+                            <TextField
+                              size='small'
+                              className="bg-white"
+                              {...Object.assign(params, { error: touched['min'] && errors['min'] })}
+                            />
+                          }
+                          className='w-full' label='wartość minimalna' />
+                      </FormControl>
+                    </span>
+                    <span className="flex flex-col flex-1">
                       <Field as={DatePicker}
-                        name='min'
-                        value={values.min ? new Date(values.min) : null}
-                        onChange={(date: Date) => setFieldValue('min', date.toString())}
+                        name='max'
+                        value={values.max ? new Date(values.max) : null}
+                        onChange={(date: Date) => setFieldValue('max', date.toString())}
+                        validate={(date: string) => {
+                          if (!date || !values.min)
+                            return null;
+                          if (new Date(values.min as string) >= new Date(date)) {
+                            return 'Wartość maksymalna musi być większa od wartości minimalnej.'
+                          }
+                          return null
+                        }}
                         renderInput={(params: any) =>
                           <TextField
+                            onBlur={() => setFieldTouched('max', true)}
                             size='small'
                             className="bg-white"
-                            {...Object.assign(params, { error: touched['min'] && errors['min'] })}
+                            {...Object.assign(params, { error: errors.max && touched.max })}
                           />
                         }
-                        className='w-full' label='wartość minimalna' />
-                    </FormControl>
-                  </span>
-                  <span className="flex flex-col flex-1">
-                    <Field as={DatePicker}
-                      name='max'
-                      value={values.max ? new Date(values.max) : null}
-                      onChange={(date: Date) => setFieldValue('max', date.toString())}
-                      validate={(date: string) => {
-                        if (!date || !values.min)
-                          return null;
-                        if (new Date(values.min as string) >= new Date(date)) {
-                          return 'Wartość maksymalna musi być większa od wartości minimalnej.'
-                        }
-                        return null
-                      }}
-                      renderInput={(params: any) =>
-                        <TextField
-                          onBlur={() => setFieldTouched('max', true)}
-                          size='small'
-                          className="bg-white"
-                          {...Object.assign(params, { error: errors.max && touched.max })}
-                        />
-                      }
-                      className='w-full' label='wartość maksymalna' />
-                    <ErrorMessage name='max'>{ErrorMessageCallback}</ErrorMessage>
-                  </span>
-                </span>
-                : <>
-
-                  <span className="inline-flex items-start gap-3">
-                    <span className="flex flex-col flex-1">
-                      <Field as={TextField} disabled={!values.numberType || values.valueType !== 'number'} error={errors.min && touched.min}
-                        label='wartość minimalna'
-                        validate={
-                          values.valueType !== 'number' || !values.numberType ? () => { } :
-                            (value: string) => {
-                              if (!value)
-                                return null;
-                              if (value === '0')
-                                return null;
-                              if (values.numberType === 'real') {
-                                if (!value.match(/^\-?[1-9][0-9]*[,.]?[0-9]+$/) && !value.match(/^\-?[1-9][0-9]*$/))
-                                  return 'To pole musi zawierać poprawną liczbę rzeczywistą lub całkowitą.'
-                              }
-                              else if (!value.match(/^\-?[1-9][0-9]*$/))
-                                return 'To pole musi zawierać poprawną liczbę całkowitą.'
-                              return null;
-                            }
-                        }
-                        name='min' className='bg-white mt-4 flex-1' size='small'
-                      />
-                      <ErrorMessage name='min'>{ErrorMessageCallback}</ErrorMessage>
-                      <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
-                    </span>
-                    <span className="flex flex-col flex-1">
-                      <Field as={TextField} disabled={!values.numberType || values.valueType !== 'number'} error={errors.max && touched.max}
-                        validate={
-                          values.valueType !== 'number' || !values.numberType ? () => { } :
-                            (value: string) => {
-                              if (!value)
-                                return null;
-                              if (value === '0')
-                                return null;
-                              if (values.numberType === 'real') {
-                                if (!value.match(/^\-?[1-9][0-9]*[,.]?[0-9]+$/) && !value.match(/^\-?[1-9][0-9]*$/))
-                                  return 'To pole musi zawierać poprawną liczbę rzeczywistą lub całkowitą.'
-                              }
-                              else if (!value.match(/^\-?[1-9][0-9]*$/))
-                                return 'To pole musi zawierać poprawną liczbę całkowitą.'
-
-                              if (values.numberType === 'real'
-                                ? parseFloat(value.replaceAll(',', '.')) <= parseFloat((values.min as string).replaceAll(',', '.'))
-                                : parseInt(value.replaceAll(',', '.')) <= parseInt((values.min as string).replaceAll(',', '.'))
-                              )
-                                return 'Wartość maksymalna musi być większa od wartości minimalnej.'
-                              return null;
-                            }
-                        }
-                        label='wartość maksymalna'
-                        name='max' className='bg-white mt-4 flex-1' size='small'
-                      />
+                        className='w-full' label='wartość maksymalna' />
                       <ErrorMessage name='max'>{ErrorMessageCallback}</ErrorMessage>
-                      <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
                     </span>
                   </span>
-                </>}
+                  : <>
+
+                    <span className="inline-flex items-start gap-3">
+                      <span className="flex flex-col flex-1">
+                        <Field as={TextField} disabled={!values.numberType || values.valueType !== 'number'} error={errors.min && touched.min}
+                          label='wartość minimalna'
+                          validate={
+                            values.valueType !== 'number' || !values.numberType ? () => { } :
+                              (value: string) => {
+                                if (!value)
+                                  return null;
+                                if (value === '0')
+                                  return null;
+                                if (values.numberType === 'real') {
+                                  if (!value.match(/^\-?[1-9][0-9]*[,.]?[0-9]+$/) && !value.match(/^\-?[1-9][0-9]*$/))
+                                    return 'To pole musi zawierać poprawną liczbę rzeczywistą lub całkowitą.'
+                                }
+                                else if (!value.match(/^\-?[1-9][0-9]*$/))
+                                  return 'To pole musi zawierać poprawną liczbę całkowitą.'
+                                return null;
+                              }
+                          }
+                          name='min' className='bg-white mt-4 flex-1' size='small'
+                        />
+                        <ErrorMessage name='min'>{ErrorMessageCallback}</ErrorMessage>
+                        <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
+                      </span>
+                      <span className="flex flex-col flex-1">
+                        <Field as={TextField} disabled={!values.numberType || values.valueType !== 'number'} error={errors.max && touched.max}
+                          validate={
+                            values.valueType !== 'number' || !values.numberType ? () => { } :
+                              (value: string) => {
+                                if (!value)
+                                  return null;
+                                if (value === '0')
+                                  return null;
+                                if (values.numberType === 'real') {
+                                  if (!value.match(/^\-?[1-9][0-9]*[,.]?[0-9]+$/) && !value.match(/^\-?[1-9][0-9]*$/))
+                                    return 'To pole musi zawierać poprawną liczbę rzeczywistą lub całkowitą.'
+                                }
+                                else if (!value.match(/^\-?[1-9][0-9]*$/))
+                                  return 'To pole musi zawierać poprawną liczbę całkowitą.'
+
+                                if (values.numberType === 'real'
+                                  ? parseFloat(value.replaceAll(',', '.')) <= parseFloat((values.min as string).replaceAll(',', '.'))
+                                  : parseInt(value.replaceAll(',', '.')) <= parseInt((values.min as string).replaceAll(',', '.'))
+                                )
+                                  return 'Wartość maksymalna musi być większa od wartości minimalnej.'
+                                return null;
+                              }
+                          }
+                          label='wartość maksymalna'
+                          name='max' className='bg-white mt-4 flex-1' size='small'
+                        />
+                        <ErrorMessage name='max'>{ErrorMessageCallback}</ErrorMessage>
+                        <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
+                      </span>
+                    </span>
+                  </>
+                : null}
 
 
 
 
-              {/*<FormControlLabel className="mt-5" control={<Checkbox checked={values.required} onChange={(e, value) => { setFieldValue('required', value) }} name='required' />} label='Pole wymagane' />*/}
+              <FormControlLabel className="mt-5" control={<Checkbox checked={values.required} onChange={(e, value) => { setFieldValue('required', value) }} name='required' />} label='Pole wymagane' />
               <FormControlLabel control={<Checkbox name='fullWidth' checked={values.fullWidth} onChange={(e, value) => { setFieldValue('fullWidth', value) }} />} label='Pełna szerokość' />
 
 
@@ -412,7 +421,14 @@ const FieldEditor = () => {
                 <ConditionCalculationDisplay first type='condition' sequence={values.condition} />
                 : null
               }
-              <Button onClick={() => setEditingCondition(true)} className="self-end mt-4 border-none p-0" size='small' >Zmień</Button>
+              <span className="w-full flex items-center justify-between">
+                <Button onClick={() => setEditingCondition(true)} className="self-end mt-4 border-none p-0" color='error' size='small' >
+                  Usuń warunek
+                </Button>
+                <Button onClick={() => setEditingCondition(true)} className="self-end mt-4 border-none p-0" size='small' >
+                  Zmień
+                </Button>
+              </span>
               {editingCondition ?
                 <ConditionEditor
                   type='condition'

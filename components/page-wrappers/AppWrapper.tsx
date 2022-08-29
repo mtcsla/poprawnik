@@ -79,6 +79,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
             backdropFilter: "blur(10px)",
             background: "rgba(255, 255, 255, 0.6)",
 
+            zIndex: 200,
             left: width && width <= 1100 ? 0 : "calc(18rem)",
             right: 0,
 

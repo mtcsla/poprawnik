@@ -2,7 +2,7 @@ import { Button, ButtonGroup, Chip, Dialog, DialogActions, DialogContent, Dialog
 import { Field, Formik } from 'formik';
 import { isDate } from 'mathjs';
 import React from 'react';
-import { FieldValueType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { FieldType, FieldValueType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { useFormEditorLocation } from '../FormEditor';
 import { ConditionCalculationDisplay } from './ConditionCalculationDisplay';
 import { comparatorsForNotRequiredValuesPolish, comparatorsPolish, comparatorsText, Condition, ConditionCalculationSequence, getEmptyCondition, useSequence } from './ConditionCalculationEditorProvider';
@@ -64,6 +64,17 @@ export const EditCondition = ({ path, add, cancel, initValue }: { path: number[]
         const [loaded1, setLoaded1] = React.useState<boolean>(false);
         const [loaded2, setLoaded2] = React.useState<boolean>(false);
 
+
+        const variableType = React.useMemo((): FieldType => {
+          if (values.variable?.endsWith('Length~'))
+            return 'text';
+          return names.find(name => values.variable === name.name)?.type ?? 'text' as FieldType;
+        }, [values.variable]);
+        const variableOptions = React.useMemo((): string[] => {
+          if (values.variable?.endsWith('Length~'))
+            return [];
+          return names.find(name => values.variable === name.name)?.options ?? [] as string[];
+        }, [values.variable]);
         const variableValueType = React.useMemo((): FieldValueType => {
           if (values.variable?.endsWith('Length~'))
             return 'number';
@@ -153,7 +164,7 @@ export const EditCondition = ({ path, add, cancel, initValue }: { path: number[]
                 </p>
               </Button>}
             {valueEditorOpen ?
-              <EditNumberValue initValue={values.value} type={variableValueType} cancel={() => setValueEditorOpen(false)}
+              <EditNumberValue inputType={variableType} options={variableOptions} initValue={values.value} type={variableValueType} cancel={() => setValueEditorOpen(false)}
                 save={(values) => {
                   setFieldValue('value', values); setValueEditorOpen(false);
                 }} />

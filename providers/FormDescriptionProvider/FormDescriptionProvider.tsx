@@ -80,7 +80,7 @@ export type FormActionWithoutSave =
 
 export type FormAction = FormActionWithoutSave;
 export type NameType = {
-  name: string, required: boolean, step: number, fragment: number, field: number, list: number | null, valueType: FieldValueType
+  name: string, required: boolean, options: string[], type: FieldType, step: number, fragment: number, field: number, list: number | null, valueType: FieldValueType
 };
 
 
@@ -231,6 +231,8 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
               field: fieldIndex,
               required: field.required,
               list: step.type === 'list' ? stepIndex : null,
+              type: field.type,
+              options: field.options,
               valueType: getActualValueType(field)
             })
           })

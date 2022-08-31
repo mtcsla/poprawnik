@@ -2,26 +2,24 @@ import { ArrowDownward, ArrowDropDown, ArrowDropUp, ArrowForwardIos, ArrowUpward
 import { Button, ButtonGroup } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
-import { FormikContextValue, FormValues, NestedFormValue, useFormValue } from '../../pages/forms/[id]/form';
+import { useFormValue } from '../../pages/forms/[id]/form';
 import { StepDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { InitialValues } from '../utility/InitialValues';
+import { FieldProps } from './Field';
 import UserFragment from './Fragment';
 
-export type UserStepProps = {
-  step: StepDescription,
-  context?: React.Context<FormikContextValue>
+export interface StepProps extends FieldProps<StepDescription> {
   nested?: true,
-  display?: true
   setEditingElement?: React.Dispatch<number | null>
-  vals?: FormValues<NestedFormValue>[] | FormValues<NestedFormValue>
 }
 
 
-const UserStep = ({ step, context, nested, display, setEditingElement, vals }: UserStepProps) => {
+const UserStep = ({ element, context, nested, display, setEditingElement, listElementValues, formDescription }: StepProps) => {
   const { values, setFieldValue, setFieldError } = useFormValue();
 
-  const fragments = React.useMemo(() => step.children.map(
-    (fragment, index) => <UserFragment {...{ fragment, index, context, display, values: vals as FormValues<NestedFormValue> }} key={index} />),
-    []
+  const fragments = React.useMemo(() => element.children.map(
+    (element, index) => <UserFragment {...{ element, index, context, valueDisplay: display, formDescription, listElementValues }} key={index} />),
+    element.type === 'step' ? [element] : [element, listElementValues]
   );
 
 
@@ -29,8 +27,8 @@ const UserStep = ({ step, context, nested, display, setEditingElement, vals }: U
     React.useMemo(() => {
       if (nested)
         return [<></>]
-      return step.type === 'list' ?
-        (values[step.name] as []).map(
+      return element.type === 'list' ?
+        (values[element.name] as []).map(
           (value, index) =>
             <div className='pt-0 flex flex-col mb-8 border rounded-lg'>
               <div className='bg-slate-100 flex items-center justify-between rounded-t-lg w-full h-14 mb-8 px-4 sm:px-8 py-4'>
@@ -44,7 +42,7 @@ const UserStep = ({ step, context, nested, display, setEditingElement, vals }: U
                     </Button>
                   </Tooltip>
                   <Tooltip title='Zamień z wartością niżej.'>
-                    <Button disabled={index === (values[step.name] as []).length - 1} className='rounded-r px-3 border-slate-200 bg-white'>
+                    <Button disabled={index === (values[element.name] as []).length - 1} className='rounded-r px-3 border-slate-200 bg-white'>
                       <ArrowDropUp />
                       <ArrowDownward className='scale-75' />
                     </Button>
@@ -54,7 +52,7 @@ const UserStep = ({ step, context, nested, display, setEditingElement, vals }: U
 
 
               <div className='sm:px-8 px-4 cursor-not-allowed'>
-                <UserStep vals={value} nested={true} display key={index} step={step} />
+                <UserStep listElementValues={value} nested={true} display formDescription={formDescription} key={index} element={element} />
               </div>
               <div className='flex w-full p-4 sm:px-6 px-4 justify-end'>
                 <Button
@@ -71,9 +69,9 @@ const UserStep = ({ step, context, nested, display, setEditingElement, vals }: U
             </div>
         )
         : [<></>]
-    }, [(values[step.name] as [])])
+    }, [values[element.name]])
 
-  return step.type === 'step' || nested
+  return element.type === 'step' || nested
     ? <div className='inline-flex w-full gap-4 flex-col'>
       {fragments}
     </div>
@@ -87,6 +85,7 @@ const UserStep = ({ step, context, nested, display, setEditingElement, vals }: U
 
       <Button size='small' onClick={
         () => {
+          setFieldValue(element.name, [...values[element.name], InitialValues.fromStep(element)]);
           setEditingElement?.(-1);
         }
       } className='self-end border-none'>
@@ -100,8 +99,8 @@ const UserStep = ({ step, context, nested, display, setEditingElement, vals }: U
 /*<>
   <Formik initialValues={
     (editingElement as number) >= 0
-      ? (values[step.name] as [])[editingElement as number]
-      : stepToInitData(step)
+      ? (values[element.name] as [])[editingElement as number]
+      : stepToInitData(element)
   } onSubmit={() => { }}>
     {() => null}
   </Formik>

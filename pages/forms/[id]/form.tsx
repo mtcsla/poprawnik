@@ -8,10 +8,11 @@ import React from 'react';
 import { firestore } from '../../../buildtime-deps/firebase';
 import UserStep from '../../../components/form/Step';
 import LogoHeader from '../../../components/LogoHeader';
-import { Validators } from '../../../components/utility/ValidatorFactories';
+import { InitialValues } from '../../../components/utility/InitialValues';
+import { ValidatorsObject } from '../../../components/utility/ValidatorsObject';
 import { useAuth } from '../../../providers/AuthProvider';
 import BodyScrollLock from "../../../providers/BodyScrollLock";
-import { FormDescription, StepDescription } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { FormDescription } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { IFormData } from '../../account/lawyer/index';
 
 export type FormikContextValue = {
@@ -31,6 +32,14 @@ const formikValue = {
   setFieldTouched: () => { },
   setFieldError: () => { }
 }
+
+const topLevelFormDataContext = React.createContext<{
+  values: FormValues<RootFormValue>;
+  currentListIndex: number | null;
+}>({ values: {}, currentListIndex: null });
+
+export const useTopLevelFormData = () => React.useContext(topLevelFormDataContext);
+
 
 const formikContext = React.createContext<FormikContextValue>(formikValue);
 export const useFormValue = () => React.useContext(formikContext);
@@ -79,6 +88,11 @@ const FormDisplay = () => {
 
   const [loading, setLoading] = React.useState(true);
 
+  const dataRef = React.useRef<FormValues<RootFormValue>>({});
+  React.useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
+
   React.useEffect(() => {
     if (!router.isReady)
       return;
@@ -108,7 +122,7 @@ const FormDisplay = () => {
           setData(
             retrievedData
               ? JSON.parse(retrievedData)
-              : descriptionToInitialValues(formDescription)
+              : InitialValues.fromDescription(formDescription)
           );
           setDescription(formDescription);
           setLoading(false);
@@ -127,16 +141,18 @@ const FormDisplay = () => {
         if (!router.query.step
           || parseInt(router.query.step as string) >= description.length
         ) {
-          router.replace(`/forms/${router.query.id}/form?step=${localStorage.getItem(`--${router.query.id}-last-step`) ?? 0}${testing ? '&testing=true' : ''}`).then(
-            () => setCurrentStep(parseInt(router.query.step as string))
+          const step = localStorage.getItem(`--${router.query.id}-last-step`) ?? '0'
+
+          router.replace(`/forms/${router.query.id}/form?step=${step}${testing ? '&testing=true' : ''}`).then(
+            () => setCurrentStep(parseInt(step))
           );
           return
         }
 
         const lastValid = lastValidStep(description, data);
-        if ((lastValid) < parseInt(router.query.step as string)) {
+        if ((lastValid) < (parseInt(router.query.step as string) ?? 2000000000000000000000000000000000000000000000)) {
           router.replace(`/forms/${router.query.id}/form?step=${lastValid}${testing ? '&testing=true' : ''}`).then(
-            () => setCurrentStep(parseInt(router.query.step as string))
+            () => setCurrentStep(lastValid)
           );
           return
         }
@@ -163,120 +179,33 @@ const FormDisplay = () => {
       localStorage.setItem(`--${router.query.id as string}-data`, JSON.stringify(data));
   }
   const nextStep = () => {
-    if (currentStep < description.length - 1)
+    const dataRetrievalFunction = testing ? sessionStorage : localStorage;
+
+    if (currentStep < description.length - 1) {
       router.push(`/forms/${router.query.id}/form?step=${currentStep + 1}${testing ? '&testing=true' : ''}`);
+      return;
+    }
+
+    dataRetrievalFunction.setItem(`--${router.query.id as string}-data`, JSON.stringify(data));
+    dataRetrievalFunction.setItem(`--${router.query.id as string}-last-step`, `${currentStep}`);
+
+    router.push(`/account/lawyer/edit-document/template?id=${router.query.id}`)
   }
 
 
+  const formValidators = React.useMemo(
+    () =>
+      ValidatorsObject.fromDescription(description),
+    [description]
+  )
+  const currentStepValidators = React.useMemo(
+    () =>
+      currentStep >= description.length
+        ? { validate: (values: any) => ({} as ValidatorsObject.Errors) }
+        : ValidatorsObject.fromStep(description[currentStep]),
+    [description, currentStep]
+  )
 
-  const form = React.useMemo(() => {
-    if (description.length > 0 && Object.keys(data).length > 0)
-      return <Formik validateOnChange validateOnMount initialValues={data} onSubmit={() => { }}>
-        {({ values, errors, touched, setFieldValue, setFieldTouched, setFieldError, isValid, submitForm }) => {
-
-          const formikContextValue = { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } as FormikContextValue;
-          const [buttonActive, setButtonActive] = React.useState(true);
-          const [editingElement, setEditingElement] = React.useState<number | null>(null);
-
-          const initialListElementValues = React.useMemo(() => {
-            if (editingElement === null)
-              return {}
-            if (editingElement === -1)
-              return stepToInitialValues(description[currentStep])
-            return (values[description[currentStep].name] as FormValues<NestedFormValue>[])[editingElement as number]
-
-          }, [editingElement])
-
-          React.useEffect(() => {
-            updateData(values);
-          }, [values])
-          React.useEffect(() => { if (isValid && !buttonActive) setButtonActive(true); }, [isValid])
-
-          return <formikContext.Provider value={formikContextValue}>
-            <div className='mt-8' />
-            <UserStep step={description[currentStep]}
-              setEditingElement={setEditingElement} />
-
-            <Dialog open={editingElement !== null}>
-
-              <DialogTitle>
-                <pre className='text-sm text-right'>
-                  {editingElement as number === -1
-                    ? `Dodajesz nowy element do listy`
-                    : `Edytujesz element nr ${editingElement as number + 1} listy`
-                  }
-                </pre>
-              </DialogTitle>
-              <SizedDialogContent>
-                <Formik validateOnChange validateOnMount initialValues={initialListElementValues} onSubmit={(vals: FormValues<NestedFormValue>) => {
-                  if (editingElement === -1) {
-                    const list = values[description[currentStep].name] as FormValues<NestedFormValue>[];
-                    setFieldValue(description[currentStep].name, [...list, vals]);
-                  } else {
-                    const list = values[description[currentStep].name] as FormValues<NestedFormValue>[];
-                    list[editingElement as number] = vals;
-                    setFieldValue(description[currentStep].name, list);
-                  }
-                  setEditingElement(null);
-                }}>
-                  {({ values, errors, touched, setFieldValue, setFieldError, setFieldTouched, submitForm, isValid }) => {
-                    const formikContextValue = { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } as FormikContextValue;
-                    const formikNestedContext = React.useMemo(() => React.createContext(formikContextValue), []);
-
-                    const [buttonActive, setButtonActive] = React.useState(true);
-
-                    React.useEffect(() => {
-                      if (!buttonActive && isValid)
-                        setButtonActive(true);
-                    }, [isValid])
-
-
-                    return <formikNestedContext.Provider value={formikContextValue}>
-                      <UserStep
-                        nested context={formikNestedContext} step={description[currentStep]} />
-                      <span className='flex justify-end mt-4 items-center'>
-                        <Button disabled={!buttonActive} className='border-none' size='small' onClick={
-                          () => {
-                            submitForm();
-                            if (!isValid)
-                              setButtonActive(false);
-                          }
-                        }>Zapisz</Button>
-                        <Button className='border-none' onClick={() => setEditingElement(null)} size='small' color='error'>Anuluj</Button>
-                      </span>
-                    </formikNestedContext.Provider>
-                  }}
-                </Formik>
-              </SizedDialogContent>
-            </Dialog>
-
-
-            <Snackbar open={!buttonActive}>
-              <Alert severity='error'>Wypełnij wszystkie pola poprawnie.</Alert>
-            </Snackbar>
-            <div className={loading ? '' : 'mt-8'} />
-            <Button
-              disabled={!buttonActive}
-              className={`p-2.5 ${buttonActive ? 'bg-blue-500  hover:bg-blue-400' : 'bg-gray-300'} text-white mb-8  ${loading ? '' : 'mt-auto'}`}
-              onClick={() => {
-                if (!isValid) {
-                  submitForm();
-                  setButtonActive(false);
-                }
-                else {
-                  nextStep();
-                }
-              }}>
-              dalej
-              <ArrowForward className='ml-4' />
-            </Button>
-          </formikContext.Provider>
-        }}
-      </Formik>;
-    else return <></>
-  },
-    [description, currentStep, loading]
-  );
 
 
 
@@ -319,7 +248,143 @@ const FormDisplay = () => {
                 <ArrowForward className='ml-4' />
               </Button>
             </>
-            : form
+            : (description.length > 0 && Object.keys(data).length > 0 && currentStep < description.length && currentStep >= 0)
+              ? <Formik validate={
+                values => {
+                  const errors = formValidators.validate(dataRef.current, description);
+                  return errors;
+                }
+              } validateOnMount validateOnChange initialValues={data} onSubmit={() => { }}>
+                {({ values, errors, touched, setFieldValue, setFieldTouched, setFieldError, isValid, submitForm }) => {
+
+                  const formikContextValue = { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } as FormikContextValue;
+                  const setTopFieldValue = setFieldValue
+                  const [buttonActive, setButtonActive] = React.useState(true);
+                  const [editingElement, setEditingElement] = React.useState<number | null>(null);
+
+                  const newListElementValues = React.useRef<FormValues<NestedFormValue>>({});
+
+                  const initialListElementValues = React.useMemo(() => {
+                    if (editingElement === null)
+                      return {}
+                    if (editingElement === -1)
+                      return InitialValues.fromStep(description[currentStep])
+                    return (values[description[currentStep].name] as FormValues<NestedFormValue>[])[editingElement as number]
+
+                  }, [editingElement])
+
+                  React.useEffect(() => {
+                    updateData(values);
+                  }, [values])
+                  React.useEffect(() => { if (isValid && !buttonActive) setButtonActive(true); }, [isValid])
+
+                  return <formikContext.Provider value={formikContextValue}>
+                    <topLevelFormDataContext.Provider value={{ values: dataRef.current, currentListIndex: editingElement === -1 ? (values[description[currentStep].name] as []).length - 1 : editingElement }}>
+                      <div className='mt-8' />
+                      <UserStep element={description[currentStep]} formDescription={description}
+                        setEditingElement={setEditingElement} />
+                      <Dialog open={editingElement !== null}>
+
+                        <DialogTitle>
+                          <pre className='text-sm text-right'>
+                            {editingElement as number === -1
+                              ? `Dodajesz nowy element do listy`
+                              : `Edytujesz element nr ${editingElement as number + 1} listy`
+                            }
+                          </pre>
+                        </DialogTitle>
+                        <SizedDialogContent>
+                          {editingElement != null
+                            ? <Formik
+                              validate={() => {
+                                return currentStepValidators.validate(
+                                  editingElement === -1
+                                    ? newListElementValues.current
+                                    : (data[description[currentStep].name] as FormValues<NestedFormValue>[])[editingElement as number],
+                                  description
+                                );
+                              }}
+                              validateOnChange validateOnMount initialValues={initialListElementValues} onSubmit={(vals: FormValues<NestedFormValue>) => {
+
+                                if (editingElement === -1) {
+                                  const list = values[description[currentStep].name] as FormValues<NestedFormValue>[];
+                                  list[list.length - 1] = vals;
+                                  setFieldValue(description[currentStep].name, [...list]);
+                                } else {
+                                  const list = values[description[currentStep].name] as FormValues<NestedFormValue>[];
+                                  list[editingElement as number] = vals;
+                                  setFieldValue(description[currentStep].name, [...list]);
+                                }
+                                setEditingElement(null);
+                              }}>
+                              {({ values, errors, touched, setFieldValue, setFieldError, setFieldTouched, submitForm, isValid }) => {
+                                const formikContextValue = { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } as FormikContextValue;
+                                const formikNestedContext = React.useMemo(() => React.createContext(formikContextValue), []);
+
+                                const [buttonActive, setButtonActive] = React.useState(true);
+
+                                React.useEffect(() => {
+                                  if (editingElement === -1)
+                                    newListElementValues.current = values;
+                                }, [values])
+
+                                React.useEffect(() => {
+                                  if (!buttonActive && isValid)
+                                    setButtonActive(true);
+                                }, [isValid])
+
+
+                                return <formikNestedContext.Provider value={formikContextValue}>
+                                  <UserStep formDescription={description}
+                                    nested context={formikNestedContext} element={description[currentStep]} />
+                                  <span className='flex justify-end mt-4 items-center'>
+                                    <Button disabled={!buttonActive} className='border-none' size='small' onClick={
+                                      () => {
+                                        submitForm();
+                                        if (!isValid)
+                                          setButtonActive(false);
+                                      }
+                                    }>Zapisz</Button>
+                                    <Button className='border-none' onClick={() => {
+                                      const edited = editingElement;
+                                      setEditingElement(null);
+                                      if (edited === -1)
+                                        setTopFieldValue(description[currentStep].name, (data[description[currentStep].name] as FormValues<NestedFormValue>[]).slice(0, -1))
+                                    }} size='small' color='error'>Anuluj</Button>
+                                  </span>
+                                </formikNestedContext.Provider>
+                              }}
+                            </Formik>
+                            : null}
+                        </SizedDialogContent>
+                      </Dialog>
+
+
+                      <Snackbar open={!buttonActive}>
+                        <Alert severity='error'>Wypełnij wszystkie pola poprawnie.</Alert>
+                      </Snackbar>
+                      <div className={loading ? '' : 'mt-8'} />
+                      <Button
+                        disabled={!buttonActive}
+                        className={`p-2.5 ${buttonActive ? 'bg-blue-500  hover:bg-blue-400' : 'bg-gray-300'} text-white mb-8  ${loading ? '' : 'mt-auto'}`}
+                        onClick={() => {
+                          if (!isValid) {
+                            submitForm();
+                            setButtonActive(false);
+                          }
+                          else {
+                            nextStep();
+                          }
+                        }}>
+                        dalej
+                        <ArrowForward className='ml-4' />
+                      </Button>
+                    </topLevelFormDataContext.Provider>
+                  </formikContext.Provider>
+                }}
+              </Formik>
+              : <></>
+
         }
 
       </Body>
@@ -328,80 +393,13 @@ const FormDisplay = () => {
   </BodyScrollLock>;
 }
 
-export function stepToInitialValues(step: StepDescription) {
-  const initValues = {} as FormValues<NestedFormValue>;
-
-  step.children.forEach((fragment) => {
-    fragment.children.forEach(({ name, type, valueType }) => {
-      initValues[name] = type === 'date' ? null : '' as NestedFormValue;
-    })
-  })
-
-  return initValues;
-}
-
-export function descriptionToInitialValues(description: FormDescription) {
-  let data = {} as FormValues<RootFormValue>;
 
 
-  description.forEach((step) => {
-    if (step.type === 'list')
-      data[step.name] = [] as FormValues<NestedFormValue>[];
-    else
-      data = { ...data, ...stepToInitialValues(step) };
-  });
-
-  return data;
-}
-
-export function stepToValidators(step: StepDescription) {
-  const validators = {} as {
-    [key: string]: (value: any) => string | null;
-  };
-
-  step.children.forEach((fragment) =>
-    fragment.children.forEach((field) => {
-      const { text, select, date } = Validators.factory(field);
-      validators[field.name] = field.type === 'text' ? text() : field.type === 'select' ? select() : date();
-    })
-  )
-
-  return validators;
-}
-export function descriptionToValidators(description: FormDescription) {
-  let validators = {} as { [key: string]: (value: any) => string | null };
-
-  description.forEach((step) => {
-    if (step.type === 'list') {
-      validators[step.name] = (value: FormValues<NestedFormValue>[]) => {
-        return null;
-      }
-    }
-    else
-      validators = { ...validators, ...stepToValidators(step) };
-  });
-
-  return validators;
-}
-
-export function validateValues(values: FormValues<RootFormValue>, validators: { [key: string]: (value: any) => string | null }) {
-  let errors = {} as { [key: string]: string };
-
-  Object.keys(validators).forEach((key) => {
-    const error = validators[key](values[key]);
-
-    if (error)
-      errors = { ...errors, [key]: error };
-  });
-
-  return errors;
-}
-
-function lastValidStep(description: FormDescription, values: FormValues<RootFormValue>) {
+export function lastValidStep(description: FormDescription, values: FormValues<RootFormValue>): number {
   let lastValidStep = 0;
 
   for (let i = 0; i < description.length; i++) {
-    const errors = validateValues(values, descriptionToValidators(description.slice(0, i + 1)));
+    const errors = ValidatorsObject.fromDescription(description.slice(0, i + 1)).validate(values, description);
     if (Object.keys(errors).length === 0)
       lastValidStep = i;
     else

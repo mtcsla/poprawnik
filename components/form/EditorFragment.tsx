@@ -3,8 +3,8 @@ import { Button } from '@mui/material';
 import { Formik } from 'formik';
 import { cloneDeep } from 'lodash';
 import { useRouter } from 'next/router';
-import { FragmentDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
-import UserField, { UserFieldProps } from './Field';
+import { FieldDescription, FragmentDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import UserField, { FieldProps } from './Field';
 const EditorFragment = ({ fragment, editor, }: { editor: boolean, fragment: FragmentDescription }) => {
   const router = useRouter();
 
@@ -28,16 +28,16 @@ const EditorFragment = ({ fragment, editor, }: { editor: boolean, fragment: Frag
       : <Formik initialValues={{}} onSubmit={() => { }}>{
         ({ values, errors, touched }) =>
           <div className='inline-flex justify-between items-start flex-wrap w-full'>
-            {fragment.children.map((field, index) =>
+            {fragment.children.map((element, index) =>
 
               <Button onClick={() => {
                 const newQuery = cloneDeep(router.query)
                 newQuery.field = (index).toString()
                 router.push({ pathname: router.pathname, query: newQuery });
               }}
-                className='font-normal normal-case  p-1 pb-0 hover:bg-transparent h-auto border-transparent mb-1' style={field.fullWidth ? { width: '100%' } : { width: '49%' }}>
+                className='font-normal normal-case  p-1 pb-0 hover:bg-transparent h-auto border-transparent mb-1' style={element.fullWidth ? { width: '100%' } : { width: '49%' }}>
                 <span className='pointer-events-none w-full'>
-                  <UserField display fullWidth  {...{ field } as UserFieldProps} />
+                  <UserField display fullWidth  {...{ element } as FieldProps<FieldDescription>} />
                 </span>
               </Button>
             )}

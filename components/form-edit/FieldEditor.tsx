@@ -165,7 +165,6 @@ const FieldEditor = () => {
                 validate={
                   router?.query?.new != '1' ? () => null :
                     (value: string) => {
-                      console.log(names);
                       if (!value)
                         return 'To pole jest wymagane.'
                       if (!value.match(/^[a-z_0-9]*$/))

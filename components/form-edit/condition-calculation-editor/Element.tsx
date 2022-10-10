@@ -6,6 +6,7 @@ import { useFormDescription } from '../../../providers/FormDescriptionProvider/F
 import { ConditionCalculationDisplay } from './ConditionCalculationDisplay';
 import { Calculation, comparatorsForNotRequiredValuesPolish, comparatorsPolish, Condition, ConditionCalculationSequence, getElement, isChild, Operator, useParenthesesEditor, useSequence } from './ConditionCalculationEditorProvider';
 import { EditCondition } from './EditCondition';
+import { EditNumberValue } from './EditNumberValue';
 
 
 
@@ -69,7 +70,9 @@ export const Element = ({ path, type }: { path: number[]; type: 'condition' | 'c
                       ? <p className='text-sm'>{isDate((element as Condition).value.value) ? ((element as Condition).value.value as Date)?.toLocaleDateString('pl-PL') : (element as Condition).value.value}<p className='inline text-xs italic ml-2'>(wartość stała)</p> </p>
                       :
                       <Tooltip title={
-                        <ConditionCalculationDisplay reversed type='calculation' first sequence={(element as Condition).value.value as ConditionCalculationSequence} />
+                        <div className='p-2 sm:p-4 border rounded-lg bg-white'>
+                          <ConditionCalculationDisplay tooltip reversed type='calculation' sequence={(element as Condition).value.value as ConditionCalculationSequence} />
+                        </div>
                       }><Chip className='rounded  bg-green-500 flex items-center' label={<pre className='text-sm text-white'><AddTask className='mr-2' /> obliczenia</pre>} /></Tooltip>
                   : null}
             </>
@@ -77,7 +80,7 @@ export const Element = ({ path, type }: { path: number[]; type: 'condition' | 'c
         </div>
 
         {editorOpen
-          ? <EditCondition {...{ path, initValue: element as Condition, cancel: () => setEditorOpen(false) }}></EditCondition>
+          ? <EditCondition {...{ path, initValue: element as Condition, cancel: () => setEditorOpen(false) }} />
           : null}
         {parenthesesEditor && isChild(path, parenthesesEditor) ? <Checkbox className='scale-125' checked={elementIndex >= Math.min(...parentheses) && elementIndex <= Math.max(...parentheses)}
           disabled={parentheses.length === 2 && !parentheses.includes(elementIndex)}
@@ -106,6 +109,10 @@ export const Element = ({ path, type }: { path: number[]; type: 'condition' | 'c
 
             }
           </div>
+          {editorOpen
+            ? <EditNumberValue {...{ path, initValue: element as Calculation, cancel: () => setEditorOpen(false), save: (value) => { modifySequence(['set_element', [path, value]]); setEditorOpen(false) }, type: 'number', inputType: 'text' }} />
+            : null
+          }
           {parenthesesEditor && isChild(path, parenthesesEditor) ? <Checkbox className='scale-125' checked={elementIndex >= Math.min(...parentheses) && elementIndex <= Math.max(...parentheses)}
             disabled={parentheses.length === 2 && !parentheses.includes(elementIndex)}
             onClick={() => modifyParentheses(elementIndex)} /> : null}

@@ -49,7 +49,7 @@ const pageWithAppropriateWrapper = (location: string, component: ReactNode) => {
   if (location.includes("/account"))
     return <AccountPageWrapper>{component}</AccountPageWrapper>
 
-  return <AppWrapper>{component}</AppWrapper>;
+  return <div className="flex flex-col"><AppWrapper>{component}</AppWrapper></div>;
 };
 
 export default MyApp;

@@ -5,13 +5,15 @@ import React from "react";
 import { useFormDescription } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { Calculation, comparatorsForNotRequiredValuesPolish, comparatorsPolish, Condition, ConditionCalculationSequence } from './ConditionCalculationEditorProvider';
 
-export const ConditionCalculationDisplay = ({ reversed, sequence, first, type }: { sequence: ConditionCalculationSequence; reversed?: true, first?: true; type: 'calculation' | 'condition' }) => {
+export const ConditionCalculationDisplay = ({ reversed, sequence, first, type, tooltip, focused }: {
+  sequence: ConditionCalculationSequence; reversed?: true, first?: true; type: 'calculation' | 'condition', tooltip?: true, focused?: boolean
+}) => {
   const { names } = useFormDescription();
 
   const Wrapper = ({ children, first }: { children: React.ReactNode; first?: true; }) => {
     return first ? <span
-      className={"rounded-lg inline-flex gap-1 p-3 items-center flex-wrap justify-start" + (reversed ? '' : ' border')}
-      style={{ background: reversed ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.3)' }}
+      className={`rounded-lg inline-flex gap-1 ${tooltip ? '' : 'p-3'} items-center flex-wrap justify-start` + (reversed ? '' : ' border ') + (focused ? 'border-blue-500 text-blue-500' : '')}
+      style={tooltip ? {} : { background: reversed ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.3)' }}
     >
       {children}
     </span>
@@ -24,7 +26,7 @@ export const ConditionCalculationDisplay = ({ reversed, sequence, first, type }:
     {sequence.components.map((element, index) => <> <>
       {(element as ConditionCalculationSequence).components
         ? <ConditionCalculationDisplay reversed={reversed} type={type} sequence={element as ConditionCalculationSequence} />
-        : <div className={'inline-flex gap-2 items-center rounded-lg p-2' + (reversed ? ' text-white' : '')}>
+        : <div className={'inline-flex gap-2 items-center flex-wrap rounded-lg p-2' + (reversed ? ' text-white' : '')}>
           {index === 0 && !first ? <div className="bg-gray-300 p-2 rounded"><pre className="inline text-white">(</pre></div> : null}
           {type === 'condition' ? <>
             {(element as Condition).simpleValue == null ? <>
@@ -57,7 +59,9 @@ export const ConditionCalculationDisplay = ({ reversed, sequence, first, type }:
                       : (element as Condition).value.value} <p className='inline text-xs italic ml-2'>(wartość stała)</p>
                     </p>
                     : <Tooltip title={
-                      <ConditionCalculationDisplay reversed type='calculation' first sequence={(element as Condition).value.value as ConditionCalculationSequence} />
+                      <div className='p-2 sm:p-4 border rounded-lg bg-white'>
+                        <ConditionCalculationDisplay tooltip reversed type='calculation' sequence={(element as Condition).value.value as ConditionCalculationSequence} />
+                      </div>
                     }><Chip className='rounded  bg-green-500 flex items-center' label={<pre className='text-sm text-white'><AddTask className='mr-2' /> obliczenia</pre>} /></Tooltip>
 
                 : null}

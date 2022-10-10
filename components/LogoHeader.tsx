@@ -2,6 +2,7 @@ import { DragHandle, Facebook, Instagram } from "@mui/icons-material";
 import { Button, Paper, useTheme } from "@mui/material";
 import Link from "next/link";
 import React from "react";
+import useWindowSize from '../hooks/WindowSize';
 
 const LogoHeader = ({
   border,
@@ -19,13 +20,14 @@ const LogoHeader = ({
   social?: boolean;
 }) => {
   const theme = useTheme()
+  const { width } = useWindowSize();
   return (
     <Paper
       variant="outlined"
       style={{ width: "18rem", maxWidth: 320, height: "4rem" }}
       classes={!border ? { root: "border-b-0" } : {}}
       className={
-        "bg-transparent rounded-none flex items-center border-l-0 border-t-0 border-r-0 pl-5 pr-5"
+        `bg-${width != null && width >= 1100 ? 'white' : 'transparent'} rounded-none flex items-center border-l-0 border-t-0 border-r-0 pl-5 pr-5`
       }
     >
       {openSidebar ? (

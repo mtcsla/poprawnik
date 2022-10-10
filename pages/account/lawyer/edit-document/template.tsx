@@ -1,28 +1,222 @@
-import { Bookmark, Edit } from '@mui/icons-material';
-import { Button } from "@mui/material";
+import { ArrowDropDown, Bookmark, CalendarToday, Edit, FormatAlignJustify, FormatListNumbered, List, Numbers, TextFields } from '@mui/icons-material';
+import { Button, Chip, Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 
+import { doc, getDoc } from '@firebase/firestore';
 import Link from 'next/link';
 import React from 'react';
+import { firestore } from '../../../../buildtime-deps/firebase';
+import { ConditionCalculationDisplay } from '../../../../components/form-edit/condition-calculation-editor/ConditionCalculationDisplay';
+import TemplateEditor from '../../../../components/template-edit/TemplateEditor';
+import { FieldDescription, FormDescription, StepDescription } from '../../../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import TemplateDescriptionProvider from '../../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
+import { FormValues, NestedFormValue, RootFormValue } from '../../../forms/[id]/form';
 
 const EditDocumentTemplate = () => {
   const router = useRouter();
-
   const id = React.useMemo(() => {
     if (!router.isReady)
       return null;
     return router.query.id
   }, [router.isReady])
+  const [values, setValues] = React.useState<FormValues<RootFormValue>>({});
 
-  return <div className="w-full flex-col pb-8 mb-2">
+  const [loading, setLoading] = React.useState<boolean>(true);
+
+  const [formDescription, setFormDescription] = React.useState<FormDescription>([]);
+  const [templateDescription, setTemplateDescription] = React.useState<any>({});
+
+  const [valuesExpanded, setValuesExpanded] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (!id) return;
+    setValues(JSON.parse(sessionStorage.getItem(`--${id}-data`) ?? '{}'));
+  }, [id])
+  React.useEffect(() => {
+    if (!router.isReady)
+      return;
+    if (!id) {
+      router.replace('/')
+      return;
+    }
+
+    getDoc(doc(firestore, `/forms/${id}`)).then(doc => {
+      if (!doc.exists) {
+        router.replace('/account/lawyer')
+        return;
+      }
+      setFormDescription(doc.data()?.formData ?? []);
+      setTemplateDescription(doc.data()?.templateData ?? {});
+      setLoading(false);
+    }).catch((err) => {
+
+    })
+  }, [id])
+
+  return <div className="w-full flex-col flex pb-8 mb-2">
     <h1 className="inline-flex gap-2 mb-1"><Bookmark color='primary' /> Edytujesz wzór pisma</h1>
     <p>Wypełnij formularz przykładowymi danymi, aby szybko generować podgląd.</p>
 
+    {Object.keys(values).length === 0 || formDescription.length === 0
+      ? <div className='border sm:p-8 p-4 bg-slate-50 mt-8 rounded-lg flex justify-center items-center'>
+        <pre>Brak przykładowych danych</pre>
+      </div>
+      : <>
+        <span className='flex mt-8 items-center justify-between'>
+          <pre>dane</pre>
+          <Button className='border-none' onClick={() => setValuesExpanded(!valuesExpanded)} size='small'>
+            <ArrowDropDown className={`${valuesExpanded ? 'rotate-180' : ''} mr-2`} />
+            {valuesExpanded ? 'zwiń' : 'rozwiń'} dane
+          </Button>
+        </span>
+        <div
+          onClick={() => { if (!valuesExpanded) setValuesExpanded(true) }}
+          className={`w-full rounded-lg relative h-auto border ${!valuesExpanded ? 'hover:border-blue-500 hover:bg-blue-100 cursor-pointer' : ''}`} style={!valuesExpanded ? { maxHeight: 200, overflowY: 'hidden' } : {}}>
+          <div className='absolute right-0 left-0 bottom-0 top-0 rounded-lg' style={{
+            background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 75%)',
+            display: valuesExpanded ? 'none' : 'block'
+          }} />
+          <div className='flex flex-col p-4 sm:p-8  '>
+            <ValuesDisplay values={values} description={formDescription} />
+          </div>
+        </div>
+      </>
+    }
     <Link href={`/forms/${id}/form?testing=true`}>
-      <Button className='w-full mt-8 p-4 bg-blue-500 text-white hover:bg-blue-400'> Wypełnij formualrz <Edit className='ml-2' /></Button>
+      <Button className='w-full mt-8 p-4 bg-blue-500 text-white hover:bg-blue-400'> {Object.keys(values).length ? 'Edytuj dane' : 'Wypełnij formularz'} <Edit className='ml-2' /></Button>
     </Link>
-    <div className='border p-8 bg-slate-50 mt-8 rounded-lg flex justify-center items-center'><pre>Brak przykładowych danych</pre></div>
+    {loading
+      ? null
+      :
+      <div className='relative'>
+        <div className='relative top-0 bottom-0 left-0 right-0' style={{ maxWidth: '100vw' }}>
+          <TemplateDescriptionProvider id={id as string} form={formDescription} initTemplate={templateDescription}>
+            <TemplateEditor />
+          </TemplateDescriptionProvider>
+        </div>
+      </div>
+    }
+    <Button disabled={!Object.keys(values).length}
+      className={`p-4 mt-8 bg-blue-500 text-white hover:bg-blue-400 ${!Object.keys(values).length ? 'bg-gray-300 hover:bg-gray-300' : ''}`}>
+      Podgląd pisma
+      <FormatAlignJustify className='ml-2' />
+    </Button>
   </div>;
 }
+
+const ValuesDisplay = ({ values, description, nested }: { values: FormValues<RootFormValue> | FormValues<NestedFormValue>; description: FormDescription | StepDescription; nested?: boolean }) => {
+  return nested
+    ? <>{(description as StepDescription).children.map((fragment) =>
+      fragment.children.map((field) =>
+        <VariableNameAndValue field={field} value={values[field.name] as NestedFormValue} inList />
+      )
+    )}</>
+    :
+    <>{
+      (description as FormDescription).map(
+        (step, index) => step.type === 'list' ? <div className='flex flex-col mb-4'>
+          <span className='flex items-center justify-between flex-wrap'>
+            <pre className='text-base '>Krok {index + 1}</pre>
+            <Chip size='small' color='warning' label={step.name} />
+          </span>
+          <p className='text-sm mt-2 mb-4'>{step.subtitle}</p>
+          <pre className='text-sm justify-end flex items-center'><List className='mr-2' color='primary' /> Ten krok jest listą</pre>
+          {(values[step.name] as FormValues<NestedFormValue>[]).map(
+            (value, index) => <div className='flex mt-4 flex-col'>
+              <pre className='mb-2 text-sm'>{step.listItemName || 'Wartość'} {index + 1}</pre>
+              <ValuesDisplay nested values={value as FormValues<NestedFormValue>} description={step} /></div>
+          )}
+
+        </div> : <div className='flex flex-col mb-4'>
+          <pre className='text-base '>Krok {index + 1}</pre>
+          <p className='text-sm mt-2 mb-4'>{step.subtitle}</p>
+          <span className='w-full inline-flex flex-wrap gap-3'>
+            {step.children.map(
+              fragment => fragment.children.map(
+                field => <VariableNameAndValue field={field} value={values[field.name] as NestedFormValue} />
+              )
+            )}
+          </span>
+        </div>
+      )}</>
+
+}
+
+const VariableInfo = ({ field, value, inList }: { field: FieldDescription, value: NestedFormValue, inList?: boolean }) => {
+  return <div style={{ minWidth: 200 }} className='bg-white flex flex-col p-4 border rounded-lg'>
+    <Chip label={<>
+      {field.type === 'date'
+        ? <CalendarToday className='mr-2' />
+        : field.type === 'select'
+          ? <FormatListNumbered className='mr-2' />
+          : field.valueType === 'text'
+            ? <TextFields className='mr-2' />
+            : <Numbers className='mr-2' />
+      }
+      {field.name}
+    </>} className='w-full' size='small' color={inList ? 'error' : 'primary'} />
+    <pre className='text-sm items-center mt-2 justify-between flex'>
+      {field.type === 'date'
+        ? <><CalendarToday className='mr-2' /> data </>
+        : field.type === 'select'
+          ? <><FormatListNumbered className='mr-2' /> wybór </>
+          : field.valueType === 'text'
+            ? <><TextFields className='mr-2' /> tekst</>
+            : <><Numbers className='mr-2' /> liczba</>
+      }
+    </pre>
+    <p className='my-1 text-sm'>{field.description}</p>
+    <pre className='mb-1'>wartość:</pre>
+    {value == null || value == ''
+      ? <pre className='p-1  text-sm text-center rounded bg-slate-100'>brak</pre>
+      : <p className='p-1 text-sm text-center rounded bg-slate-100'>{field.type === 'date' ? new Date(value as string)?.toLocaleDateString('pl-PL') : value}</p>
+    }
+    <pre className='my-1'>warunek:</pre>
+    {field.condition.components.length === 0
+      ? <pre className='rounded-lg text-center p-3 border'>brak</pre>
+      : <ConditionCalculationDisplay sequence={field.condition} first type='condition' />
+    }
+
+    <pre className='my-1'>wymagane:</pre>
+    <pre className='rounded-lg text-center p-3 border'>{
+      !field.required
+        ? 'nie'
+        : field.condition.components.length > 0
+          ? 'warunkowo'
+          : 'tak'
+
+    }</pre>
+
+  </div>
+}
+const VariableNameAndValue = ({ field, value, inList }: { field: FieldDescription, value: NestedFormValue, inList?: boolean }) =>
+  <Tooltip title={<VariableInfo {...{ field, value, inList }} />}>
+    <div style={{ minWidth: 100 }} className='flex-1  p-3 rounded  flex flex-col border  items-center'>
+      <Chip label={<>
+        {field.type === 'date'
+          ? <CalendarToday className='mr-2' />
+          : field.type === 'select'
+            ? <FormatListNumbered className='mr-2' />
+            : field.valueType === 'text'
+              ? <TextFields className='mr-2' />
+              : <Numbers className='mr-2' />
+        }
+        {field.name}
+      </>} className='w-full' size='small' color={inList ? 'error' : 'primary'} />
+      {
+        (value == null || value == '') ? <pre className='text-base p-1 mt-2 text-center w-full rounded bg-slate-100'>Brak</pre>
+          :
+          <pre className='normal-case font-normal text-base truncate self-start w-full mt-2 p-1 rounded bg-slate-100 text-center text-slate-600'>
+            {
+              field.type === 'date' ? new Date(value as any)?.toLocaleDateString('pl-PL') : value
+            }
+          </pre>
+      }
+    </div>
+  </Tooltip>
+
+
+
+
 
 export default EditDocumentTemplate;

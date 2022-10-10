@@ -36,6 +36,9 @@ body {
 * {
   font-family: "IBM Plex Sans", sans-serif !important;
 }
+.scale-102 {
+  transform: scale(1.02) !important;
+}
 div[role="presentation"] {
   overflow-x: clip;
 }
@@ -46,6 +49,9 @@ a {
 
 .MuiSelect-select {
   @apply inline-flex gap-6 items-center justify-between;
+}
+div.Mui-disabled fieldset {
+  border-color: rgb(226 232 240) !important;
 }
 
 *::after {

@@ -10,35 +10,37 @@ export namespace Validators {
     };
   };
 
-  const textFieldValidatorFactory =
-    (field: FieldDescription) => (value: string) => {
-      if (field.required) if (!value) return "To pole jest wymagane.";
+  const textFieldValidatorFactory = (field: FieldDescription) =>
+    field.valueType === "number"
+      ? (value: string) => {
+          if (field.required && !value) return "To pole jest wymagane.";
 
-      const parser = field.numberType === "real" ? parseFloat : parseInt;
+          const parser = field.numberType === "real" ? parseFloat : parseInt;
 
-      const min = field.min
-        ? parser((field.min as string).replaceAll(",", "."))
-        : -1000000000000000000000000000000000000000000000;
-      const max = field.max
-        ? parser((field.max as string).replaceAll(",", "."))
-        : 1000000000000000000000000000000000000000000000;
+          const min = field.min
+            ? parser((field.min as string).replaceAll(",", "."))
+            : -1000000000000000000000000000000000000000000000;
+          const max = field.max
+            ? parser((field.max as string).replaceAll(",", "."))
+            : 1000000000000000000000000000000000000000000000;
 
-      if (field.numberType === "real") {
-        if (
-          !value.match(/^\-?[1-9]?[0-9]*[,.]?[0-9]+$/) &&
-          !value.match(/^\-?[1-9][0-9]*$/)
-        )
-          return "To pole musi zawierać poprawną liczbę rzeczywistą lub całkowitą.";
-      } else if (!value.match(/^\-?[1-9]?[0-9]*$/))
-        return "To pole musi zawierać poprawną liczbę całkowitą.";
+          if (field.numberType === "real") {
+            if (
+              !value.match(/^\-?[1-9]?[0-9]*[,.]?[0-9]+$/) &&
+              !value.match(/^\-?[1-9][0-9]*$/)
+            )
+              return "To pole musi zawierać poprawną liczbę rzeczywistą lub całkowitą.";
+          } else if (!value.match(/^\-?[1-9]?[0-9]*$/))
+            return "To pole musi zawierać poprawną liczbę całkowitą.";
 
-      if (parser(value) < min)
-        return `Wartość pola musi być większa od ${min}.`;
-      if (parser(value) > max)
-        return `Wartość pola muse być mniejsza od ${max}.`;
+          if (parser(value) < min)
+            return `Wartość pola musi być większa od ${min}.`;
+          if (parser(value) > max)
+            return `Wartość pola muse być mniejsza od ${max}.`;
+          return null;
+        }
+      : selectFieldValidatorFactory(field);
 
-      return null;
-    };
   const selectFieldValidatorFactory =
     (field: FieldDescription) => (value: string) => {
       if (field.required) if (!value) return "To pole jest wymagane.";

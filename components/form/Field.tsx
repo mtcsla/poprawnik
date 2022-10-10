@@ -129,6 +129,7 @@ const UserSelectField = ({ element, context, display, formDescription }: FieldPr
     <Field
       className='w-full'
       as={Select}
+      disabled={disabled}
       onChange={(e: SelectChangeEvent) => setFieldValue(element.name, e.target.value)}
       validate={display ? validatorFunction : undefined}
       label={element.label}
@@ -147,7 +148,11 @@ const UserTextField = ({ element, context, display, formDescription }: FieldProp
   const [disabled, setDisabled] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    setDisabled(!Evaluate.sequence(element.condition, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition());
+    setDisabled(
+      formDescription
+        ? !Evaluate.sequence(element.condition, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition()
+        : false
+    );
   }, [topData.values, formDescription, topData.currentListIndex]);
 
 

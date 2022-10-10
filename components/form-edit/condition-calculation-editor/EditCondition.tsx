@@ -2,6 +2,7 @@ import { Button, ButtonGroup, Chip, Dialog, DialogActions, DialogContent, Dialog
 import { Field, Formik } from 'formik';
 import { isDate } from 'mathjs';
 import React from 'react';
+import BodyScrollLock from '../../../providers/BodyScrollLock';
 import { FieldType, FieldValueType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { useFormEditorLocation } from '../FormEditor';
 import { ConditionCalculationDisplay } from './ConditionCalculationDisplay';
@@ -177,17 +178,19 @@ export const EditCondition = ({ path, add, cancel, initValue }: { path: number[]
           </DialogActions>
 
           <DialogContent>
-            <p className='text-sm font-semibold'>...lub wybierz prostą wartość logiczną:</p>
-            <p className='text-xs text-slate-500 mb-4' style={{ maxWidth: 350 }}>wybranie prostej wartości wymaże wartości wprowadzone w pola prostego warunku</p>
+            <BodyScrollLock>
+              <p className='text-sm font-semibold'>...lub wybierz prostą wartość logiczną:</p>
+              <p className='text-xs text-slate-500 mb-4' style={{ maxWidth: 350 }}>wybranie prostej wartości wymaże wartości wprowadzone w pola prostego warunku</p>
 
-            <ButtonGroup className='w-full'>
-              <Button className='flex-1 rounded-l' onClick={() =>
-                save({ variable: null, comparator: null, value: { type: null, value: null }, simpleValue: true })
-              }>prawda</Button>
-              <Button onClick={() =>
-                save({ variable: null, comparator: null, value: { type: null, value: null }, simpleValue: false })
-              } className='flex-1 rounded-r'>fałsz</Button>
-            </ButtonGroup>
+              <ButtonGroup className='w-full'>
+                <Button className='flex-1 rounded-l' onClick={() =>
+                  save({ variable: null, comparator: null, value: { type: null, value: null }, simpleValue: true })
+                }>prawda</Button>
+                <Button onClick={() =>
+                  save({ variable: null, comparator: null, value: { type: null, value: null }, simpleValue: false })
+                } className='flex-1 rounded-r'>fałsz</Button>
+              </ButtonGroup>
+            </BodyScrollLock>
           </DialogContent>
 
         </>;

@@ -13,6 +13,31 @@ import { cloneDeep } from "lodash";
 
 export namespace FormDescriptionFunctions {
   //keep these functions pure!!
+  export const setStepListMessage = (
+    state: FormDescription,
+    [index, message]: [number, string]
+  ) => {
+    const newState = cloneDeep(state);
+    newState[index].listMessage = message;
+    return newState;
+  };
+  export const setStepListItemName = (
+    state: FormDescription,
+    [index, name]: [number, string]
+  ) => {
+    const newState = cloneDeep(state);
+    newState[index].listItemName = name;
+    return newState;
+  };
+  export const setStepListMinMaxItems = (
+    state: FormDescription,
+    [index, minMaxItems]: [number, { min: number | null; max: number | null }]
+  ) => {
+    const newState = cloneDeep(state);
+    newState[index].listMinMaxItems = minMaxItems;
+    return newState;
+  };
+
   export const removeStep = (
     state: FormDescription,
     index: number
@@ -175,8 +200,7 @@ export namespace FormDescriptionFunctions {
     ]
   ): FormDescription => {
     const newState = cloneDeep(state);
-    newState[stepIndex].children[fragmentIndex].children[fieldIndex].icon =
-      icon;
+    //newState[stepIndex].children[fragmentIndex].children[fieldIndex].icon = icon;
     return newState;
   };
   export const setFieldType = (

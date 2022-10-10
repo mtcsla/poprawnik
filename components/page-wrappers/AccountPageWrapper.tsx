@@ -1,5 +1,5 @@
 import { ArrowLeft, Edit, Gavel, Logout, PersonRounded, Shield, ShoppingBag } from '@mui/icons-material';
-import { Button, List, ListItem, Paper, SwipeableDrawer, useTheme } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Button, List, ListItem, Paper, SwipeableDrawer, useTheme } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -19,7 +19,8 @@ const AccountPageWrapper = ({ children }: { children: React.ReactNode }) => {
 
 
 
-    <div style={{ height: '4rem', backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)" }} className=' fixed z-50 w-full  flex items-center p-3 pl-0 pr-0 justify-between'>
+    <div style={
+      { height: '4rem', backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)" }} className='fixed z-50 w-full  flex items-center p-3 pl-0 pr-0 justify-between'>
       <LogoHeader
         noText={(width && width < 1100) as boolean}
         border={false}
@@ -39,7 +40,7 @@ const AccountPageWrapper = ({ children }: { children: React.ReactNode }) => {
             </ListItem>
           </List>
 
-          <List className='w-full pl-3'>
+          <List className='w-full pl-3 pr-4'>
             <AccountPageLink caption="Twoje informacje" link={'/account'} icon={PersonRounded} />
             <AccountPageLink caption="Historia zakupów" link={'/account/purchases'} icon={ShoppingBag} />
           </List>
@@ -51,9 +52,21 @@ const AccountPageWrapper = ({ children }: { children: React.ReactNode }) => {
             </ListItem>
           </List>
 
-          <List className='w-full pl-3'>
+          <List className='w-full pl-3 pr-4'>
             <AccountPageLink caption="Redaktor" link={'/account/editor'} icon={Edit} />
-            <AccountPageLink caption="Prawnik" link={'/account/lawyer'} icon={Gavel} />
+            <AccountPageAccordion caption="Prawnik" link={'/account/lawyer'} icon={Gavel} >
+              <List className=''>
+                <Link href='/account/lawyer'>
+                  <ListItem className={(router.pathname.startsWith('/account/lawyer') ? 'bg-blue-50' : 'hover:bg-slate-50') + ' mb-1.5 transition-colors cursor-pointer p-1.5 pl-3 pr-3 flex  items-center justify-between w-full rounded-lg'}>
+                    <p className={(router.pathname.startsWith('/account/lawyer') ? 'text-blue-500' : '') + ' text-sm'}>Pisma</p>
+                  </ListItem>
+                </Link>
+
+                <ListItem className={(router.pathname.startsWith('/account/lawyer') && router.pathname.includes('!!!!!!!') ? 'bg-blue-50' : 'hover:bg-slate-50') + ' transition-colors cursor-pointer p-1.5 pl-3 pr-3 flex  items-center justify-between w-full rounded-lg'}>
+                  <p className={(router.pathname.startsWith('/account/lawyer') && router.pathname.includes('!!!!!!!') ? 'text-blue-500' : '') + ' text-sm'}>Kalkulatory</p>
+                </ListItem>
+              </List>
+            </AccountPageAccordion>
             <AccountPageLink caption="Panel administratora" link={'/account/admin'} icon={Shield} />
           </List>
         </span>
@@ -83,7 +96,14 @@ const AccountPageWrapper = ({ children }: { children: React.ReactNode }) => {
 const AccountPageSidebar = ({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: React.Dispatch<boolean> }) => {
   const { width } = useWindowSize();
 
-  return width && width >= 1100 ? <div style={{ height: 'calc(100% - 4rem)' }} className='mt-16 fixed p-2 w-72 flex flex-col items-start justify-between'>
+  return width && width >= 1100 ? <div style={Object.assign(
+    { height: 'calc(100% - 4rem)' },
+    width && width >= 1100
+      ? {
+        backdropFilter: 'blur(10px)', background: 'white', zIndex: 5000, WebkitBackdropFilter: "blur(10px)"
+      }
+      : {})
+  } className='mt-16 fixed p-2 w-72 flex flex-col items-start justify-between'>
     {children}
   </div>
     :
@@ -109,6 +129,26 @@ const AccountPageLink = ({ caption, link, icon }: { caption: string, link: strin
   return <Link href={link}><ListItem className={(selected() ? 'bg-blue-50' : 'hover:bg-slate-50') + ' transition-colors mb-2 cursor-pointer p-1.5 pl-3 pr-3 flex flex-row-reverse items-center justify-between w-full rounded-lg'}>
     <Icon color='primary' /> <p className={(selected() ? 'text-blue-500' : '') + ' text-sm'}>{caption}</p>
   </ListItem></Link>
+}
+const AccountPageAccordion = ({
+  caption, icon, link, children
+}: { caption: string, icon: any, link: string, children: React.ReactNode }) => {
+  const router = useRouter();
+  const Icon = icon;
+
+  const defaultExpanded = () => link === '/account' ? router.pathname === link : router.pathname.includes(link);
+
+  return <div className='flex flex-col'><Accordion defaultExpanded={defaultExpanded()}>
+    <AccordionSummary className='p-0 mx-0 mb-1.5'>
+      <ListItem className={'transition-colors cursor-pointer p-1.5 pl-3 pr-3 flex flex-row-reverse items-center justify-between w-full rounded-lg'}>
+        <Icon color='primary' /> <p className={'text-sm'}>{caption}</p>
+      </ListItem>
+    </AccordionSummary>
+    <AccordionDetails className='py-0 pr-0'>
+      {children}
+    </AccordionDetails>
+  </Accordion>
+  </div>
 }
 
 export default AccountPageWrapper;

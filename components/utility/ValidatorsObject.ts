@@ -51,6 +51,7 @@ export namespace ValidatorsObject {
         validateValues(values, description, validators, listIndex),
     } as ValidatorsObject.Validators;
   }
+
   export function fromDescription(
     description: FormDescription
   ): ValidatorsObject.Validators {

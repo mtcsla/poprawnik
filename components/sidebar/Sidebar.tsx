@@ -16,8 +16,10 @@ const SidebarPaper = styled(Paper)`
 const Sidebar = ({ }) => {
   const { width } = useWindowSize();
 
-  return <SidebarPaper variant='outlined' style={{ width: '18rem', paddingRight: 2, maxWidth: 320 }}
-    className='flex flex-col items-center justify-between h-full border-0 rounded-none'>
+  return <SidebarPaper variant='outlined' style={
+    { width: '18rem', paddingRight: 2, maxWidth: 320 }
+  }
+    className='flex flex-col items-center bg-white justify-between h-full border-0 rounded-none'>
     <div className={'flex flex-col items-center'}>
       <LogoHeader border={false} />
       <div className="w-full pl-2 mt-3">

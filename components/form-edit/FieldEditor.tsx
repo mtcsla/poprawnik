@@ -5,6 +5,7 @@ import { ErrorMessage, Field, Formik } from "formik";
 import { cloneDeep } from 'lodash';
 import { useRouter } from "next/router";
 import React from "react";
+import BodyScrollLock from "../../providers/BodyScrollLock";
 import { FieldDescription, getDefaultField, useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import EditorField from "../form/EditorField";
 import { ConditionCalculationDisplay } from "./condition-calculation-editor/ConditionCalculationDisplay";
@@ -78,7 +79,9 @@ const FieldEditor = () => {
         <Dialog open={dialogOpen}>
           <DialogTitle><pre className="text-sm">Anulujesz {router?.query?.new == '1' ? 'dodawanie' : 'edycję'} pola</pre></DialogTitle>
           <DialogContent>
-            Pole nie zostanie {router?.query?.new == '1' ? 'dodane' : 'zmienione'}. Wszystkie zmiany zostaną utracone.
+            <BodyScrollLock>
+              Pole nie zostanie {router?.query?.new == '1' ? 'dodane' : 'zmienione'}. Wszystkie zmiany zostaną utracone.
+            </BodyScrollLock>
           </DialogContent>
           <DialogActions>
             <Button className="border-none" size='small' onClick={cancel}>Ok</Button>

@@ -1,11 +1,11 @@
-import { List } from '@mui/icons-material';
+import { Add, Delete, List, PersonOutline, Remove } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useRouter } from 'next/router';
 import React from 'react';
 import BodyScrollLock from '../../providers/BodyScrollLock';
-import { useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { FormAction, FormDescription, useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import EditorFragment from '../form/EditorFragment';
 import { FormNormalize } from './condition-calculation-editor/normalizers/FormNormalize';
 import { useFormEditorLocation } from './FormEditor';
@@ -19,39 +19,74 @@ const StepEditor = () => {
   const { location, setLocation } = useFormEditorLocation();
   const [step, fragment, field] = location;
 
-  const [editing, setEditing] = React.useState<boolean>(false);
+  const [editing, setEditing] = React.useState<null | 'subtitle' | 'listMessage' | 'listItemName' | 'listMinMaxItems'>(null);
   const [saving, setSaving] = React.useState<boolean>(false);
   const [error, setError] = React.useState<boolean>(false);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(false);
 
-  const textareaRef = React.useRef<HTMLTextAreaElement>()
+  const subtitleTextArea = React.useRef<HTMLTextAreaElement>();
+
+  const listMessageTextArea = React.useRef<HTMLTextAreaElement>();
+
+  const listItemNameInput = React.useRef<{ value: string }>({ value: '' });
+  const listMinMaxItemsInput = React.useRef<{ value: { min: null | number, max: null | number } }>({ value: { min: null, max: null } });
+  const [listMinMaxItems, setListMinMaxItems] = React.useState<{ min: null | number, max: null | number }>({ min: null, max: null });
+
   const router = useRouter();
 
 
-  const save = () => {
+  const save = (item: 'subtitle' | 'listMessage' | 'listItemName' | 'listMinMaxItems') => {
     setSaving(true);
-    const lastSubtitle = description[step as number].subtitle;
-    const newDescription = cloneDeep(currentDescription);
+    const last = description[step as number][item];
+    const newDescription: FormDescription = cloneDeep(currentDescription);
 
-    newDescription[step as number].subtitle = textareaRef?.current?.value as string ?? '';
+    let ref: React.MutableRefObject<any>;
+    let method: FormAction[0];
+    switch (item) {
+      case 'subtitle':
+        method = 'step_set_subtitle';
+        ref = subtitleTextArea;
+        break;
+      case 'listMessage':
+        method = 'step_set_list_message';
+        ref = listMessageTextArea;
+        break;
+      case 'listItemName':
+        method = 'step_set_list_item_name';
+        ref = listItemNameInput;
+        break;
+      case 'listMinMaxItems':
+        method = 'step_set_list_min_max_items';
+        ref = listMinMaxItemsInput;
+        break;
+      default:
+        throw new Error('Invalid item');
+    }
+    newDescription[step as number][item] = (ref?.current?.value
+      ??
+      (item === 'listMinMaxItems' ? { min: null, max: null } : '')
+    ) as never;
+
 
     modifyCurrentDescription?.([
-      'step_set_subtitle', [step as number, textareaRef?.current?.value as string ?? ''],
+      method, [step as number, ref?.current?.value as string ??
+        (item === 'listMinMaxItems' ? { min: null, max: null } : '')
+      ] as any,
     ]);
 
     updateFirestoreDoc(newDescription).
       then(
         () => {
           setSaving(false);
-          setEditing(false);
+          setEditing(null);
         }).
       catch(
         () => {
           setError(true);
-          modifyCurrentDescription?.(['step_set_subtitle', [step as number, lastSubtitle]])
+          modifyCurrentDescription?.([method, [step as number, last as any]] as any);
           setSaving(false);
-          setEditing(false)
+          setEditing(null)
           setTimeout(() => setError(false), 5000)
         }
       )
@@ -71,7 +106,7 @@ const StepEditor = () => {
             )
           })
           modifyCurrentDescription(['form_set_description', newDescription]);
-          setSaving(false); setEditing(false);
+          setSaving(false); setEditing(null);
           setDeleteDialogOpen(false);
         }).
       catch(
@@ -79,7 +114,7 @@ const StepEditor = () => {
           setError(true);
           modifyDescription?.(['form_set_description', lastDescription]);
 
-          setSaving(false); setEditing(false);
+          setSaving(false); setEditing(null);
           setTimeout(() => setError(false), 5000)
         }
       )
@@ -107,7 +142,9 @@ const StepEditor = () => {
         <pre className='text-sm'>Usuwasz krok</pre>
       </DialogTitle>
       <DialogContent>
-        <p className='text-sm'>Ta akcja jest nieodwracalna.</p>
+        <BodyScrollLock>
+          <p className='text-sm'>Ta akcja jest nieodwracalna.</p>
+        </BodyScrollLock>
       </DialogContent>
       <DialogActions>
         <LoadingButton loading={saving} className='border-none' onClick={deleteStep} size='small'>
@@ -124,46 +161,168 @@ const StepEditor = () => {
       : null}
     <span className='flex items-center justify-between'>
       <pre className='text-xs mt-2'>Krótki opis</pre>
-      {!editing ?
-        <Button size='small' className='border-none mt-4' onClick={() => setEditing(true)}>edytuj</Button>
+      {editing !== 'subtitle' ?
+        <Button size='small' disabled={!!editing} className='border-none mt-4 px-0' onClick={() => setEditing('subtitle')}>edytuj</Button>
         : <span className='flex items-center'>
-          <Button size='small' className='border-none mt-4' disabled={saving} color='error' onClick={() => setEditing(false)}>anuluj</Button>
-          <LoadingButton size='small' loading={saving} onClick={save} className='border-none mt-4'>zapisz</LoadingButton>
+          <Button size='small' className='border-none mt-4 px-0 mr-4' disabled={saving} color='error' onClick={() => setEditing(null)}>anuluj</Button>
+          <LoadingButton size='small' loading={saving} onClick={() => save('subtitle')} className='border-none mt-4 px-0'>zapisz</LoadingButton>
         </span>}
-
-
     </span>
     <p className='text-sm'>Jedno bądź dwa zdania w skrócie opisujące krok.</p>
-    {editing
+    {editing === 'subtitle'
       ? <div className='w-full flex flex-col'>
-        <textarea maxLength={150} readOnly={saving} defaultValue={currentDescription[step as number].subtitle} ref={textareaRef as any} className='p-4 border rounded mt-4' />
+        <textarea maxLength={150} readOnly={saving} defaultValue={currentDescription[step as number].subtitle} ref={subtitleTextArea as any} className='p-4 border rounded mt-4' />
       </div>
       : <div className='text-sm p-4 w-full border rounded mt-4' style={{ minHeight: 70 }}>{currentDescription[step as number].subtitle}</div>
+    }
+    {currentDescription[step as number].type === 'list' ? <>
+      <span className='flex justify-between items-center'>
+        <pre className='text-xs mt-6'>Nazwa wartości</pre>
+        {editing !== 'listItemName' ?
+          <Button size='small' disabled={!!editing} className='border-none mt-4 px-0' onClick={() => setEditing('listItemName')}>edytuj</Button>
+          : <span className='flex items-center'>
+            <Button size='small' className='border-none mt-4 px-0 mr-4' disabled={saving} color='error' onClick={() => setEditing(null)}>anuluj</Button>
+            <LoadingButton size='small' loading={saving} onClick={() => save('listItemName')} className='border-none mt-4 px-0'>zapisz</LoadingButton>
+          </span>}
+      </span>
+      <p className='text-sm mt-2'>Jeżeli np. każda z wartości listy reprezentuje jednego uczestnika postępowania, napisz "uczestnik postępowania".</p>
+      <span className='flex items-center justify-between'>
+        <span className='flex items-center mt-4'>
+          <PersonOutline className='mr-2 text-lg -translate-y-0.5' color={'info'} /> <p className='text-sm'>Nazwa wartości</p></span> <div className='flex-1' />
+        {
+          editing === 'listItemName'
+            ? <span className='flex flex-col items-end'>
+              <TextField
+                defaultValue={currentDescription[step as number].listItemName}
+                onChange={e => listItemNameInput.current = { value: e.target.value }}
+                size='small'
+                style={{ maxWidth: 200 }}
+              />
+
+            </span>
+            : currentDescription[step as number].listItemName
+              ? <pre className='text-xs'>{currentDescription[step as number].listItemName}</pre>
+              : <pre className='text-xs'>brak</pre>
+        }
+
+      </span>
+
+      <span className='flex justify-between items-center'>
+        <pre className='text-xs mt-6'>Minimalna i maksymalna liczba wartości</pre>
+        {editing !== 'listMinMaxItems' ?
+          <Button size='small' disabled={!!editing} className='border-none mt-4 px-0' onClick={() => {
+            setEditing('listMinMaxItems');
+            setListMinMaxItems(description[step as number].listMinMaxItems ?? { min: null, max: null })
+          }}>edytuj</Button>
+          : <span className='flex items-center'>
+            <Button size='small' className='border-none mt-4 px-0 mr-4' disabled={saving} color='error' onClick={() => setEditing(null)}>anuluj</Button>
+            <LoadingButton size='small' disabled={
+              listMinMaxItems.max === NaN || listMinMaxItems.min === NaN
+              || (listMinMaxItems.max as number) < (listMinMaxItems.min as number)
+            } loading={saving} onClick={() => save('listMinMaxItems')} className='border-none mt-4 px-0'>zapisz</LoadingButton>
+          </span>}
+      </span>
+      <p className='text-sm mt-2'>Jeżeli zostawisz pole minimalnej liczby wartości puste, lista będzie mogła mieć 0 wartości, czyli nie będzie wymagane jej wypełnienie.</p>
+      <span className='flex items-center justify-between'>
+        <span className='flex items-center mt-4'>
+          <Remove className='mr-2 text-lg -translate-y-0.5' color={'info'} /> <p className='text-sm'>Minimalna liczba wartości</p></span> <div className='flex-1' />
+        {
+          editing === 'listMinMaxItems'
+            ? <span className='flex flex-col items-end'>
+              <TextField
+                defaultValue={currentDescription[step as number]?.listMinMaxItems?.min ?? ''}
+                onChange={e => {
+                  listMinMaxItemsInput.current = {
+                    value: {
+                      min: parseInt(e.target.value),
+                      max: listMinMaxItemsInput.current?.value?.max
+                    }
+                  };
+                  setListMinMaxItems(listMinMaxItemsInput.current.value);
+                }}
+                size='small'
+                style={{ maxWidth: 200 }}
+              />
+
+            </span>
+            : currentDescription[step as number]?.listMinMaxItems?.min != null
+              ? <pre className='text-xs'>{currentDescription[step as number]?.listMinMaxItems?.min}</pre>
+              : <pre className='text-xs'>brak</pre>
+        }
+
+      </span>
+      <span className='flex items-center justify-between'>
+        <span className='flex items-center mt-4'>
+          <Add className='mr-2 text-lg -translate-y-0.5' color={'info'} /> <p className='text-sm'>Maksymalna liczba wartości</p></span> <div className='flex-1' />
+        {
+          editing === 'listMinMaxItems'
+            ? <span className='flex flex-col items-end'>
+              <TextField
+                defaultValue={currentDescription[step as number]?.listMinMaxItems?.max ?? ''}
+                onChange={e => {
+                  listMinMaxItemsInput.current = {
+                    value: {
+                      min: listMinMaxItemsInput.current?.value?.min,
+                      max: parseInt(e.target.value),
+                    }
+                  };
+                  setListMinMaxItems(listMinMaxItemsInput.current.value);
+                }}
+                size='small'
+                style={{ maxWidth: 200 }}
+              />
+
+            </span>
+            : currentDescription[step as number]?.listMinMaxItems?.max != null
+              ? <pre className='text-xs'>{currentDescription[step as number]?.listMinMaxItems?.max}</pre>
+              : <pre className='text-xs'>brak</pre>
+        }
+
+      </span>
+      <span className='flex items-center justify-between'>
+        <pre className='text-xs mt-4'>Tekst wskazówki</pre>
+        {editing !== 'listMessage' ?
+          <Button size='small' disabled={!!editing} className='border-none mt-4 px-0' onClick={() => setEditing('listMessage')}>edytuj</Button>
+          : <span className='flex items-center'>
+            <Button size='small' className='border-none mt-4 px-0 mr-4' disabled={saving} color='error' onClick={() => setEditing(null)}>anuluj</Button>
+            <LoadingButton size='small' loading={saving} onClick={() => save('listMessage')} className='border-none mt-4 px-0'>zapisz</LoadingButton>
+          </span>}
+      </span>
+      <p className='text-sm'>Wskazówka dotycząca wypełniania listy, np. <i>Dodaj do listy wszystkich spadkobierców testamentowych</i>.</p>
+      {editing === 'listMessage'
+        ? <div className='w-full flex flex-col'>
+          <textarea maxLength={150} readOnly={saving} defaultValue={currentDescription[step as number].listMessage} ref={listMessageTextArea as any} className='p-4 border rounded mt-4' />
+        </div>
+        : <div className='text-sm p-4 w-full border rounded mt-4' style={{ minHeight: 70 }}>{currentDescription[step as number].listMessage}</div>
+      }
+
+    </> : null
     }
 
     <div className='flex mt-6 items-center justify-between mb-2'>
       <pre className='text-xs mt-2'>Fragmenty</pre>
 
-      <Button size='small' className='border-none' onClick={newFragment}>Dodaj fragment</Button>
+      <Button size='small' className='border-none px-0' onClick={() => { setEditing(null); newFragment(); }}>Dodaj fragment</Button>
     </div>
     {currentDescription[step as number].children.length ?
       currentDescription[step as number].children.map((fragment, index) =>
 
         <Button onClick={() => {
+          setEditing(null);
           router.push({ pathname: router.pathname, query: Object.assign(router.query, { fragment: index.toString() }) })
-        }} className='w-full normal-case text-left hover:border-blue-500 rounded-lg border mb-4  hover:bg-blue-50  cursor-pointer p-4 '>
+        }} className='w-full normal-case text-left hover:border-blue-500 rounded-lg border mb-8  hover:bg-blue-50  cursor-pointer p-4 '>
           <div className='text-black w-full pointer-events-none'>
             <EditorFragment fragment={fragment} editor={false} />
           </div>
         </Button>)
-      : <div className='rounded border h-16 mt-2 flex items-center justify-center p-4'>
+      : <div className='rounded border h-16 mb-8 mt-2 flex items-center justify-center p-4'>
         <pre>Brak fragmentów</pre>
       </div>
     }
 
 
-    <LoadingButton disabled={editing} loading={saving} color='error' className='mt-6' onClick={() => setDeleteDialogOpen(true)}>
-      Usuń krok
+    <LoadingButton disabled={!!editing} loading={saving} color='error' className={`mt-2 p-4`} onClick={() => setDeleteDialogOpen(true)}>
+      <Delete className='mr-2' />Usuń krok
     </LoadingButton>
     {typeof fragment === 'number' ? <BodyScrollLock><FragmentEditor /></BodyScrollLock> : null}
   </> : null;

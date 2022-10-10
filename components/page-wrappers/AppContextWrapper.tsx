@@ -47,10 +47,6 @@ const theme = createTheme({
     },
     MuiDialog: {
       styleOverrides: {
-        root: {
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-        },
         paper: {
           maxWidth: '100vw !important',
           margin: 0
@@ -58,23 +54,27 @@ const theme = createTheme({
       }
 
     },
-    MuiTextField: {
+    MuiInputBase: {
       styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-notchedOutline': {
-            'border': `1px solid ${colors.slate[200]}`,
-          }
-        }
+        input: {
+          '&.Mui-disabled': {
+            borderColor: colors.slate[200] + ' !important'
+          },
+        },
       }
     },
     MuiOutlinedInput: {
       styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-notchedOutline': {
-            'border': `1px solid ${colors.slate[200]}`,
-          }
-        }
-      }
+        input: {
+          transition: 'background-color 0.3s ease-in-out',
+          '&.Mui-disabled': {
+            backgroundColor: colors.slate[50]
+          },
+        },
+        notchedOutline: {
+          borderColor: colors.slate[200],
+        },
+      },
     },
     MuiButton: {
       styleOverrides: {
@@ -124,6 +124,7 @@ const theme = createTheme({
         tooltip: {
           background: 'transparent !important',
           zIndex: 1000,
+          color: 'inherit'
         }
       }
     },

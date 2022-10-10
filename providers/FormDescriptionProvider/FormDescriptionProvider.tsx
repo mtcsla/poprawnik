@@ -17,6 +17,12 @@ export type StepDescription = {
   type: 'step' | 'list';
   children: FragmentDescription[]
   name: string,
+
+  listMessage: string,
+  listItemName: string,
+  listMinMaxItems:
+  { min: number | null, max: number | null };
+
 };
 export type FragmentDescription = {
   title: string;
@@ -49,6 +55,9 @@ export type FormActionWithoutSave =
   | ['form_remove_step', number]
   //the first number in action value is always the step index
   | ['step_set_description', [number, StepDescription | null]]
+  | ['step_set_list_message', [number, string]]
+  | ['step_set_list_item_name', [number, string]]
+  | ['step_set_list_min_max_items', [number, { min: number | null, max: number }]]
   | ['step_set_subtitle', [number, string]]
   | ['step_append_fragment', [number, FragmentDescription | null]]
   | ['step_remove_fragment', number]
@@ -85,7 +94,15 @@ export type NameType = {
 
 
 export const getDefaultForm = (): FormDescription => [];
-export const getDefaultStep = (): StepDescription => ({ subtitle: '', name: '', type: 'step', children: [] });
+export const getDefaultStep = (): StepDescription => ({
+  subtitle: '',
+  name: '',
+  type: 'step',
+  children: [],
+  listMessage: '',
+  listItemName: '',
+  listMinMaxItems: { min: null, max: null },
+});
 export const getDefaultFragment = (): FragmentDescription => ({ title: '', subtitle: '', icon: '', children: [] });
 export const getDefaultField = (): FieldDescription => ({ label: '', description: '', fullWidth: false, min: null, max: null, numberType: null, required: true, name: '', placeholder: '', type: 'text', valueType: null, options: [], hint: '', condition: { components: [], operators: [] } });
 
@@ -145,6 +162,15 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
       //step actions
       case 'step_set_description':
         newState = FormDescriptionFunctions.setStepDescription(state, actionValue);
+        break;
+      case 'step_set_list_message':
+        newState = FormDescriptionFunctions.setStepListMessage(state, actionValue);
+        break;
+      case 'step_set_list_item_name':
+        newState = FormDescriptionFunctions.setStepListItemName(state, actionValue);
+        break;
+      case 'step_set_list_min_max_items':
+        newState = FormDescriptionFunctions.setStepListMinMaxItems(state, actionValue);
         break;
       case 'step_set_subtitle':
         newState = FormDescriptionFunctions.setStepSubtitle(state, actionValue);

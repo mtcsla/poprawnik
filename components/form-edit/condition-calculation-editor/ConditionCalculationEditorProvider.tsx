@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import React from 'react';
-import { useFormEditorLocation } from '../FormEditor';
+import { FormDescription } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { ElementsList } from './ElementsList';
 
 export type Condition = {
@@ -26,6 +26,9 @@ export type OperatorCalculation = '+' | '-' | '/' | '*' | '^'
 
 export type Operator = OperatorCondition | OperatorCalculation | null;
 
+/**
+ * @deprecated use Expression<Component, Operator> instead
+*/
 export type ConditionCalculationSequence = { components: (Subcondition | ConditionCalculationSequence)[], operators: Operator[] }
 
 
@@ -69,15 +72,17 @@ const parenthesesContext = React.createContext<{
 
 export const useSequence = () => React.useContext(sequenceContext);
 export const useParenthesesEditor = () => React.useContext(parenthesesContext);
-const ConditionCalculationEditor = ({ exit, save, type, initValue }: {
+
+const ConditionCalculationEditor = ({ exit, save, type, initValue, staticValues }: {
   exit: () => void,
   save: (condition: ConditionCalculationSequence) => void,
   type: 'calculation' | 'condition',
-  initValue?: ConditionCalculationSequence
+  initValue?: ConditionCalculationSequence,
+  staticValues?: {
+    formDescription: FormDescription,
+    listIndex?: number
+  }
 }) => {
-
-  const { location } = useFormEditorLocation();
-  const [step, fragment, field]: [number, number, number] = location as [number, number, number];
   const [parenthesesEditor, setParenthesesEditor] = React.useState<number[] | null>(null);
   const [parentheses, setParentheses] = React.useState<number[]>([])
 

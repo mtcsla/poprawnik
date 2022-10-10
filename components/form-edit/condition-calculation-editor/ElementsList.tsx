@@ -31,7 +31,7 @@ export const ElementsList = ({ path, type }: { path: number[]; type: 'calculatio
         modifySequence(['remove_element', path]);
   }, [subsequence]);
 
-  return <span className='w-full inline-flex gap-6 min-w-max items-start justify-between'><div className={'inline-flex w-full items-start gap-3 flex-col'}>
+  return <span className={` w-full inline-flex gap-6 min-w-max items-start justify-between`}><div className={`inline-flex w-full items-start gap-3 flex-col `}>
 
     <div className='w-full inline-flex items-center'>
       <div onClick={handleClick} className={(parenthesesEditor ? 'pointer-events-none' : '') + ' rounded-lg cursor-pointer bg-slate-50 p-2 px-4 border border-transparent hover:border-blue-500 hover:bg-blue-50'}>(</div>
@@ -75,6 +75,8 @@ export const ElementsList = ({ path, type }: { path: number[]; type: 'calculatio
         : <EditNumberValue
           nested
           type='number'
+          inputType='text'
+
           initValue={{ type: null, value: null }}
           cancel={() => setEditorOpen(false)}
           save={value => { modifySequence(['add_element', [path, value]]); setEditorOpen(false) }}

@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { firestore } from '../../../buildtime-deps/firebase';
 import { useAuth } from '../../../providers/AuthProvider';
+import BodyScrollLock from '../../../providers/BodyScrollLock';
 export const getStaticProps = async () => {
   return { props: {} };
 }
@@ -65,9 +66,7 @@ const YourForms = ({ }) => {
       description: '',
 
       formData: [],
-      templateData: {},
-
-      visible: false
+      templateData: [],
     }).then((snapshot) => {
       router.push('/account/lawyer/edit-document?id=' + snapshot.id);
     }).catch(err => {
@@ -179,7 +178,9 @@ const YourForms = ({ }) => {
     <Dialog open={confirmDelete !== -1}>
       <DialogTitle><pre className='text-sm'>Potwierdzenie</pre></DialogTitle>
       <DialogContent>
-        Czy na pewno chcesz usunąć pismo o nazwie <i>{forms?.[confirmDelete]?.title || "brak tytułu".toUpperCase()}</i>?
+        <BodyScrollLock>
+          Czy na pewno chcesz usunąć pismo o nazwie <i>{forms?.[confirmDelete]?.title || "brak tytułu".toUpperCase()}</i>?
+        </BodyScrollLock>
       </DialogContent>
       <DialogActions>
         <LoadingButton disabled={deleting} onClick={() => setConfirmDelete(-1)} color='error' className='border-none'>

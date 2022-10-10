@@ -20,6 +20,7 @@ import useWindowSize from "../hooks/WindowSize";
 
 import restricted from "../restricted.json";
 import unauthenticated from "../unauthenticated.json";
+import BodyScrollLock from "./BodyScrollLock";
 
 export const possibleRoles = ["user", "admin", "lawyer", "editor"];
 
@@ -265,7 +266,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           <pre className={'text-sm'}> POTWIERDZENIE </pre>
         </DialogTitle>
         <DialogContent>
-          <p className="text-sm">Czy na pewno chcesz się wylogować?</p>
+          <BodyScrollLock>
+            <p className="text-sm">Czy na pewno chcesz się wylogować?</p>
+          </BodyScrollLock>
         </DialogContent>
         <DialogActions>
           <LoadingButton onClick={async () => {

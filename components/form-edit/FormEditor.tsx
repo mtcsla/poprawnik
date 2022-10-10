@@ -4,6 +4,7 @@ import { ErrorMessage, Field, Formik } from 'formik';
 import { cloneDeep } from 'lodash';
 import { useRouter } from 'next/router';
 import React from 'react';
+import BodyScrollLock from '../../providers/BodyScrollLock';
 import { useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { ErrorMessageCallback } from './FieldEditor';
 import StepEditor from './StepEditor';
@@ -25,7 +26,7 @@ export const URLtoQueryObject = (url: string): { [key: string]: string } => {
 
 type FormEditorLocation = [number | null, number | null, number | null]
 
-const locationContext = React.createContext<
+export const locationContext = React.createContext<
   { location: FormEditorLocation, setLocation: React.Dispatch<FormEditorLocation> }
 >(
   {
@@ -47,7 +48,15 @@ const FormEditor = () => {
   const router = useRouter();
 
   const newStep = (type: 'step' | 'list', name?: string) => {
-    modifyCurrentDescription(['form_append_step', { subtitle: '', type, children: [], name: type === 'list' ? (name || '') : '' }]);
+    modifyCurrentDescription(['form_append_step', {
+      subtitle: '',
+      type,
+      children: [],
+      name: type === 'list' ? (name || '') : '',
+      listItemName: '',
+      listMessage: '',
+      listMinMaxItems: { min: null, max: null },
+    }]);
     setDialogOpen(false);
   }
   const selectStep = (step: string): void => {
@@ -95,9 +104,11 @@ const FormEditor = () => {
     <Dialog open={dialogOpen}>
       <DialogTitle className='font-mono uppercase text-slate-500 text-sm'>Dodajesz nowy krok</DialogTitle>
       <DialogContent>
-        <p className='text-base'>
-          Wybierz rodzaj kroku.
-        </p>
+        <BodyScrollLock>
+          <p className='text-base'>
+            Wybierz rodzaj kroku.
+          </p>
+        </BodyScrollLock>
       </DialogContent>
       <DialogActions className='flex justify-between w-72'>
         <Button onClick={() => setDialogOpen(false)} color='error' className='border-none'>
@@ -145,7 +156,7 @@ const FormEditor = () => {
     </Dialog>
 
     <span className='flex justify-end'>
-      <Button size='small' className='border-none' onClick={() => setDialogOpen(true)}>dodaj krok</Button>
+      <Button size='small' className='border-none px-0' onClick={() => setDialogOpen(true)}>dodaj krok</Button>
     </span>
     {currentDescription.length ?
       <Tabs className='border rounded-lg mb-6' onChange={(e, value) => selectStep(value)} value={parseInt(selectedStep)}>

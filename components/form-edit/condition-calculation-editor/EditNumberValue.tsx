@@ -3,6 +3,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { Field, Formik } from 'formik';
 import React from 'react';
 import { FieldType, FieldValueType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { useTemplateEditorContextForConditionsAndCalculations } from '../../template-edit/TemplateEditor';
 import { useFormEditorLocation } from '../FormEditor';
 import { ConditionCalculationDisplay } from './ConditionCalculationDisplay';
 import ConditionCalculationEditor, { ConditionCalculationSequence, ConditionValue } from './ConditionCalculationEditorProvider';
@@ -18,35 +19,40 @@ export const EditNumberValue = ({ type, inputType, save, cancel, initValue, nest
   cancel: () => void;
   nested?: true
 }) => {
+  const templateEditorIndex = useTemplateEditorContextForConditionsAndCalculations();
 
   const { names, description } = useFormDescription();
   const { location } = useFormEditorLocation();
+
   const [step, fragment, field] = location as [number, number, number];
+
 
   const [editingCalcualtion, setEditingCalculation] = React.useState<boolean>(false);
 
 
 
-  const globalVariableNames = React.useMemo(() => names.filter(item => (item.step < step || (item.step === step && item.fragment < fragment))
+  const globalVariableNames = React.useMemo(() => names.filter(item =>
+    (templateEditorIndex == null ? (item.step < step || (item.step === step && item.fragment < fragment)) : true)
     && item.list == null && item.valueType === type
   ).map((item) => <MenuItem value={item.name} className='flex items-center justify-between'>
     <Chip color='info' label={item.name} /> {valueTypeToPolish(item.valueType)}
-  </MenuItem>), [names, step, fragment]);
+  </MenuItem>), [names, step, fragment, templateEditorIndex]);
 
-  const listVariableNames = React.useMemo(() => names.filter(item => item.list === step && item.fragment < fragment && item.valueType === type
+  const listVariableNames = React.useMemo(() => names.filter(item =>
+    (item.list === (templateEditorIndex ?? step) && (templateEditorIndex ? true : item.fragment < fragment)) && item.valueType === type
   ).map((item) => <MenuItem value={item.name} className='flex items-center justify-between'>
     <Chip color='error' label={item.name} /> {valueTypeToPolish(item.valueType)}
-  </MenuItem>), [names, step, fragment]);
+  </MenuItem>), [names, step, fragment, templateEditorIndex]);
 
   const listNames = React.useMemo(() => description.filter(
-    (item, index) => item.type === 'list' && index < step
+    (item, index) => item.type === 'list' && (templateEditorIndex ? true : index < step)
   ).map((item, index) => <MenuItem value={`${item.name}~`} className='flex items-center justify-between'>
     <span className='inline-flex gap-3 items-center'>
       długość listy <Chip color='warning' label={item.name} />
     </span>
     liczba
   </MenuItem>
-  ), [description.length, step]);
+  ), [description.length, step, templateEditorIndex]);
 
   const emptyList = <MenuItem disabled><pre>brak</pre></MenuItem>;
 
@@ -89,7 +95,7 @@ export const EditNumberValue = ({ type, inputType, save, cancel, initValue, nest
                     : null}
                   <MenuItem disabled className='opacity-100'>Zmienne globalne</MenuItem>
                   {globalVariableNames.length ? globalVariableNames : emptyList}
-                  {description[step].type === 'list'
+                  {(templateEditorIndex === null ? description[step].type === 'list' : templateEditorIndex >= 0)
                     ?
                     [
                       <MenuItem disabled className='opacity-100'>Zmienne listowe</MenuItem>

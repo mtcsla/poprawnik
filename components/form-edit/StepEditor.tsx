@@ -1,13 +1,15 @@
 import { Add, Delete, List, PersonOutline, Remove } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, TextField } from '@mui/material';
+import { Button, Dialog, DialogContent, DialogTitle, Snackbar, TextField } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useRouter } from 'next/router';
 import React from 'react';
 import BodyScrollLock from '../../providers/BodyScrollLock';
 import { FormAction, FormDescription, useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { useFormTemplateDescription } from '../../providers/FormDescriptionProvider/FormTemplateDescriptionProvider';
+import { TemplateDescription } from '../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
 import EditorFragment from '../form/EditorFragment';
-import { FormNormalize } from './condition-calculation-editor/normalizers/FormNormalize';
+import Changes from './Changes';
 import { useFormEditorLocation } from './FormEditor';
 import FragmentEditor from './FragmentEditor';
 export type StepEditorProps = {
@@ -15,6 +17,7 @@ export type StepEditorProps = {
 }
 const StepEditor = () => {
   const { description, updateFirestoreDoc, currentDescription, modifyDescription, modifyCurrentDescription } = useFormDescription();
+  const templateDescriptionObject = useFormTemplateDescription();
 
   const { location, setLocation } = useFormEditorLocation();
   const [step, fragment, field] = location;
@@ -91,8 +94,8 @@ const StepEditor = () => {
         }
       )
   }
-  const deleteStep = () => {
-    setSaving(true);
+  const deleteStep = (newForm: FormDescription, newTemplate: TemplateDescription) => {
+    /*setSaving(true);
 
     const newDescription = FormNormalize.conditions(cloneDeep(currentDescription), location, true)
     const lastDescription = cloneDeep(currentDescription);
@@ -112,12 +115,28 @@ const StepEditor = () => {
       catch(
         () => {
           setError(true);
-          modifyDescription?.(['form_set_description', lastDescription]);
+          modifyCurrentDescription?.(['form_set_description', lastDescription]);
 
           setSaving(false); setEditing(null);
           setTimeout(() => setError(false), 5000)
         }
+
       )
+      */
+
+    setSaving(true);
+    updateFirestoreDoc(newForm, newTemplate).then(() => {
+      modifyCurrentDescription(['form_set_description', newForm]);
+      templateDescriptionObject.setCurrentDescription(newTemplate);
+      setSaving(false);
+      router.back()
+    }).catch(
+      () => {
+        setSaving(false);
+        setError(true);
+        setTimeout(() => setError(false), 5000)
+      }
+    );
   }
   const newFragment = () => {
     router.push({
@@ -141,19 +160,19 @@ const StepEditor = () => {
       <DialogTitle>
         <pre className='text-sm'>Usuwasz krok</pre>
       </DialogTitle>
-      <DialogContent>
-        <BodyScrollLock>
-          <p className='text-sm'>Ta akcja jest nieodwracalna.</p>
-        </BodyScrollLock>
+      <DialogContent style={{ maxWidth: 800 }} className="text-sm">
+        Krok zostanie usunięty. Wszelkie odwołania do pól zawartych w kroku w warunkach zostaną zamienione na wartości obojętne, a obliczenia zawierające wartości pól zawartych w kroku zostaną usunięte.
+        <Changes
+          deletionType="step"
+          deletePath={[step as number, null, null]}
+          requiredChange={false}
+          message="Zmiany zostaną zapisane, ta operacja jest nieodwracalna."
+          onCancel={() => setDeleteDialogOpen(false)}
+          onSubmit={(newForm, newTemplate) => deleteStep(newForm, newTemplate)}
+
+          saving={saving}
+        />
       </DialogContent>
-      <DialogActions>
-        <LoadingButton loading={saving} className='border-none' onClick={deleteStep} size='small'>
-          usuń krok
-        </LoadingButton>
-        <Button size='small' className='border-none' color='error' disabled={saving} onClick={() => setDeleteDialogOpen(false)}>
-          anuluj
-        </Button>
-      </DialogActions>
     </Dialog>
 
     {currentDescription[step as number].type === 'list'
@@ -217,7 +236,7 @@ const StepEditor = () => {
           : <span className='flex items-center'>
             <Button size='small' className='border-none mt-4 px-0 mr-4' disabled={saving} color='error' onClick={() => setEditing(null)}>anuluj</Button>
             <LoadingButton size='small' disabled={
-              listMinMaxItems.max === NaN || listMinMaxItems.min === NaN
+              listMinMaxItems.max === null || listMinMaxItems.min === null
               || (listMinMaxItems.max as number) < (listMinMaxItems.min as number)
             } loading={saving} onClick={() => save('listMinMaxItems')} className='border-none mt-4 px-0'>zapisz</LoadingButton>
           </span>}
@@ -321,7 +340,7 @@ const StepEditor = () => {
     }
 
 
-    <LoadingButton disabled={!!editing} loading={saving} color='error' className={`mt-2 p-4`} onClick={() => setDeleteDialogOpen(true)}>
+    <LoadingButton disabled={!!editing} loading={saving} color='error' className={`mt-2 p-4 bg-red-100 border-none`} onClick={() => setDeleteDialogOpen(true)}>
       <Delete className='mr-2' />Usuń krok
     </LoadingButton>
     {typeof fragment === 'number' ? <BodyScrollLock><FragmentEditor /></BodyScrollLock> : null}

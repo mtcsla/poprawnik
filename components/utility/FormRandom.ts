@@ -17,24 +17,30 @@ import {
   Operator,
 } from "../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider";
 import { formControlClasses } from "@mui/material";
+import { OperatorCondition } from "../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider";
+import { Expression } from "../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider";
 
 export namespace FormRandom {
   export const emptyStep = (isList: boolean): StepDescription => ({
     subtitle: faker.company.catchPhrase(),
     type: !isList ? "step" : "list",
+    listMessage: "",
+    listItemName: "",
+    listMinMaxItems: { min: null, max: null },
     name: !isList
       ? ""
       : faker.unique(() => faker.random.alphaNumeric(25), undefined, {
           maxRetries: 500,
           maxTime: 1000,
         }),
-    children: [FormRandom.emptyFragment()],
+    children: [FormRandom.emptyFragment([])],
   });
-  export const emptyFragment = (): FragmentDescription => ({
+  export const emptyFragment = (names: Name[]): FragmentDescription => ({
     title: faker.company.bs(),
     subtitle: faker.company.catchPhrase(),
     icon: "",
     children: [],
+    condition: condition(names) as Expression<Condition, OperatorCondition>,
   });
   export const conditionElement = (names: Name[]) => {
     const variable = faker.helpers.arrayElement(names);
@@ -207,7 +213,9 @@ export namespace FormRandom {
         randomInt(0, 16) % 4 === 0
       ) {
         usedNames.push(...currFragmentNames);
-        data[data.length - 1].children.push(FormRandom.emptyFragment());
+        data[data.length - 1].children.push(
+          FormRandom.emptyFragment(usedNames)
+        );
       } else if (
         data[data.length - 1].children.length >= 2 &&
         randomInt(0, 20) % 3 === 0

@@ -3,7 +3,10 @@ import { Field, Formik } from 'formik';
 import { isDate } from 'mathjs';
 import React from 'react';
 import BodyScrollLock from '../../../providers/BodyScrollLock';
-import { FieldType, FieldValueType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { FieldType, FieldValueType, NameType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { useTemplateDescription } from '../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
+import { useTemplateEditorContextForConditionsAndCalculations } from '../../template-edit/TemplateEditor';
+import { Evaluate } from '../../utility/Evaluate';
 import { useFormEditorLocation } from '../FormEditor';
 import { ConditionCalculationDisplay } from './ConditionCalculationDisplay';
 import { comparatorsForNotRequiredValuesPolish, comparatorsPolish, comparatorsText, Condition, ConditionCalculationSequence, getEmptyCondition, useSequence } from './ConditionCalculationEditorProvider';
@@ -13,26 +16,47 @@ import { EditNumberValue } from "./EditNumberValue";
 
 export const EditCondition = ({ path, add, cancel, initValue }: { path: number[]; add?: true; cancel: () => void; initValue?: Condition; }) => {
 
-  const { names, description } = useFormDescription();
+  const formDescription = useFormDescription();
+  const templateDescription = useTemplateDescription();
+
   const { location } = useFormEditorLocation();
   const [step, fragment, field] = location as [number, number, number];
   const { sequence, modifySequence } = useSequence();
 
+  const isInTemplate = React.useMemo(() => { return !!templateDescription.form.length }, [templateDescription])
+  const { description, names } = React.useMemo(() => {
+    if (isInTemplate) {
+      return { description: templateDescription.form, names: Evaluate.getNames(templateDescription.form) as NameType[] };
+    }
+    else return { description: formDescription.description, names: formDescription.names }
+  }, [formDescription, templateDescription])
+
+  const listIndex = useTemplateEditorContextForConditionsAndCalculations();
+
   const [valueEditorOpen, setValueEditorOpen] = React.useState(false);
 
-  const globalVariableNames = React.useMemo(() => names.filter(item => (item.step < step || (item.step === step && item.fragment < fragment))
-    && item.list == null
+  const globalVariableNames = React.useMemo(() => names.filter(item =>
+    (isInTemplate)
+      ? true
+      : (item.step < step || (item.step === step && item.fragment < fragment)
+      )
+      && item.list == null
+      && !item.name.endsWith('~')
   ).map((item) => <MenuItem value={item.name} className='flex items-center justify-between'>
     <Chip color='info' label={item.name} /> {valueTypeToPolish(item.valueType)}
   </MenuItem>), [names, step, fragment]);
 
-  const listVariableNames = React.useMemo(() => names.filter(item => item.list === step && item.fragment < fragment
-  ).map((item) => <MenuItem value={item.name} className='flex items-center justify-between'>
-    <Chip color='error' label={item.name} /> {valueTypeToPolish(item.valueType)}
-  </MenuItem>), [names, step, fragment]);
+  const listVariableNames = React.useMemo(() =>
+    names.filter(
+      isInTemplate
+        ? item => item.list === listIndex
+        : item => item.list === step && item.fragment < fragment
+    ).map((item) => <MenuItem value={item.name} className='flex items-center justify-between'>
+      <Chip color='error' label={item.name} /> {valueTypeToPolish(item.valueType)}
+    </MenuItem>), [names, step, fragment]);
 
   const listNames = React.useMemo(() => description.filter(
-    (item, index) => item.type === 'list' && index < step
+    (item, index) => item.type === 'list' && (isInTemplate ? true : index < step)
   ).map((item, index) => <MenuItem value={`${item.name}~`} className='flex items-center justify-between'>
     <span className='inline-flex gap-3 items-center'>
       długość listy <Chip color='warning' label={item.name} />
@@ -48,6 +72,7 @@ export const EditCondition = ({ path, add, cancel, initValue }: { path: number[]
     <DialogTitle>
       <pre className='text-sm'>{!add ? 'Edytujesz' : 'Dodajesz'} warunek</pre>
       <p className='text-sm'>Edytuj ten prosty warunek...</p>
+      {listIndex}
     </DialogTitle>
 
     <Formik initialValues={initValue ?? getEmptyCondition()} onSubmit={() => { }}>

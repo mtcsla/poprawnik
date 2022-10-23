@@ -7,7 +7,12 @@ import {
   FormDescription,
 } from "../../../../providers/FormDescriptionProvider/FormDescriptionProvider";
 import { cloneDeep, cloneDeepWith } from "lodash";
-import { Condition, Calculation } from "../ConditionCalculationEditorProvider";
+import {
+  Condition,
+  Calculation,
+  OperatorCondition,
+} from "../ConditionCalculationEditorProvider";
+import { Expression } from "../../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider";
 /**
  * Pass in the copy of the description object to prevent hard to debug problems.
  */
@@ -50,6 +55,14 @@ export namespace FormNormalize {
         const newFragment = cloneDeep(fragment);
         newFragment.children = [];
 
+        let newFragmentCondition = cloneDeep(
+          fragment.condition ?? { operators: [], components: [] }
+        );
+        newFragmentCondition = removeNamesFromCondition(
+          newFragmentCondition,
+          names
+        ) as Expression<Condition, OperatorCondition>;
+
         for (const field of fragment.children) {
           let newFieldCondition = cloneDeep(field.condition);
           newFieldCondition = removeNamesFromCondition(
@@ -60,7 +73,10 @@ export namespace FormNormalize {
           newFragment.children.push({ ...field, condition: newFieldCondition });
         }
 
-        newStep.children.push(newFragment);
+        newStep.children.push({
+          ...newFragment,
+          condition: newFragmentCondition,
+        });
       }
 
       newDescriptionPart.push(newStep);
@@ -87,13 +103,13 @@ export namespace FormNormalize {
   /**
    * Pass in copy of the sequence object!
    */
-  const removeNamesFromCondition = (
+  export const removeNamesFromCondition = (
     sequence: ConditionCalculationSequence,
     names: string[]
   ) => {
     const newSequence = cloneDeep(sequence);
 
-    newSequence.components.forEach((item, index) => {
+    newSequence?.components?.forEach((item, index) => {
       if (
         !(item as ConditionCalculationSequence).components ||
         !(item as ConditionCalculationSequence).operators

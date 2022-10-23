@@ -16,7 +16,10 @@ type TemplateLeafElementType = 'text' | 'variable' | 'calculation' | 'enter' | '
 
 export type TemplateElementType = { leaf: TemplateLeafElementType, parent: TemplateParentElementType };
 
-export type TemplateElementPrototype<Child> = {
+interface MarkedForDeletion {
+  markedForDeletion?: true;
+}
+export interface TemplateElementPrototype<Child> extends MarkedForDeletion {
   type: TemplateElementType['leaf'] | TemplateElementType['parent'];
   child: Child
 }

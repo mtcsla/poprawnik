@@ -1,5 +1,5 @@
 import { doc, getDoc, updateDoc } from '@firebase/firestore';
-import { Bookmark, DoneAll, Warning } from "@mui/icons-material";
+import { ArrowBack, Bookmark, DoneAll, Warning } from "@mui/icons-material";
 import { LoadingButton } from '@mui/lab';
 import { Button, Skeleton, TextField } from '@mui/material';
 import { useRouter } from 'next/router';
@@ -56,6 +56,10 @@ const EditForm = () => {
 
 
   return <article className="w-full flex flex-col items-stretch mb-8">
+    <Button size='small' onClick={() => router.push(`/account/lawyer`)} className='bg-blue-100 rounded mb-12 border-none w-full flex items-center justify-between'>
+      <ArrowBack />
+      Wróć do twoich pism
+    </Button>
     <h1 className="mb-4"><Bookmark className="mr-2 -translate-y-0.5" color='primary' />Edytujesz pismo</h1>
     {form && userProfile ? <>
       <span className="flex items-center justify-between">

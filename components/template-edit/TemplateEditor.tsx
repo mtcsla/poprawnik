@@ -5,7 +5,6 @@ import { Expression, ListElement, TemplateElement, TemplatePath, useTemplateDesc
 import { ConditionCalculationDisplay } from '../form-edit/condition-calculation-editor/ConditionCalculationDisplay';
 import { Condition, OperatorCondition } from '../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
 import { EditTemplateDescription } from './EditTemplateDescription';
-import { TemplateNestingParentEditor } from './nesting/TemplateNestingParentEditor';
 
 export const isValidElement = (element: TemplateElement) => {
   if (element.type === 'text') return element.text !== '';
@@ -22,15 +21,19 @@ export type ParentElementPropsType<Type> = {
 
 const templateParenthesesEditorContext = React.createContext<{
   path: TemplatePath | null,
+  editing: boolean
   parentheses: [number | null, number | null],
   setParentheses: React.Dispatch<[number | null, number | null]>,
   setPath: React.Dispatch<TemplatePath | null>
+  setEditing: React.Dispatch<boolean>
 }>(
   {
     path: null,
     parentheses: [null, null],
+    editing: true,
     setParentheses: () => { },
-    setPath: () => { }
+    setPath: () => { },
+    setEditing: () => { },
   }
 )
 export const useTemplateParenthesesEditor = () => React.useContext(templateParenthesesEditorContext);
@@ -40,21 +43,20 @@ export const templateEditorContextForConditionsAndCalculations = React.createCon
 );
 export const useTemplateEditorContextForConditionsAndCalculations = () => React.useContext(templateEditorContextForConditionsAndCalculations);
 
-export default function TemplateEditor() {
+export default function TemplateEditor({ display }: { display?: boolean }) {
   const { description, modifyDescription, form } = useTemplateDescription();
 
   const [parentheses, setParentheses] = React.useState<[number | null, number | null]>([null, null]);
   const [path, setPath] = React.useState<TemplatePath | null>(null);
+  const [editing, setEditing] = React.useState<boolean>(false);
 
 
-  const parenthesesEditorContextValue = { parentheses, setParentheses, path, setPath };
+  const parenthesesEditorContextValue = { parentheses, setParentheses, path, setPath, editing, setEditing };
 
   return <templateEditorContextForConditionsAndCalculations.Provider value={-1}>
     <templateParenthesesEditorContext.Provider value={parenthesesEditorContextValue}>
       <FormDescriptionProvider initValue={form} id={''}>
-        <TemplateNestingParentEditor adding />
-        <pre className='mt-8 mb-4'>Wzór pisma</pre>
-        <EditTemplateDescription path={path ?? []} />
+        <EditTemplateDescription noHeadline={display} path={(!editing ? path : null) ?? []} />
       </FormDescriptionProvider>
     </templateParenthesesEditorContext.Provider>
   </templateEditorContextForConditionsAndCalculations.Provider>

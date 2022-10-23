@@ -1,6 +1,6 @@
 import { doc, getDoc } from '@firebase/firestore';
-import { Bookmark } from "@mui/icons-material";
-import { Skeleton } from '@mui/material';
+import { ArrowBack, Bookmark } from "@mui/icons-material";
+import { Button, Skeleton } from '@mui/material';
 import { useRouter } from "next/router";
 import React from "react";
 import { IFormData } from "..";
@@ -8,6 +8,7 @@ import { firestore } from "../../../../buildtime-deps/firebase";
 import FormEditor from '../../../../components/form-edit/FormEditor';
 import { useAuth } from '../../../../providers/AuthProvider';
 import FormDescriptionProvider from '../../../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import FormTemplateDescriptionProvider from '../../../../providers/FormDescriptionProvider/FormTemplateDescriptionProvider';
 
 const EditDocumentForm = () => {
   const [form, setForm] = React.useState<IFormData | null>(null);
@@ -39,6 +40,10 @@ const EditDocumentForm = () => {
   }, [router.isReady])
 
   return <article className='w-full flex flex-col items-stretch mb-6'>
+    <Button size='small' disabled={!id} onClick={() => router.push(`/account/lawyer/edit-document?id=${id}`)} className='bg-blue-100 rounded mb-12 border-none w-full flex items-center justify-between'>
+      <ArrowBack />
+      Wróć do pisma
+    </Button>
     <h1>
       <Bookmark className="-translate-y-0.5 mr-1" color='primary' />
       Edytujesz formularz pisma
@@ -47,7 +52,9 @@ const EditDocumentForm = () => {
       <>
         <p><i>{form.title}</i></p>
         <FormDescriptionProvider id={id} initValue={form.formData}>
-          <FormEditor />
+          <FormTemplateDescriptionProvider initValue={form.templateData}>
+            <FormEditor />
+          </FormTemplateDescriptionProvider>
         </FormDescriptionProvider>
       </>
       :

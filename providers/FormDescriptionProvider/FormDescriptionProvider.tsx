@@ -3,8 +3,9 @@ import { cloneDeep } from 'lodash';
 import { useRouter } from 'next/router';
 import React from "react";
 import { firestore } from "../../buildtime-deps/firebase";
-import { ConditionCalculationSequence } from '../../components/form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
+import { Condition, ConditionCalculationSequence, OperatorCondition } from '../../components/form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
 import { FormRandom } from '../../components/utility/FormRandom';
+import { Expression, TemplateDescription } from '../TemplateDescriptionProvider/TemplateDescriptionProvider';
 import { FormDescriptionFunctions } from "./FormDescriptionStateModifierFunctions";
 
 
@@ -28,6 +29,7 @@ export type FragmentDescription = {
   title: string;
   subtitle: string;
   icon: string;
+  condition: Expression<Condition, OperatorCondition>
   children: FieldDescription[]
 };
 export type FieldDescription = {
@@ -74,6 +76,7 @@ export type FormActionWithoutSave =
   | ['fragment_append_field', [number, number, FieldDescription | null]]
   | ['fragment_remove_field', [number, number, number]] //the third number is the field's index
   | ['fragment_reorder_fields', [number, number, number, number]] //the third number is the field's index and the fourth number is the index it should be moved to
+  | ['fragment_set_condition', [number, number, Expression<Condition, OperatorCondition>]]
 
   | ['field_set_label', [number, number, number, string]]
   | ['field_set_name', [number, number, number, string]]
@@ -89,7 +92,7 @@ export type FormActionWithoutSave =
 
 export type FormAction = FormActionWithoutSave;
 export type NameType = {
-  name: string, required: boolean, options: string[], type: FieldType, step: number, fragment: number, field: number, list: number | null, valueType: FieldValueType
+  name: string, required: boolean, options: string[], type: FieldType, step: number, fragment: number, field: number, list: number | null, valueType: FieldValueType, fragmentConditional: boolean, condition?: Expression<Condition, OperatorCondition>
 };
 
 
@@ -103,14 +106,14 @@ export const getDefaultStep = (): StepDescription => ({
   listItemName: '',
   listMinMaxItems: { min: null, max: null },
 });
-export const getDefaultFragment = (): FragmentDescription => ({ title: '', subtitle: '', icon: '', children: [] });
+export const getDefaultFragment = (): FragmentDescription => ({ title: '', subtitle: '', icon: '', children: [], condition: { components: [], operators: [] } });
 export const getDefaultField = (): FieldDescription => ({ label: '', description: '', fullWidth: false, min: null, max: null, numberType: null, required: true, name: '', placeholder: '', type: 'text', valueType: null, options: [], hint: '', condition: { components: [], operators: [] } });
 
 const formDescriptionContext = React.createContext<{
   description: FormDescription, modifyDescription: React.Dispatch<FormAction>,
   currentDescription: FormDescription, modifyCurrentDescription: React.Dispatch<FormAction>,
   names: NameType[],
-  updateFirestoreDoc: (description: FormDescription) => Promise<void>
+  updateFirestoreDoc: (description: FormDescription, template?: TemplateDescription) => Promise<void>
 }>({ description: [], modifyDescription: () => { }, currentDescription: [], modifyCurrentDescription: () => { }, updateFirestoreDoc: async () => { }, names: [] });
 export const useFormDescription = () => React.useContext(formDescriptionContext);
 export type FormDescriptionProviderProps = {
@@ -131,8 +134,8 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
     formDescriptionReducer,
     initValue ?? getDefaultForm()
   );
-  const updateFirestoreDoc = async (description: FormDescription) => {
-    await updateDoc(doc(firestore, `forms/${id}`), { formData: description })
+  const updateFirestoreDoc = async (description: FormDescription, template?: TemplateDescription) => {
+    await updateDoc(doc(firestore, `forms/${id}`), template ? { formData: description, templateData: template } : { formData: description });
   }
   const [names, setNames] = React.useState<NameType[]>([])
 
@@ -190,6 +193,9 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
         break;
       case 'fragment_set_subtitle':
         newState = FormDescriptionFunctions.setFragmentSubtitle(state, actionValue);
+        break;
+      case 'fragment_set_condition':
+        newState = FormDescriptionFunctions.setFragmentCondition(state, actionValue);
         break;
       case 'fragment_set_icon':
         newState = FormDescriptionFunctions.setFragmentIcon(state, actionValue);
@@ -259,7 +265,9 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
               list: step.type === 'list' ? stepIndex : null,
               type: field.type,
               options: field.options,
-              valueType: getActualValueType(field)
+              valueType: getActualValueType(field),
+              fragmentConditional: !!fragment?.condition?.components?.length,
+              condition: field.condition as Expression<Condition, OperatorCondition>
             })
           })
         })

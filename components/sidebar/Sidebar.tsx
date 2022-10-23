@@ -80,7 +80,7 @@ export function LoggedInUserDisplay() {
   const router = useRouter();
 
   return <Link passHref href={userProfile ? '/account' : `/login?redirect=${router.pathname}`}>
-    <a className="w-full pr-5 pl-1 flex flex-col">
+    <a className="w-full pr-3 pl-1 flex flex-col">
       <Wrapper roles={userProfile?.roles ?? []}>
         <Tooltip placement="right-start" sx={{ background: 'transparent !important' }} title={
           userProfile && userProfile.roles.length > 1 ?

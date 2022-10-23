@@ -1,3 +1,8 @@
+import { Expression } from "../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider";
+import {
+  OperatorCondition,
+  OperatorCalculation,
+} from "../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider";
 import {
   Calculation,
   Condition,
@@ -5,6 +10,43 @@ import {
 } from "../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider";
 
 export namespace FormNameCheck {
+  export const conditionNotRequired = (
+    names: string[],
+    condition:
+      | Expression<Condition, OperatorCondition>
+      | ConditionCalculationSequence,
+    path: number[] = []
+  ): number[][] => {
+    const pathsFound: number[][] = [];
+
+    condition.components.forEach((item, index) => {
+      if (
+        !(item as ConditionCalculationSequence).components ||
+        !(item as ConditionCalculationSequence).operators
+      ) {
+        if ((item as Condition).value.type === "calculation") {
+          if (
+            FormNameCheck.calculation(
+              names,
+              (item as Condition).value.value as ConditionCalculationSequence,
+              []
+            ).length
+          )
+            pathsFound.push(path.concat([index]));
+        }
+      } else
+        pathsFound.push(
+          ...FormNameCheck.conditionNotRequired(
+            names,
+            item as Expression<Condition, OperatorCondition>,
+            path.concat([index])
+          )
+        );
+    });
+
+    return pathsFound;
+  };
+
   export const condition = (
     names: string[],
     condition: ConditionCalculationSequence,
@@ -45,6 +87,9 @@ export namespace FormNameCheck {
     return pathsFound;
   };
 
+  /**
+   * Works both for removal and changing the status to not required.
+   */
   export const calculation = (
     names: string[],
     calculation: ConditionCalculationSequence,

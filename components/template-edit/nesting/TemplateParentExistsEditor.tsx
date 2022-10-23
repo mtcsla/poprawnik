@@ -1,15 +1,17 @@
 import { Edit } from '@mui/icons-material';
 import { Button, Checkbox, Chip, FormControl, InputLabel, MenuItem, Select, Tooltip } from '@mui/material';
 import React from 'react';
+import { existsContext } from '../../../pages/account/lawyer/edit-document/template';
 import { useFormDescription } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { ExistsElement, useTemplateDescription } from '../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
+import { useTemplateChangesDisplay } from '../../form-edit/Changes';
 import { Evaluate } from '../../utility/Evaluate';
 import { ParentElementPropsType, useTemplateEditorContextForConditionsAndCalculations } from '../TemplateEditor';
 
 
 
 
-export const TemplateParentExistsEditor = ({ path, element, onChange }: ParentElementPropsType<ExistsElement>) => {
+export const TemplateParentExistsEditor = ({ path, element, onChange, }: ParentElementPropsType<ExistsElement>) => {
   const { form } = useTemplateDescription();
   const listIndex = useTemplateEditorContextForConditionsAndCalculations();
 
@@ -17,7 +19,7 @@ export const TemplateParentExistsEditor = ({ path, element, onChange }: ParentEl
   const [selectOpen, setSelectOpen] = React.useState(false);
 
   React.useEffect(() => {
-    onChange({ type: 'exists', variables, child: null as never });
+    onChange({ type: 'exists', variables, child: element?.child?.length ? element?.child : [] });
   }, [variables]);
 
   const globals = React.useMemo(() => Evaluate.getNames(form).filter(name => name.list == null && !name.name?.endsWith('~')), [form]);
@@ -79,29 +81,36 @@ export const TemplateParentExistsEditor = ({ path, element, onChange }: ParentEl
   </>;
 };
 
-export const TemplateParentExistsDisplay = ({ element, children }: { element: ExistsElement, children: React.ReactNode }) => {
+export const TemplateParentExistsDisplay = ({ element, children, edit }: { element: ExistsElement, children: React.ReactNode, edit: () => void }) => {
   const { names } = useFormDescription();
+  const { changedConditions, deletionPaths } = useTemplateChangesDisplay();
 
-  return <div style={{ maxWidth: 800 }} className='bg-green-500 rounded-lg sm:pt-6 pt-4 flex flex-col overflow-x-visible'>
+  return <div style={{ maxWidth: 800 }} className='rounded-lg sm:pt-6 pt-4 flex flex-col overflow-x-visible bg-green-100'>
     <span className='px-4 sm:px-6 pb-4 sm:pb-6 w-full inline-flex items-center flex-wrap justify-end gap-3'>
-      <pre className='text-sm mb-4 text-white'>Asercja istnienia</pre>
+      <pre className='text-sm mb-4'>Asercja istnienia</pre>
       <div className='flex-1' />
-      <Button className=' bg-white border-none self-end' size='small' color='primary'>Edytuj<Edit className='ml-2' /></Button>
+      {
+        changedConditions.length || deletionPaths.length
+          ? null
+          : <Button className='bg-white border-none self-end' size='small' color='primary' onClick={edit}>Edytuj<Edit className='ml-2' /></Button>
+      }
     </span>
 
-    <p className='text-sm mb-4 text-white mx-4 sm:mx-6'>Fragment wyświetlany gdy pola następujących zmiennych są niepuste:
+    <p className='text-sm mb-4 mx-4 sm:mx-6'>Fragment wyświetlany gdy pola następujących zmiennych są niepuste:
     </p>
 
-    <div className='bg-white inline-flex gap-4 py-2 flex-wrap  mx-4 sm:mx-6 rounded-lg '>
+    <div className='bg-white inline-flex gap-1 py-2 flex-wrap  mx-4 sm:mx-6 rounded-lg '>
       {element.variables.map((name) => {
         const variable = names.find(item => item.name === name);
         return <Chip size='small' className='mr-2 ml-2' color={variable?.list == null ? 'primary' : 'error'} label={name} />
       })}
     </div>
 
-    <div className='bg-green-500 min-w-full pt-4 pb-4 sm:px-6 px-4 rounded-lg w-fit'>
+    <div className='bg-green-100 min-w-full pt-4 pb-4 sm:pb-6 sm:px-6 px-4 rounded-lg w-fit'>
       <div className='bg-white sm:p-4 p-2 rounded-lg'>
-        {children}
+        <existsContext.Provider value={element.variables || []}>
+          {children}
+        </existsContext.Provider>
       </div>
     </div>
 

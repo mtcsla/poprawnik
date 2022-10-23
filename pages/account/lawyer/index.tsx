@@ -1,5 +1,5 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, query, where } from '@firebase/firestore';
-import { Add, Article } from '@mui/icons-material';
+import { Add, Article, Help } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton } from '@mui/material';
 import Link from 'next/link';
@@ -191,6 +191,13 @@ const YourForms = ({ }) => {
         </LoadingButton>
       </DialogActions>
     </Dialog>
+
+    <h1 className='mt-8'>
+      <Help className='-translate-y-0.5 mr-2' color='primary' /> Pomoc
+    </h1>
+    <p>
+      Dowiedz się wszystkiego o kreatorze pism.
+    </p>
   </article>;
 }
 

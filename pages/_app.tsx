@@ -27,7 +27,7 @@ function MyApp({ Component, pageProps }: any) {
   return (
     <>
       <Head>
-        <title>Iusinus</title>
+        <title>POPRAWNIK - serwis z pismami sądowymi</title>
         <meta name="theme-color" content="#fff" />
         <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css' />
       </Head>

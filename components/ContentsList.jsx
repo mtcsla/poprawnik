@@ -142,6 +142,7 @@ const useIntersectionObserver = (setActiveId, headingElements) => {
       }
     };
 
+
     const rem = getComputedStyle(document.documentElement).fontSize;
 
     const value = `-${

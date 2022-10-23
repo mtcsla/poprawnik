@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { collection, doc, getDoc } from '@firebase/firestore';
-import { ArrowForward } from '@mui/icons-material';
+import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { Alert, Button, CircularProgress, Dialog, DialogContent, DialogTitle, LinearProgress, Snackbar } from '@mui/material';
 import { Formik } from 'formik';
 import { useRouter } from 'next/router';
@@ -212,6 +212,10 @@ const FormDisplay = () => {
   return <BodyScrollLock>
     <div className="bg-white sm:p-8 p-4 sm:pb-0 pb-0 flex flex-col items-center overflow-y-auto fixed top-0 bottom-0 right-0 left-0" style={{ zIndex: 201 }}>
       <Body className='w-full bg-red- min-h-full flex flex-col'>
+        <Button size='small' className='bg-blue-100 rounded mb-12 border-none w-full flex items-center justify-between'>
+          <ArrowBack />
+          Wróć do strony pisma
+        </Button>
         <span className='flex flex-col'>
           <div className="flex justify-between mb-4 flex-wrap items-center">
             <span className='-ml-5 -mt-4'>
@@ -364,21 +368,23 @@ const FormDisplay = () => {
                         <Alert severity='error'>Wypełnij wszystkie pola poprawnie.</Alert>
                       </Snackbar>
                       <div className={loading ? '' : 'mt-8'} />
-                      <Button
-                        disabled={!buttonActive}
-                        className={`p-2.5 ${buttonActive ? 'bg-blue-500  hover:bg-blue-400' : 'bg-gray-300'} text-white mb-8  ${loading ? '' : 'mt-auto'}`}
-                        onClick={() => {
-                          if (!isValid) {
-                            submitForm();
-                            setButtonActive(false);
-                          }
-                          else {
-                            nextStep();
-                          }
-                        }}>
-                        dalej
-                        <ArrowForward className='ml-4' />
-                      </Button>
+                      <div className={`${loading ? '' : 'mt-auto'} w-full flex pb-3`}>
+                        <Button
+                          disabled={!buttonActive}
+                          className={`p-2.5 w-full ${buttonActive ? 'bg-blue-200  hover:bg-blue-100' : 'bg-gray-300'} mb-8  `}
+                          onClick={() => {
+                            if (!isValid) {
+                              submitForm();
+                              setButtonActive(false);
+                            }
+                            else {
+                              nextStep();
+                            }
+                          }}>
+                          dalej
+                          <ArrowForward className='ml-4' />
+                        </Button>
+                      </div>
                     </topLevelFormDataContext.Provider>
                   </formikContext.Provider>
                 }}

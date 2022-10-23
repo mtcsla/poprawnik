@@ -2,8 +2,11 @@ import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormCo
 import { DatePicker } from '@mui/x-date-pickers';
 import { Field, Formik } from 'formik';
 import React from 'react';
-import { FieldType, FieldValueType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { existsContext } from '../../../pages/account/lawyer/edit-document/template';
+import { FieldType, FieldValueType, NameType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { useTemplateDescription } from '../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
 import { useTemplateEditorContextForConditionsAndCalculations } from '../../template-edit/TemplateEditor';
+import { Evaluate } from '../../utility/Evaluate';
 import { useFormEditorLocation } from '../FormEditor';
 import { ConditionCalculationDisplay } from './ConditionCalculationDisplay';
 import ConditionCalculationEditor, { ConditionCalculationSequence, ConditionValue } from './ConditionCalculationEditorProvider';
@@ -19,40 +22,54 @@ export const EditNumberValue = ({ type, inputType, save, cancel, initValue, nest
   cancel: () => void;
   nested?: true
 }) => {
-  const templateEditorIndex = useTemplateEditorContextForConditionsAndCalculations();
 
-  const { names, description } = useFormDescription();
+  const formDescription = useFormDescription();
+  const templateDescription = useTemplateDescription();
+
+
+  const isInTemplate = React.useMemo(() => !!formDescription.description.length, [templateDescription, formDescription])
+  const listIndex = useTemplateEditorContextForConditionsAndCalculations();
+  const allowedNotRequired = React.useContext(existsContext);
+
+  const { description, names } = React.useMemo(() => {
+    if (isInTemplate)
+      return {
+        description: templateDescription.form,
+        names: Evaluate.getNames(templateDescription.form) as NameType[]
+      }
+    else return {
+      description: formDescription.description,
+      names: formDescription.names
+    }
+  }, [templateDescription, formDescription])
+
   const { location } = useFormEditorLocation();
-
   const [step, fragment, field] = location as [number, number, number];
-
 
   const [editingCalcualtion, setEditingCalculation] = React.useState<boolean>(false);
 
-
-
   const globalVariableNames = React.useMemo(() => names.filter(item =>
-    (templateEditorIndex == null ? (item.step < step || (item.step === step && item.fragment < fragment)) : true)
-    && item.list == null && item.valueType === type
+    (!isInTemplate ? (item.step < step || (item.step === step && item.fragment < fragment)) : true)
+    && item.list == null && item.valueType === type && !item.name.endsWith('~') && ((item.required && !item.fragmentConditional && !item?.condition?.components?.length) || allowedNotRequired.includes(item.name))
   ).map((item) => <MenuItem value={item.name} className='flex items-center justify-between'>
     <Chip color='info' label={item.name} /> {valueTypeToPolish(item.valueType)}
-  </MenuItem>), [names, step, fragment, templateEditorIndex]);
+  </MenuItem>), [names, step, fragment, isInTemplate]);
 
   const listVariableNames = React.useMemo(() => names.filter(item =>
-    (item.list === (templateEditorIndex ?? step) && (templateEditorIndex ? true : item.fragment < fragment)) && item.valueType === type
+    (item.list === (listIndex ?? step) && (isInTemplate ? true : item.fragment < fragment)) && item.valueType === type && ((item.required && !item.fragmentConditional && !item?.condition?.components?.length) || allowedNotRequired.includes(item.name))
   ).map((item) => <MenuItem value={item.name} className='flex items-center justify-between'>
     <Chip color='error' label={item.name} /> {valueTypeToPolish(item.valueType)}
-  </MenuItem>), [names, step, fragment, templateEditorIndex]);
+  </MenuItem>), [names, step, fragment, isInTemplate]);
 
   const listNames = React.useMemo(() => description.filter(
-    (item, index) => item.type === 'list' && (templateEditorIndex ? true : index < step)
+    (item, index) => item.type === 'list' && (isInTemplate ? true : index < step)
   ).map((item, index) => <MenuItem value={`${item.name}~`} className='flex items-center justify-between'>
     <span className='inline-flex gap-3 items-center'>
       długość listy <Chip color='warning' label={item.name} />
     </span>
     liczba
   </MenuItem>
-  ), [description.length, step, templateEditorIndex]);
+  ), [description.length, step, isInTemplate]);
 
   const emptyList = <MenuItem disabled><pre>brak</pre></MenuItem>;
 
@@ -95,7 +112,7 @@ export const EditNumberValue = ({ type, inputType, save, cancel, initValue, nest
                     : null}
                   <MenuItem disabled className='opacity-100'>Zmienne globalne</MenuItem>
                   {globalVariableNames.length ? globalVariableNames : emptyList}
-                  {(templateEditorIndex === null ? description[step].type === 'list' : templateEditorIndex >= 0)
+                  {(!isInTemplate ? description[step].type === 'list' : listIndex != null && listIndex >= 0)
                     ?
                     [
                       <MenuItem disabled className='opacity-100'>Zmienne listowe</MenuItem>

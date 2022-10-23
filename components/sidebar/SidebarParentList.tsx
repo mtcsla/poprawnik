@@ -1,5 +1,5 @@
-import { AddBox, Article, Feed, Gavel } from "@mui/icons-material";
-import { Accordion, AccordionSummary, Typography } from "@mui/material";
+import { Article, Feed, Gavel, Lock } from "@mui/icons-material";
+import { Accordion, AccordionSummary, Tooltip, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import React from "react";
 import ArticlesList from "./sidebar-lists/ArticlesList";
@@ -14,8 +14,15 @@ export const NavigationMenu = () => {
   return <div className={'flex flex-col w-full pl-1'}>
     <MenuAccordion linkFragment={'documents'} icon={<Article {...{ sx }} color={'primary'} className={'mr-4'} />}
       title={'Pisma'} onChange={() => setExpanded(0)} expanded={expanded == 0} />
-    <MenuAccordion linkFragment={'calculators'} icon={<AddBox {...{ sx }} color={'primary'} className={'mr-4'} />}
-      title={'Kalkulatory'} onChange={() => setExpanded(1)} expanded={expanded == 1} />
+    <Tooltip title={<div className='p-1 rounded bg-black bg-opacity-70 text-white'>Już niedługo!</div>} placement='right' >
+      <span>
+        <MenuAccordion linkFragment={'calculators'} icon={<Lock {...{ sx }} color={'primary'} className={'mr-4 text-slate-400'} />}
+          //@ts-ignore
+          title={<span className="text-slate-400">Kalkulatory</span>}
+          onChange={() => { }} expanded={expanded == 1}
+        />
+      </span>
+    </Tooltip>
     <MenuAccordion linkFragment={'articles'} icon={<Feed {...{ sx }} color={'primary'} className={'mr-4'} />}
       title={'Artykuły'} onChange={() => setExpanded(2)} expanded={expanded == 2} >
       <ArticlesList />
@@ -39,11 +46,13 @@ export const MenuAccordion = ({
   return <Accordion defaultExpanded={router.pathname.includes(linkFragment as string)} expanded={expanded} onChange={onChange}
     className={'w-full mt-2 pl-1  border-none'}
     style={{ marginRight: 3, borderTop: 'none !important' }}>
-    <AccordionSummary className={(expanded ? 'bg-slate-50 cursor-default' : '') + ' pl-4 pr-0'} id={title}>
+    <AccordionSummary className={(expanded ? 'cursor-default' : '') + ' pl-4 pr-0'} id={title}>
       <span className={'flex w-full items-center justify-between'}>
         <Typography className={'text-sm '} sx={{ fontWeight: 400 }} component={'p'}>{title}</Typography> {icon}
       </span>
     </AccordionSummary>
-    {children}
+    <div className="mb-0 pr-3.5 pl-2">
+      {children}
+    </div>
   </Accordion>
 }

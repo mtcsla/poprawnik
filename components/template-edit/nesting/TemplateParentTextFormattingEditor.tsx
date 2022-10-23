@@ -1,7 +1,9 @@
 import { AlignHorizontalCenter, AlignHorizontalLeft, AlignHorizontalRight, Edit } from '@mui/icons-material';
 import { Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import React from 'react';
+import { textFormattingContext } from '../../../pages/account/lawyer/edit-document/template';
 import { TextFormattingElement } from '../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
+import { useTemplateChangesDisplay } from '../../form-edit/Changes';
 import { ParentElementPropsType } from '../TemplateEditor';
 
 
@@ -12,10 +14,10 @@ export function TemplateParentTextFormattingEditor({ path, element, onChange }: 
   const [align, setAlign] = React.useState(element?.align ?? 'left');
 
   React.useEffect(() => {
-    onChange({ effect, element: _element, align, child: [], type: 'textFormatting' });
+    onChange({ effect, element: _element, align, child: element?.child?.length ? element?.child : [], type: 'textFormatting' });
   }, [effect, _element, align]);
   React.useEffect(() => {
-    onChange({ effect, element: _element, align, child: [], type: 'textFormatting' });
+    onChange({ effect, element: _element, align, child: element?.child?.length ? element?.child : [], type: 'textFormatting' });
   }, []);
 
   return <>
@@ -71,17 +73,22 @@ export function TemplateParentTextFormattingEditor({ path, element, onChange }: 
   </>;
 }
 
-export const TemplateParentTextFormattingDisplay = ({ element, children }: { element: TextFormattingElement, children: React.ReactNode }) => {
-  return <div style={{ maxWidth: 800 }} className='bg-blue-500 rounded-lg sm:pt-6 pt-4 flex flex-col overflow-x-visible'>
+export const TemplateParentTextFormattingDisplay = ({ element, children, edit }: { element: TextFormattingElement, children: React.ReactNode, edit: () => void }) => {
+  const { changedConditions, deletionPaths } = useTemplateChangesDisplay();
+  return <div style={{ maxWidth: 800 }} className='rounded-lg sm:pt-6 pt-4 flex flex-col overflow-x-visible bg-sky-100'>
     <span className='px-4 sm:px-6 pb-4 sm:pb-6 w-full inline-flex items-center flex-wrap justify-end gap-3'>
-      <pre className='text-sm mb-4 text-white'>Formatowanie tekstu</pre>
+      <pre className='text-sm mb-4'>Formatowanie tekstu</pre>
       <div className='flex-1' />
-      <Button className=' bg-white border-none self-end' size='small' color='primary'>Edytuj<Edit className='ml-2' /></Button>
+      {
+        changedConditions.length || deletionPaths.length
+          ? null
+          : <Button className='bg-white border-none self-end' size='small' color='primary' onClick={edit}>Edytuj<Edit className='ml-2' /></Button>
+      }
     </span>
-    <p className='text-sm mb-4 text-white mx-4 sm:mx-6'>Tekst będzie wyświetlany z następującym formatowaniem:
+    <p className='text-sm mb-4 mx-4 sm:mx-6'>Tekst będzie wyświetlany z następującym formatowaniem:
     </p>
 
-    <pre className='text-xs mb-2 sm:mx-6 mx-4 text-white'>Rodzaj tekstu</pre> <div className='p-2 mb-2 bg-white flex flex-col mx-4 sm:mx-6 rounded-lg '>
+    <pre className='text-xs mb-2 sm:mx-6 mx-4 '>Rodzaj tekstu</pre> <div className='p-2 mb-2 bg-white flex flex-col mx-4 sm:mx-6 rounded-lg '>
       {
         element.element === 'p'
           ? <p className={`text-${element.align} m-0`}>normalny tekst</p>
@@ -96,14 +103,14 @@ export const TemplateParentTextFormattingDisplay = ({ element, children }: { ele
                   : null
       }
     </div>
-    <pre className='text-xs mb-2 sm:mx-6 mx-4 text-white'>Wyrównanie tekstu</pre> <div className='p-2 mb-2 bg-white flex flex-col mx-4 sm:mx-6 rounded-lg '>
+    <pre className='text-xs mb-2 sm:mx-6 mx-4'>Wyrównanie tekstu</pre> <div className='p-2 mb-2 bg-white flex flex-col mx-4 sm:mx-6 rounded-lg '>
       {
         element.align === 'left' ? <p className='text-left w-full'><AlignHorizontalLeft className='mr-1' />do lewej</p>
           : element.align === 'center' ? <p className='text-center w-full'><AlignHorizontalCenter className='mr-1' />do środka</p>
             : <p className='text-right w-full'><AlignHorizontalRight className='mr-1' />do prawej</p>
       }
     </div>
-    <pre className='text-xs mb-2 sm:mx-6 mx-4 text-white'>Efekt tekstu</pre>
+    <pre className='text-xs mb-2 sm:mx-6 mx-4'>Efekt tekstu</pre>
     <div className='p-2 bg-white flex flex-col mx-4 sm:mx-6 rounded-lg '>
       {
         element.effect === 'normal' ? <p>normalny tekst</p>
@@ -114,9 +121,15 @@ export const TemplateParentTextFormattingDisplay = ({ element, children }: { ele
       }
     </div>
 
-    <div className='bg-blue-500 min-w-full pt-4 pb-4 sm:px-6 px-4 rounded-lg w-fit'>
+    <div className='bg-sky-100 min-w-full pt-4 pb-4 sm:pb-6 sm:px-6 px-4 rounded-lg w-fit'>
       <div className='bg-white sm:p-4 p-2 rounded-lg'>
-        {children}
+        <textFormattingContext.Provider value={{
+          align: element.align || 'left',
+          effect: element.effect || 'normal',
+          element: element.element || 'p',
+        }}>
+          {children}
+        </textFormattingContext.Provider>
       </div>
     </div>
 

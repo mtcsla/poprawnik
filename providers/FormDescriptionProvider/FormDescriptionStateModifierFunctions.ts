@@ -10,6 +10,11 @@ import {
   getDefaultFragment,
 } from "./FormDescriptionProvider";
 import { cloneDeep } from "lodash";
+import { Expression } from "../TemplateDescriptionProvider/TemplateDescriptionProvider";
+import {
+  Condition,
+  OperatorCondition,
+} from "../../components/form-edit/condition-calculation-editor/ConditionCalculationEditorProvider";
 
 export namespace FormDescriptionFunctions {
   //keep these functions pure!!
@@ -105,6 +110,20 @@ export namespace FormDescriptionFunctions {
     newState[stepIndex].children[fragmentIndex].subtitle = subtitle;
     return newState;
   };
+  export const setFragmentCondition = (
+    state: FormDescription,
+    [stepIndex, fragmentIndex, condition]: [
+      number,
+      number,
+      Expression<Condition, OperatorCondition>
+    ]
+  ) => {
+    const newState = cloneDeep(state);
+    newState[stepIndex].children[fragmentIndex].condition =
+      cloneDeep(condition);
+    return newState;
+  };
+
   export const setFragmentIcon = (
     state: FormDescription,
     [stepIndex, fragmentIndex, icon]: [number, number, string]

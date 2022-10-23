@@ -38,6 +38,7 @@ describe("Condition normalizer inside form description object", () => {
       const shouldBeDeleted = FormUtility.removed(
         description,
         pathForDeletion,
+        "removed",
         _delete
       );
       const newDescription = FormNormalize.conditions(

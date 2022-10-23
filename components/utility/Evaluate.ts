@@ -8,14 +8,23 @@ import {
   NestedFormValue,
 } from "../../pages/forms/[id]/form";
 import { cloneDeep } from "lodash";
-import { Calculation } from "../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider";
+import {
+  Calculation,
+  OperatorCondition,
+} from "../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider";
 import {
   FormDescription,
   NameType,
 } from "../../providers/FormDescriptionProvider/FormDescriptionProvider";
+import { Expression } from "../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider";
 export namespace Evaluate {
   interface RuntimeNameType extends NameType {
-    condition: ConditionCalculationSequence;
+    condition:
+      | ConditionCalculationSequence
+      | Expression<Condition, OperatorCondition>;
+    fragmentCondition:
+      | ConditionCalculationSequence
+      | Expression<Condition, OperatorCondition>;
   }
   export const getNames = (description: FormDescription) => {
     const names: Partial<RuntimeNameType>[] = [];
@@ -35,6 +44,13 @@ export namespace Evaluate {
             valueType: field.valueType,
             list: step.type === "list" ? index : null,
             condition: field.condition,
+            required: field.required,
+            options: field.options,
+            fragmentConditional: !!fragment?.condition?.components?.length,
+            fragmentCondition: fragment?.condition ?? {
+              components: [],
+              operators: [],
+            },
           });
         });
       });

@@ -9,10 +9,9 @@ export const EditTemplateElementVariable = ({ path, index, onChange, element }: 
   const { description, modifyDescription, form } = useTemplateDescription();
   const listIndex = useTemplateEditorContextForConditionsAndCalculations();
 
-  const names = React.useMemo(() => Evaluate.getNames(form).filter(name => name.valueType !== 'number'), [form]);
 
-  const globals = React.useMemo(() => Evaluate.getNames(form).filter(name => name.list == null && !name.name?.endsWith('~')), [form]);
-  const listVars = React.useMemo(() => listIndex == -1 ? [] : Evaluate.getNames(form).filter(name => name.list === listIndex! && !name.name?.endsWith('~')), [form]);
+  const globals = React.useMemo(() => Evaluate.getNames(form).filter(name => name.list == null && name.valueType !== 'number' && name.required && !name.fragmentConditional && !name?.condition?.components?.length && !name.name?.endsWith('~')), [form]);
+  const listVars = React.useMemo(() => listIndex == -1 ? [] : Evaluate.getNames(form).filter(name => name.list === listIndex! && name.valueType !== 'number' && name.required && !name.fragmentConditional && !name?.condition?.components?.length && !name.name?.endsWith('~')), [form]);
 
   const GlobalsElement = React.useMemo(() => globals.map((name) => {
     return <MenuItem className='flex w-full items-center justify-between' value={name.name!}>

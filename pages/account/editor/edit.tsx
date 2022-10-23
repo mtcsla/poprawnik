@@ -86,7 +86,7 @@ const Edit = () => {
           />
 
           {article.contents.map((item, index) => (
-            <div className={"w-full mb-6 flex flex-col"}>
+            <div className={"w-full  mb-6 flex flex-col"}>
               <span className={"flex justify-between"}>
                 <Chip label={index + 1} size={"small"} />
                 <Button

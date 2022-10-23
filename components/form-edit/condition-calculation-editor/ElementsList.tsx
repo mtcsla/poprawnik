@@ -76,7 +76,6 @@ export const ElementsList = ({ path, type }: { path: number[]; type: 'calculatio
           nested
           type='number'
           inputType='text'
-
           initValue={{ type: null, value: null }}
           cancel={() => setEditorOpen(false)}
           save={value => { modifySequence(['add_element', [path, value]]); setEditorOpen(false) }}

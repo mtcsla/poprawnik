@@ -1,5 +1,5 @@
-import { ArrowDropDown, Bookmark, CalendarToday, Edit, FormatAlignJustify, FormatListNumbered, List, Numbers, TextFields } from '@mui/icons-material';
-import { Button, Chip, Tooltip } from '@mui/material';
+import { ArrowBack, ArrowDropDown, Bookmark, CalendarToday, Close, Edit, FormatAlignJustify, FormatListNumbered, List, Numbers, TextFields } from '@mui/icons-material';
+import { Button, Chip, Dialog, DialogContent, Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 
 import { doc, getDoc } from '@firebase/firestore';
@@ -8,9 +8,22 @@ import React from 'react';
 import { firestore } from '../../../../buildtime-deps/firebase';
 import { ConditionCalculationDisplay } from '../../../../components/form-edit/condition-calculation-editor/ConditionCalculationDisplay';
 import TemplateEditor from '../../../../components/template-edit/TemplateEditor';
+import BodyScrollLock from '../../../../providers/BodyScrollLock';
 import { FieldDescription, FormDescription, StepDescription } from '../../../../providers/FormDescriptionProvider/FormDescriptionProvider';
-import TemplateDescriptionProvider from '../../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
+import TemplateDescriptionProvider, { TextFormattingElement } from '../../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
 import { FormValues, NestedFormValue, RootFormValue } from '../../../forms/[id]/form';
+
+export const listContext = React.createContext<string>('');
+export const existsContext = React.createContext<string[]>([]);
+export const textFormattingContext = React.createContext<{
+  effect: TextFormattingElement['effect'];
+  element: TextFormattingElement['element'];
+  align: TextFormattingElement['align'];
+}>({
+  effect: 'normal',
+  element: 'p',
+  align: 'left'
+});
 
 const EditDocumentTemplate = () => {
   const router = useRouter();
@@ -27,6 +40,7 @@ const EditDocumentTemplate = () => {
   const [templateDescription, setTemplateDescription] = React.useState<any>({});
 
   const [valuesExpanded, setValuesExpanded] = React.useState<boolean>(false);
+  const [editorOpen, setEditorOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     if (!id) return;
@@ -53,64 +67,101 @@ const EditDocumentTemplate = () => {
     })
   }, [id])
 
-  return <div className="w-full flex-col flex pb-8 mb-2">
-    <h1 className="inline-flex gap-2 mb-1"><Bookmark color='primary' /> Edytujesz wzór pisma</h1>
-    <p>Wypełnij formularz przykładowymi danymi, aby szybko generować podgląd.</p>
-
-    {Object.keys(values).length === 0 || formDescription.length === 0
-      ? <div className='border sm:p-8 p-4 bg-slate-50 mt-8 rounded-lg flex justify-center items-center'>
-        <pre>Brak przykładowych danych</pre>
-      </div>
-      : <>
-        <span className='flex mt-8 items-center justify-between'>
-          <pre>dane</pre>
-          <Button className='border-none' onClick={() => setValuesExpanded(!valuesExpanded)} size='small'>
-            <ArrowDropDown className={`${valuesExpanded ? 'rotate-180' : ''} mr-2`} />
-            {valuesExpanded ? 'zwiń' : 'rozwiń'} dane
-          </Button>
-        </span>
-        <div
-          onClick={() => { if (!valuesExpanded) setValuesExpanded(true) }}
-          className={`w-full rounded-lg relative h-auto border ${!valuesExpanded ? 'hover:border-blue-500 hover:bg-blue-100 cursor-pointer' : ''}`} style={!valuesExpanded ? { maxHeight: 200, overflowY: 'hidden' } : {}}>
-          <div className='absolute right-0 left-0 bottom-0 top-0 rounded-lg' style={{
-            background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 75%)',
-            display: valuesExpanded ? 'none' : 'block'
-          }} />
-          <div className='flex flex-col p-4 sm:p-8  '>
-            <ValuesDisplay values={values} description={formDescription} />
-          </div>
-        </div>
-      </>
-    }
-    <Link href={`/forms/${id}/form?testing=true`}>
-      <Button className='w-full mt-8 p-4 bg-blue-500 text-white hover:bg-blue-400'> {Object.keys(values).length ? 'Edytuj dane' : 'Wypełnij formularz'} <Edit className='ml-2' /></Button>
-    </Link>
-    {loading
-      ? null
-      :
-      <div className='relative'>
-        <div className='relative top-0 bottom-0 left-0 right-0' style={{ maxWidth: '100vw' }}>
-          <TemplateDescriptionProvider id={id as string} form={formDescription} initTemplate={templateDescription}>
-            <TemplateEditor />
-          </TemplateDescriptionProvider>
-        </div>
-      </div>
-    }
-    <Button disabled={!Object.keys(values).length}
-      className={`p-4 mt-8 bg-blue-500 text-white hover:bg-blue-400 ${!Object.keys(values).length ? 'bg-gray-300 hover:bg-gray-300' : ''}`}>
-      Podgląd pisma
-      <FormatAlignJustify className='ml-2' />
+  return <>
+    <Button size='small' disabled={!id} onClick={() => router.push(`/account/lawyer/edit-document?id=${id}`)} className='bg-blue-100 rounded mb-12 border-none w-full flex items-center justify-between'>
+      <ArrowBack />
+      Wróć do pisma
     </Button>
-  </div>;
+    {formDescription.length && id && Object.keys(templateDescription).length
+      ? <listContext.Provider value={''}>
+        <existsContext.Provider value={[]}>
+          <textFormattingContext.Provider value={{ effect: 'normal', element: 'p', align: 'left' }}>
+            <TemplateDescriptionProvider id={id as string} form={formDescription} initTemplate={templateDescription}>
+              <div className="w-full flex-col flex pb-8 mb-2">
+
+                <h1 className="inline-flex gap-2 mb-1"><Bookmark color='primary' /> Edytujesz wzór pisma</h1>
+                <p>Wypełnij formularz przykładowymi danymi, aby szybko generować podgląd.</p>
+
+                {Object.keys(values).length === 0 || formDescription.length === 0
+                  ? <div className='border sm:p-8 p-4 bg-slate-50 mt-8 rounded-lg flex justify-center items-center'>
+                    <pre>Brak przykładowych danych</pre>
+                  </div>
+                  : <>
+                    <span className='flex mt-8 items-center justify-between'>
+                      <pre>dane</pre>
+                      <Button className='border-none' onClick={() => setValuesExpanded(!valuesExpanded)} size='small'>
+                        <ArrowDropDown className={`${valuesExpanded ? 'rotate-180' : ''} mr-2`} />
+                        {valuesExpanded ? 'zwiń' : 'rozwiń'} dane
+                      </Button>
+                    </span>
+                    <div
+                      onClick={() => { if (!valuesExpanded) setValuesExpanded(true) }}
+                      className={`w-full rounded-lg relative h-auto border ${!valuesExpanded ? 'hover:border-blue-500 hover:bg-blue-100 cursor-pointer' : ''}`} style={!valuesExpanded ? { maxHeight: 200, overflowY: 'hidden' } : {}}>
+                      <div className='absolute right-0 left-0 bottom-0 top-0 rounded-lg' style={{
+                        background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 75%)',
+                        display: valuesExpanded ? 'none' : 'block'
+                      }} />
+                      <div className='flex flex-col p-4 sm:p-8  '>
+                        <ValuesDisplay values={values} description={formDescription} />
+                      </div>
+                    </div>
+                  </>
+                }
+                <Link href={`/forms/${id}/form?testing=true`}>
+                  <Button className='w-full mt-8 p-4 bg-blue-500 text-white hover:bg-blue-400'> {Object.keys(values).length ? 'Edytuj dane' : 'Wypełnij formularz'} <Edit className='ml-2' /></Button>
+                </Link>
+                <Dialog className='w-screen h-screen m-0' open={!loading && editorOpen}>
+                  <DialogContent sx={{ width: '98vw' }} className='relative h-screen'>
+                    <BodyScrollLock>
+                      <Button style={{ top: '2.5rem', right: '1.5vw' }} className='fixed  border-none' onClick={() => setEditorOpen(false)}><Close /></Button>
+                      <TemplateEditor />
+                    </BodyScrollLock>
+                  </DialogContent>
+                </Dialog>
+                {loading
+                  ? null
+                  :
+                  <>
+                    <pre className='mt-8 mb-4'>Wzór pisma</pre>
+                    <div onClick={() => setEditorOpen(true)} className='w-full hover:border-blue-500 cursor-pointer overflow-x-hidden h-96 border rounded-lg  relative overflow-y-hidden'>
+                      <div className='absolute right-0 left-0 bottom-0 top-0 rounded-lg' style={{
+                        background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 75%)',
+                        zIndex: 200,
+                      }} />
+                      <div className='absolute top-0 left-0 right-0 bottom-0'>
+                        <div className='relative top-0 bottom-0 left-0 right-0' style={{ maxWidth: '100vw' }}>
+                          {!editorOpen
+                            ?
+                            <TemplateEditor display />
+                            : null
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                }
+                <Button disabled={!Object.keys(values).length}
+                  className={`p-4 mt-8 bg-blue-500 text-white hover:bg-blue-400 ${!Object.keys(values).length ? 'bg-gray-300 hover:bg-gray-300' : ''}`}>
+                  Podgląd pisma
+                  <FormatAlignJustify className='ml-2' />
+                </Button>
+              </div>
+            </TemplateDescriptionProvider>
+
+          </textFormattingContext.Provider>
+        </existsContext.Provider>
+      </listContext.Provider> : null
+    }
+  </>;
 }
 
 const ValuesDisplay = ({ values, description, nested }: { values: FormValues<RootFormValue> | FormValues<NestedFormValue>; description: FormDescription | StepDescription; nested?: boolean }) => {
   return nested
-    ? <>{(description as StepDescription).children.map((fragment) =>
+    ? <div className='inline-flex flex-wrap gap-3'>{(description as StepDescription).children.map((fragment) =>
       fragment.children.map((field) =>
         <VariableNameAndValue field={field} value={values[field.name] as NestedFormValue} inList />
       )
-    )}</>
+    )}</div>
     :
     <>{
       (description as FormDescription).map(
@@ -191,7 +242,7 @@ const VariableInfo = ({ field, value, inList }: { field: FieldDescription, value
 }
 const VariableNameAndValue = ({ field, value, inList }: { field: FieldDescription, value: NestedFormValue, inList?: boolean }) =>
   <Tooltip title={<VariableInfo {...{ field, value, inList }} />}>
-    <div style={{ minWidth: 100 }} className='flex-1  p-3 rounded  flex flex-col border  items-center'>
+    <div style={{ minWidth: 200 }} className='flex-1  p-3 rounded  inline-flex gap-3 flex-wrap border  items-center'>
       <Chip label={<>
         {field.type === 'date'
           ? <CalendarToday className='mr-2' />
@@ -202,11 +253,12 @@ const VariableNameAndValue = ({ field, value, inList }: { field: FieldDescriptio
               : <Numbers className='mr-2' />
         }
         {field.name}
-      </>} className='w-full' size='small' color={inList ? 'error' : 'primary'} />
+      </>} size='small' color={inList ? 'error' : 'primary'} />
+      <div className='self-stretch flex-1 bg-slate-200 rounded-lg' />
       {
-        (value == null || value == '') ? <pre className='text-base p-1 mt-2 text-center w-full rounded bg-slate-100'>Brak</pre>
+        (value == null || value == '') ? <pre style={{ minWidth: 100 }} className='text-base p-1  text-center flex-1  rounded bg-slate-100'>Brak</pre>
           :
-          <pre className='normal-case font-normal text-base truncate self-start w-full mt-2 p-1 rounded bg-slate-100 text-center text-slate-600'>
+          <pre style={{ minWidth: 100 }} className='normal-case font-normal text-base truncate self-start flex-1  p-1 rounded bg-slate-100 text-center text-slate-600'>
             {
               field.type === 'date' ? new Date(value as any)?.toLocaleDateString('pl-PL') : value
             }

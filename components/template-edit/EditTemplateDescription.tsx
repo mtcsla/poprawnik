@@ -1,19 +1,22 @@
-import { Add, AlignHorizontalLeft, Cancel, Delete, Edit } from '@mui/icons-material';
+import { Add, AlignHorizontalRight, Cancel, Delete, Edit } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Alert, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Menu, MenuItem, Snackbar, Tab, Tabs } from '@mui/material';
+import _ from 'lodash';
 import React from 'react';
 import BodyScrollLock from '../../providers/BodyScrollLock';
 import { ModifyTemplate } from '../../providers/TemplateDescriptionProvider/ModifyTemplate';
 import { CalculationElement, Expression, TemplateDescription, TemplateElement, TemplatePath, TextElement, useTemplateDescription, VariableElement } from '../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
+import { useTemplateChangesDisplay } from '../form-edit/Changes';
 import { Calculation, OperatorCalculation } from '../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
 import { EditTemplateElement } from './EditTemplateElement';
 import { EditTemplateElementCalculation } from "./EditTemplateElementCalculation";
 import { EditTemplateElementText } from './EditTemplateElementText';
 import { EditTemplateElementVariable } from './EditTemplateElementVariable';
+import { TemplateNestingParentEditor } from './nesting/TemplateNestingParentEditor';
 import { isValidElement, useTemplateParenthesesEditor } from './TemplateEditor';
 
 export const EditTemplateDescription = (
-  { path, bordered }: { path: TemplatePath; bordered?: boolean }
+  { path, bordered, noHeadline }: { path: TemplatePath; bordered?: boolean, noHeadline?: boolean }
 ) => {
   const { description, modifyDescription, updateFirebaseDoc } = useTemplateDescription();
   const nestedDescription = React.useMemo(() => ModifyTemplate.getDescriptionFromPath(description, path), [description, path]);
@@ -56,6 +59,11 @@ export const EditTemplateDescription = (
   const [warning, setWarning] = React.useState<TemplateElement['type'] | null>(null);
   const [error, setError] = React.useState<string>('');
   const [loading, setLoading] = React.useState<boolean>(false);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(false);
+  const [deleting, setDeleting] = React.useState<boolean>(false);
+
+
   const elementValid = React.useMemo(() => element != null && isValidElement(element), [element]);
   //
   React.useEffect(() => {
@@ -130,20 +138,33 @@ export const EditTemplateDescription = (
       setLoading(false);
 
       onCloseMenu();
-    }).catch(() => {
+    }).catch((err) => {
       setLoading(false);
       setError('Wystąpił błąd podczas zapisywania zmian. Spróbuj ponownie później.');
       setTimeout(() => setError(''), 5000);
+      throw err;
     });
   };
 
-  return <>
+  const { changedConditions, deletionPaths } = useTemplateChangesDisplay();
+  const toBeDeleted = React.useMemo(() => deletionPaths.findIndex(delpath => _.isEqual(path, delpath)) >= 0, [])
+
+  return <div className='relative'>
+    {((deletionPaths.length || changedConditions.length) && toBeDeleted)
+
+      ? <div className='absolute rounded-lg bg-red-500 bg-opacity-50 z-50 top-0 bottom-0 left-0 right-0' />
+      : null}
+
+    <TemplateNestingParentEditor adding={!parentheses.editing} editing={parentheses.editing} editorPath={path} />
     {error
       ? <Snackbar open><Alert severity='error'>{error}</Alert></Snackbar>
       : null}
     <Menu open={!!menuTarget} anchorEl={menuTarget!} onClose={onCloseMenu}>
+      <BodyScrollLock> </BodyScrollLock>
       <MenuItem onClick={() => { setEditingElement(currentIndex); }}><Edit color='primary' className='mr-2' /> Edytuj element</MenuItem>
-      <MenuItem onClick={() => { }}><Delete color='error' className='mr-2' /> Usuń element</MenuItem>
+      <MenuItem onClick={() => {
+        setDeleteDialogOpen(true);
+      }}><Delete color='error' className='mr-2' /> Usuń element</MenuItem>
     </Menu>
     <Dialog open={!!warning}>
       <DialogTitle><pre className='text-sm'>Uwaga</pre></DialogTitle>
@@ -155,11 +176,43 @@ export const EditTemplateDescription = (
         </BodyScrollLock>
       </DialogContent>
       <DialogActions>
-        <Button size='small' className='border-none' color='error' onClick={() => setWarning(null)}>Anuluj</Button>
         <Button size='small' className='border-none' onClick={() => {
           handleTypeChange(warning!);
           setWarning(null);
         }}>Tak</Button>
+        <Button size='small' className='border-none' color='error' onClick={() => setWarning(null)}>Anuluj</Button>
+      </DialogActions>
+    </Dialog>
+    <Dialog open={!!deleteDialogOpen}>
+      <DialogTitle><pre className='text-sm'>Usuwasz element</pre></DialogTitle>
+      <DialogContent>
+        <BodyScrollLock>
+          Czy na pewno chcesz usunąć ten element?
+        </BodyScrollLock>
+      </DialogContent>
+      <DialogActions>
+        <LoadingButton loading={deleting} size='small' className='border-none' onClick={() => {
+          setDeleting(true);
+          const newDescription = ModifyTemplate.removeElement(description, {
+            type: 'removeElement',
+            value: {
+              path,
+              index: currentIndex as number,
+            }
+          });
+          updateFirebaseDoc(newDescription).then(() => {
+            setDeleting(false);
+            modifyDescription({ type: 'setDescription', value: { description: newDescription } });
+            setDeleteDialogOpen(false);
+          }).catch(
+            () => {
+              setError('Wystąpił błąd podczas usuwania elementu. Spróbuj ponownie później.');
+              setDeleting(false);
+              setTimeout(() => setError(''), 5000);
+            }
+          )
+        }}>Tak</LoadingButton>
+        <Button disabled={deleting} size='small' className='border-none' color='error' onClick={() => setDeleteDialogOpen(false)}>Anuluj</Button>
       </DialogActions>
     </Dialog>
     <Dialog open={addingElement || (editingElement != null)}>
@@ -212,15 +265,26 @@ export const EditTemplateDescription = (
     </Dialog>
 
 
-    <div className={`inline-flex gap-4 sm:gap-6 flex-col border-none  max-w-none w-full ${path.length ? 'rounded-lg border-none ' : ''}`} style={{ minWidth: 250 }}>
-
-      {nestedDescription.length
+    <div className={`inline-flex h-full gap-4 sm:gap-6 flex-col border-none  max-w-none w-full ${path.length ? 'rounded-lg border-none ' : ''}`} style={{ minWidth: 250 }}>
+      {!noHeadline && (!path.length || (_.isEqual(parentheses.path, path) && !parentheses.editing))
+        ? <span className='mb-4 pr-7 inline-flex items-center w-full gap-3'>
+          <pre>
+            {parentheses.path != null && !parentheses.editing
+              ? 'Dodajesz zagnieżdżenie'
+              : 'Edytujesz wzór pisma'
+            }
+          </pre>
+          <div className='border-b flex-1' />
+        </span>
+        : null
+      }
+      {nestedDescription?.length
         ? nestedDescription.map(
           (item, index) =>
             !!parentheses.path
               ? <span className='flex items-stretch justify-between w-full'>
 
-                {parentheses.path && comparePaths(parentheses.path, path)
+                {parentheses.path && comparePaths(parentheses.path, path) && !parentheses.editing
                   ? <div className={`flex items-end mr-2 ${localParentheses.includes(index)
                     || (localParentheses[0] !== null && localParentheses[1] !== null && localParentheses[0] < index && index < localParentheses[1])
                     ?
@@ -237,7 +301,7 @@ export const EditTemplateDescription = (
                   </div>
                   : null
                 }
-                <div className='flex-1'>
+                <div className={`flex-1 `}>
                   <EditTemplateElement {...{ path, index, openMenu: setMenuTargetAndIndex, menuTarget }} disabled={!!parentheses.path} />
                 </div>
               </span>
@@ -247,33 +311,39 @@ export const EditTemplateDescription = (
         : <div className='w-full bg-slate-50 flex mb-4 items-center justify-center rounded-lg border p-3 sm:p-6'>
           <pre className='text-sm'>Brak elementów</pre>
         </div>}
-      <span className='flex w-full items-center  mt-1 flex-wrap justify-end'>
-        {parentheses.path && comparePaths(parentheses.path, path)
-          ? null
-          : <Button className='border-none mr-2 self-start' size='small' disabled={(parentheses.path && !comparePaths(parentheses.path, path)) as boolean} onClick={() => setAddingElement(true)}>
-            <Add className='mr-2' />
-            Dodaj element
-          </Button>
-        }
-        <div className='border-b flex-1' />
-        {parentheses.path && comparePaths(parentheses.path, path)
-          ? <Button onClick={() => parentheses.setParentheses(localParentheses)} disabled={localParentheses[0] === null && localParentheses[1] === null || !comparePaths(parentheses.path, path)} size='small' className='border-none ml-2'>
-            Dodaj
-            <Add className='ml-2' />
-          </Button>
-          : null
-        }
-        <Button color={parentheses.path ? 'error' : 'primary'} disabled={(parentheses.path && !comparePaths(parentheses.path, path)) as boolean} onClick={() => parentheses.setPath(parentheses.path ? null : path)} size='small' className='border-none ml-2'>
-          {parentheses.path && comparePaths(parentheses.path, path)
-            ? 'Anuluj'
-            : 'Dodaj zagnieżdżenie'
+      {(deletionPaths.length || changedConditions.length)
+        ? null
+        : <span className={`flex w-full items-center flex-wrap pb-4 justify-end ${!path?.length ? 'mt-auto' : 'mt-1'}`}>
+          {parentheses.path && comparePaths(parentheses.path, path) && !parentheses.editing
+            ? null
+            : <Button className='border-none  self-start' size='small' disabled={(parentheses.path && !comparePaths(parentheses.path, path)) as boolean} onClick={() => setAddingElement(true)}>
+              <Add className='mr-2' />
+              Dodaj element
+            </Button>
           }
-          {parentheses.path && comparePaths(parentheses.path, path)
-            ? <Cancel className='ml-2' />
-            : <AlignHorizontalLeft className='ml-2' />
+          {parentheses.path && comparePaths(parentheses.path, path) && !parentheses.editing
+            ? <Button onClick={() => parentheses.setParentheses(localParentheses)} disabled={localParentheses[0] === null && localParentheses[1] === null || !comparePaths(parentheses.path, path)} size='small' className='border-none ml-2'>
+              Dodaj
+              <Add className='ml-2' />
+            </Button>
+            : null
           }
-        </Button>
-      </span>
+          {nestedDescription?.length ?
+            <Button color={parentheses.path && !parentheses.editing ? 'error' : 'primary'} disabled={(parentheses.path && !comparePaths(parentheses.path, path) && !parentheses.editing) as boolean} onClick={() => parentheses.setPath(parentheses.path ? null : path)} size='small' className='border-none ml-2'>
+              {parentheses.path && comparePaths(parentheses.path, path) && !parentheses.editing
+                ? <Cancel className='mr-2' />
+                : <AlignHorizontalRight className='mr-2' />
+              }
+              {parentheses.path && comparePaths(parentheses.path, path) && !parentheses.editing
+                ? 'Anuluj'
+                : 'Dodaj zagnieżdżenie'
+              }
+            </Button>
+            : null
+          }
+          <div className='border-b flex-1 ml-3' />
+        </span>
+      }
     </div>
-  </>;
+  </div>;
 };

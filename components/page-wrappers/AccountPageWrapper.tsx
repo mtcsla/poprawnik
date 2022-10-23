@@ -1,5 +1,5 @@
-import { ArrowLeft, Edit, Gavel, Logout, PersonRounded, Shield, ShoppingBag } from '@mui/icons-material';
-import { Accordion, AccordionDetails, AccordionSummary, Button, List, ListItem, Paper, SwipeableDrawer, useTheme } from '@mui/material';
+import { ArrowLeft, Edit, Gavel, Lock, Logout, PersonRounded, Shield, ShoppingBag } from '@mui/icons-material';
+import { Accordion, AccordionDetails, AccordionSummary, Button, List, ListItem, Paper, SwipeableDrawer, Tooltip, useTheme } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -27,6 +27,7 @@ const AccountPageWrapper = ({ children }: { children: React.ReactNode }) => {
         caption={'Wróć do serwisu.'}
         captionLink={'/'}
         openSidebar={(width && width < 1100) ? () => setOpen(true) : undefined}
+        inAccountPage={true}
       />
       <Button onClick={signOut} size="small" className="border-none mr-4 whitespace-nowrap  ">Wyloguj się <Logout className="ml-2" /></Button>
     </div>
@@ -62,10 +63,15 @@ const AccountPageWrapper = ({ children }: { children: React.ReactNode }) => {
                   </ListItem>
                 </Link>
 
-                <ListItem className={(router.pathname.startsWith('/account/lawyer') && router.pathname.includes('!!!!!!!') ? 'bg-blue-50' : 'hover:bg-slate-50') + ' transition-colors cursor-pointer p-1.5 pl-3 pr-3 flex  items-center justify-between w-full rounded-lg'}>
-                  <p className={(router.pathname.startsWith('/account/lawyer') && router.pathname.includes('!!!!!!!') ? 'text-blue-500' : '') + ' text-sm'}>Kalkulatory</p>
-                </ListItem>
+                <Tooltip title={<div className='p-1 rounded bg-black bg-opacity-70  text-white'>Już niedługo!</div>} placement='right' >
+                  <ListItem className={(router.pathname.startsWith('/account/lawyer') && router.pathname.includes('!!!!!!!') ? 'bg-blue-50' : 'hover:bg-slate-50') + ' transition-colors cursor-pointer p-1.5 pl-3 pr-3 flex  items-center justify-between w-full rounded-lg'}>
+                    <p className={(router.pathname.startsWith('/account/lawyer') && router.pathname.includes('!!!!!!!') ? ''/*'text-blue-500'*/ : '') + 'text-slate-400 text-sm'}>Kalkulatory</p>
+
+                    <Lock className='text-slate-400 text-xs' />
+                  </ListItem>
+                </Tooltip>
               </List>
+
             </AccountPageAccordion>
             <AccountPageLink caption="Panel administratora" link={'/account/admin'} icon={Shield} />
           </List>
@@ -90,7 +96,7 @@ const AccountPageWrapper = ({ children }: { children: React.ReactNode }) => {
           </footer>
         </div>
       </main>
-    </div>
+    </div >
   </div >;
 }
 const AccountPageSidebar = ({ children, open, setOpen }: { children: React.ReactNode, open: boolean, setOpen: React.Dispatch<boolean> }) => {
@@ -100,7 +106,7 @@ const AccountPageSidebar = ({ children, open, setOpen }: { children: React.React
     { height: 'calc(100% - 4rem)' },
     width && width >= 1100
       ? {
-        backdropFilter: 'blur(10px)', background: 'white', zIndex: 5000, WebkitBackdropFilter: "blur(10px)"
+        backdropFilter: 'blur(10px)', background: 'white', zIndex: 20, WebkitBackdropFilter: "blur(10px)"
       }
       : {})
   } className='mt-16 fixed p-2 w-72 flex flex-col items-start justify-between'>

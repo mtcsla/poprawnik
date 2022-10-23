@@ -1,7 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import React from 'react';
-import { FormDescription } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { ElementsList } from './ElementsList';
 
 export type Condition = {
@@ -73,15 +72,11 @@ const parenthesesContext = React.createContext<{
 export const useSequence = () => React.useContext(sequenceContext);
 export const useParenthesesEditor = () => React.useContext(parenthesesContext);
 
-const ConditionCalculationEditor = ({ exit, save, type, initValue, staticValues }: {
+const ConditionCalculationEditor = ({ exit, save, type, initValue }: {
   exit: () => void,
   save: (condition: ConditionCalculationSequence) => void,
   type: 'calculation' | 'condition',
   initValue?: ConditionCalculationSequence,
-  staticValues?: {
-    formDescription: FormDescription,
-    listIndex?: number
-  }
 }) => {
   const [parenthesesEditor, setParenthesesEditor] = React.useState<number[] | null>(null);
   const [parentheses, setParentheses] = React.useState<number[]>([])

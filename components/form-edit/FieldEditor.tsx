@@ -1,4 +1,4 @@
-import { ArrowBack, Delete, Edit, List } from "@mui/icons-material";
+import { ArrowBack, Delete, Edit, List, Visibility } from "@mui/icons-material";
 import { Alert, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material';
 import { DatePicker } from "@mui/x-date-pickers";
 import { ErrorMessage, Field, Formik } from "formik";
@@ -6,21 +6,33 @@ import { cloneDeep } from 'lodash';
 import { useRouter } from "next/router";
 import React from "react";
 import BodyScrollLock from "../../providers/BodyScrollLock";
-import { FieldDescription, getDefaultField, useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { FieldDescription, FormDescription, getDefaultField, useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { useFormTemplateDescription } from '../../providers/FormDescriptionProvider/FormTemplateDescriptionProvider';
+import { Expression, TemplateDescription } from '../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
 import EditorField from "../form/EditorField";
+import Changes from "./Changes";
 import { ConditionCalculationDisplay } from "./condition-calculation-editor/ConditionCalculationDisplay";
-import ConditionEditor from "./condition-calculation-editor/ConditionCalculationEditorProvider";
-import { FormNormalize } from "./condition-calculation-editor/normalizers/FormNormalize";
+import ConditionCalculationEditor, { Condition, OperatorCondition } from "./condition-calculation-editor/ConditionCalculationEditorProvider";
 import { useFormEditorLocation } from './FormEditor';
 
 const FieldEditor = () => {
   const { modifyDescription, description, names } = useFormDescription();
+  const templateDescriptionObject = useFormTemplateDescription();
 
   const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<boolean>(false);
   const [newOptionDialogOpen, setNewOptionDialogOpen] = React.useState<boolean>(false);
+
   const [deleteConditionOpen, setDeleteConditionOpen] = React.useState<boolean>(false);
   const [editingCondition, setEditingCondition] = React.useState<boolean>(false);
+
+  const [newTemplateDescription, setNewTemplateDescription] = React.useState<TemplateDescription | null>(null);
+
+  const [conditionToAdd, setConditionToAdd] = React.useState<Expression<Condition, OperatorCondition>>({
+    components: [],
+    operators: []
+  });
+  const [settingOptional, setSettingOptional] = React.useState<boolean>(false);
 
   const [newOption, setNewOption] = React.useState<string>('');
   const [errorOpen, setErrorOpen] = React.useState<boolean>(false);
@@ -30,10 +42,11 @@ const FieldEditor = () => {
 
   const router = useRouter();
 
+
   const fieldDescription = description[step as number].children[fragment as number].children[field as number]
-  const deleteField = () => {
-    const newDescription = cloneDeep(description);
-    modifyDescription(['form_set_description', FormNormalize.conditions(newDescription, location, true)]);
+  const deleteField = (newDescription: FormDescription, newTemplate: TemplateDescription) => {
+    modifyDescription(['form_set_description', newDescription]);
+    templateDescriptionObject.setDescription(newTemplate);
     router.back();
   }
 
@@ -55,10 +68,15 @@ const FieldEditor = () => {
     }
   }, [router.isReady])
 
+
   return <Formik initialValues={
     fieldDescription ||
     getDefaultField() as FieldDescription
   } onSubmit={(values, actions) => {
+    if (newTemplateDescription) {
+      templateDescriptionObject.setDescription(newTemplateDescription);
+      setNewTemplateDescription(null);
+    }
     if (!fieldDescription && router.query.new == '1')
       modifyDescription(['fragment_append_field', [step as number, fragment as number, values]]);
     else {
@@ -107,26 +125,90 @@ const FieldEditor = () => {
           </DialogActions>
 
         </Dialog>
-        <Dialog open={deleteDialogOpen}>
+        <Dialog open={deleteConditionOpen}>
           <DialogTitle>
             <pre className="text-sm">
-              Usuwasz pole
+              Usuwasz warunek pola
             </pre>
           </DialogTitle>
-          <DialogContent className="text-sm">
-            Pole zostanie usunięte. Wszelkie odwołania do tego pola w oblcizeniach oraz warunkach zostaną zamienione na wartość obojętną.
+          <DialogContent className="text-sm flex flex-col" style={{ maxWidth: 800 }}>
+            <p className="mb-4">
+              Warunek pola zostanie usunięty.
+            </p>
+
+            <span className="inline-flex gap-3 items-center self-end mt-4">
+              <Button className="border-none" size='small' onClick={() => { setFieldValue('condition', { components: [], operators: [] }); setDeleteConditionOpen(false); }} >Ok</Button>
+              <Button className="border-none" size='small' color='error' onClick={() => setDeleteConditionOpen(false)}>Anuluj</Button>
+            </span>
           </DialogContent>
-          <DialogActions>
-            <Button size='small' onClick={deleteField} className='mr-2 border-none'>
-              OK
-            </Button>
-            <Button size='small' color='error' onClick={() => setDeleteDialogOpen(false)} className='border-none'>
-              wróć
-            </Button>
-          </DialogActions>
+        </Dialog>
+        <Dialog open={deleteDialogOpen || !!conditionToAdd.components.length || settingOptional}>
+          <DialogTitle>
+            <pre className="text-sm">
+              {!deleteDialogOpen
+                ?
+                (settingOptional
+                  ? 'Ustawiasz pole jako opcjonalne'
+                  : 'Dodajesz warunkowość pola'
+                )
+                : 'Usuwasz pole'
+              }
+            </pre>
+          </DialogTitle>
+          <DialogContent className="text-sm" style={{ maxWidth: 800 }}>
+            <p className="mb-4">
+              {deleteDialogOpen
+                ? 'Pole zostanie usunięte. Wszelkie odwołania do tego pola w warunkach zostaną zamienione na wartość obojętną, a wszystkie obliczenia, które zawierają wartość tego pola zostaną usunięte.'
+                : (settingOptional
+                  ? 'Pole będzie opcjonalne. Wszystkie obliczenia, które zawierają wartość tego pola zostaną usunięte.'
+                  : 'Pole będzie aktywne warunkowo. Wszystkie obliczenia, które zawierają wartość tego pola zostaną usunięte.'
+                )
+              }
+            </p>
+
+            <Changes
+              message={
+                deleteConditionOpen
+                  ? "Usunięcie pola nie zostanie zapisane dopóki nie zapiszesz zmian we fragmencie, w którym znajduje się to pole."
+                  : (
+                    settingOptional
+                      ? "Ustawienie pola jako opcjonalnego nie zostanie zapisane dopóki nie zapiszesz zmian we fragmencie, w którym znajduje się to pole."
+                      : "Dodanie warunku nie zostanie zapisane dopóki nie zapiszesz zmian we fragmencie, w którym znajduje się to pole."
+                  )
+              }
+              deletionType="field"
+              deletePath={[step as number, fragment as number, field as number]}
+              requiredChange={!deleteDialogOpen}
+              onSubmit={
+                deleteDialogOpen
+                  ? deleteField
+                  : settingOptional
+                    ? (newForm, newTemplate) => {
+                      setFieldValue('required', false);
+                      setNewTemplateDescription(newTemplate);
+                      setSettingOptional(false);
+                    }
+                    : (newForm, newTemplate) => {
+                      setFieldValue('condition', conditionToAdd);
+                      setNewTemplateDescription(newTemplate);
+                      setEditingCondition(false);
+                      setConditionToAdd({ components: [], operators: [] });
+                    }
+              }
+              onCancel={() =>
+                deleteDialogOpen
+                  ? setDeleteDialogOpen(false)
+                  : settingOptional
+                    ? setSettingOptional(false)
+                    : setConditionToAdd({ components: [], operators: [] })
+              }
+            />
+          </DialogContent>
 
         </Dialog>
-        <div className="flex-1 h-full flex-col sm:p-8 md:p-12 justify-center flex">
+        <div className="flex-1 relative h-full flex-col sm:p-8 md:p-12 justify-center flex">
+          <pre className="top-12 left-12 absolute flex whitespace-nowrap items-center"><Visibility className="mr-2" /> Podgląd pola</pre>
+
           <EditorField editor field={values} />
           {values.type === 'select'
             ? <>
@@ -406,7 +488,12 @@ const FieldEditor = () => {
 
 
 
-              <FormControlLabel className="mt-5" control={<Checkbox checked={values.required} onChange={(e, value) => { setFieldValue('required', value) }} name='required' />} label='Pole wymagane' />
+              <FormControlLabel className="mt-5" control={<Checkbox checked={values.required} onChange={(e, value) => {
+                if (values.required === false || fieldDescription.required === false)
+                  setFieldValue('required', value)
+                else
+                  setSettingOptional(true)
+              }} name='required' />} label='Pole wymagane' />
               <FormControlLabel control={<Checkbox name='fullWidth' checked={values.fullWidth} onChange={(e, value) => { setFieldValue('fullWidth', value) }} />} label='Pełna szerokość' />
 
 
@@ -424,7 +511,7 @@ const FieldEditor = () => {
                 : null
               }
               <span className="w-full flex items-center justify-between">
-                <Button onClick={() => setEditingCondition(true)} className="self-end mt-4 border-none p-0" color='error' size='small' >
+                <Button disabled={!values?.condition?.components?.length} onClick={() => setDeleteConditionOpen(true)} className="self-end mt-4 border-none p-0" color='error' size='small' >
                   Usuń warunek
                 </Button>
                 <Button onClick={() => setEditingCondition(true)} className="self-end mt-4 border-none p-0" size='small' >
@@ -432,10 +519,18 @@ const FieldEditor = () => {
                 </Button>
               </span>
               {editingCondition ?
-                <ConditionEditor
+                <ConditionCalculationEditor
                   type='condition'
-                  exit={() => setEditingCondition(false)}
-                  save={condition => { setFieldValue('condition', condition); setEditingCondition(false) }}
+                  exit={() => { setConditionToAdd({ components: [], operators: [] }); setEditingCondition(false); }}
+                  save={condition => {
+                    if (values?.condition?.components?.length || fieldDescription?.condition?.components?.length) {
+                      setFieldValue('condition', condition);
+                      setEditingCondition(false)
+                    }
+                    else {
+                      setConditionToAdd(condition as Expression<Condition, OperatorCondition>);
+                    }
+                  }}
                   initValue={values.condition}
                 />
                 : null
@@ -443,7 +538,7 @@ const FieldEditor = () => {
             </div>
 
 
-            <Button className="w-full mt-8 bg-white"
+            <Button className="w-full mt-8 bg-blue-100 border-none"
               onClick={() => {
                 if (!isValid)
                   alertError()
@@ -456,7 +551,7 @@ const FieldEditor = () => {
               Gotowe
             </Button>
             {router?.query?.new === '1' ? null :
-              <Button size='small' color='error' className="w-full mt-2 bg-white"
+              <Button size='small' color='error' className="w-full mt-2 bg-red-100 border-none"
                 onClick={() => {
                   setDeleteDialogOpen(true)
                 }}

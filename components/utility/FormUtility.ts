@@ -40,16 +40,16 @@ export namespace FormUtility {
       description[step].children.forEach((fragment) =>
         fragment.children.forEach((field) => names.push(field.name))
       );
-      description.splice(step, 1);
+      if (_delete) description.splice(step, 1);
     } else if (fragment !== null && field === null) {
       description[step].children[fragment].children.forEach((field) =>
         names.push(field.name)
       );
-      description[step].children.splice(fragment, 1);
+      if (_delete) description[step].children.splice(fragment, 1);
     } else if (fragment !== null && field !== null) {
       names.push(description[step].children[fragment].children[field].name);
-
-      description[step].children[fragment].children.splice(field, 1);
+      if (_delete)
+        description[step].children[fragment].children.splice(field, 1);
     }
 
     description.forEach((_step, stepIndex) =>

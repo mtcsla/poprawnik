@@ -77,7 +77,6 @@ const getNamesFromPath = (path: [number, number | null, number | null], descript
     if (description[stepIndex].name)
       names.push(description[stepIndex].name + '~', description[stepIndex].name);
     description[stepIndex].children.forEach((fragment, index) => {
-      console.log(fragment.children.map(field => field.name).toString(), index);
       names.push(...getNamesFromPath([stepIndex, index, null], description));
     })
   }
@@ -99,10 +98,6 @@ const getConditionFromPath = (
 ): Expression<Condition, OperatorCondition> => {
   const [stepIndex, fragmentIndex, fieldIndex] = path;
   try {
-    console.log(
-      path,
-      description
-    )
 
     if (fieldIndex === null) {
       return description[stepIndex].children[fragmentIndex].condition;
@@ -136,9 +131,9 @@ const Changes = ({ deletionType, deletePath, requiredChange, onSubmit, onCancel,
 
 
 
-    const newForm = cloneDeep(_description);
 
-    const formElementsToChange = FormUtility.removed(_description, deletePath, requiredChange ? 'notRequired' : 'removed',);
+    const formElementsToChange = FormUtility.removed(cloneDeep(_description), deletePath, requiredChange ? 'notRequired' : 'removed',);
+    console.log(formElementsToChange, 'formelementstochange')
 
     const templateChanges = FormUtility.templateRemoved(
       templateDescription as TemplateDescription,
@@ -162,16 +157,19 @@ const Changes = ({ deletionType, deletePath, requiredChange, onSubmit, onCancel,
         (element) => {
           return ({
             path: element.slice(0, 3) as [number, number, number | null],
-            condition: FormNormalize.removeNamesFromCondition(
+            condition: FormUtility.normalizeCondition(
               getConditionFromPath(element.slice(0, 3) as [number, number, number | null], _description),
-              names,
+              element[3],
             ) as Expression<Condition, OperatorCondition>
           })
         }
       );
 
 
+
     const newTemplate = FormUtility.templateApplyRemoved(cloneDeep(templateDescription), templateChanges);
+
+    const newForm = FormNormalize[requiredChange ? 'conditionsNotRequired' : 'conditions'](cloneDeep(_description), deletePath);
     FormUtility.removed(newForm, deletePath, requiredChange ? 'notRequired' : 'removed', true);
     FormUtility.templateNormalizeConditions(
       newTemplate as TemplateDescription,
@@ -183,7 +181,7 @@ const Changes = ({ deletionType, deletePath, requiredChange, onSubmit, onCancel,
 
 
     return { templateChanges, templateConditionChanges, formChanges, newTemplate, newForm };
-  }, [])
+  }, [requiredChange])
 
   const [currentFormChange, setCurrentFormChange] = React.useState(0);
   const [viewingTemplateChanges, setViewingTemplateChanges] = React.useState(false);

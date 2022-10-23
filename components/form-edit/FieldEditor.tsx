@@ -178,7 +178,7 @@ const FieldEditor = () => {
               }
               deletionType="field"
               deletePath={[step as number, fragment as number, field as number]}
-              requiredChange={!deleteDialogOpen}
+              requiredChange={settingOptional || !!conditionToAdd?.components?.length}
               onSubmit={
                 deleteDialogOpen
                   ? deleteField

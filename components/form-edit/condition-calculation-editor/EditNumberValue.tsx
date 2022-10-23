@@ -27,7 +27,7 @@ export const EditNumberValue = ({ type, inputType, save, cancel, initValue, nest
   const templateDescription = useTemplateDescription();
 
 
-  const isInTemplate = React.useMemo(() => !!formDescription.description.length, [templateDescription, formDescription])
+  const isInTemplate = React.useMemo(() => !!templateDescription.description.length, [templateDescription, formDescription])
   const listIndex = useTemplateEditorContextForConditionsAndCalculations();
   const allowedNotRequired = React.useContext(existsContext);
 

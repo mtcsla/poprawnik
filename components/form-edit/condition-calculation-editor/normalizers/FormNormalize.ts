@@ -13,11 +13,94 @@ import {
   OperatorCondition,
 } from "../ConditionCalculationEditorProvider";
 import { Expression } from "../../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider";
+import { FormUtility } from "../../../utility/FormUtility";
+import { FormNameCheck } from "../../../utility/FormNameCheck";
 /**
  * Pass in the copy of the description object to prevent hard to debug problems.
  */
 
 export namespace FormNormalize {
+  export const conditionsNotRequired = (
+    _description: FormDescription,
+    _location: [number | null, number | null, number | null],
+    _delete?: true
+  ): FormDescription => {
+    const description = cloneDeep(_description);
+    const location = _location as [number, number | null, number | null];
+
+    const unnormalizedDescription = description.slice(location[0]);
+    const names: string[] =
+      location[1] === null ? [`${description[location[0]].name}~`] : [];
+
+    if (location[1] === null && location[2] === null)
+      description[location[0]].children.forEach((fragment) =>
+        fragment.children.forEach((field) => names.push(field.name))
+      );
+    else if (location[1] !== null && location[2] === null)
+      description[location[0]].children[location[1] as number].children.forEach(
+        (field) => names.push(field.name)
+      );
+    else if (location[1] !== null && location[2] !== null)
+      names.push(
+        description[location[0]].children[location[1] as number].children[
+          location[2] as number
+        ].name
+      );
+
+    const newDescriptionPart = [];
+
+    for (const step of unnormalizedDescription) {
+      const newStep = cloneDeep(step);
+      newStep.children = [];
+
+      for (const fragment of step.children) {
+        const newFragment = cloneDeep(fragment);
+        newFragment.children = [];
+
+        let newFragmentCondition = cloneDeep(
+          fragment.condition ?? { operators: [], components: [] }
+        );
+        newFragmentCondition = FormUtility.normalizeCondition(
+          newFragmentCondition,
+          FormNameCheck.conditionNotRequired(names, newFragmentCondition)
+        ) as Expression<Condition, OperatorCondition>;
+
+        for (const field of fragment.children) {
+          let newFieldCondition = cloneDeep(field.condition);
+          newFieldCondition = FormUtility.normalizeCondition(
+            newFragmentCondition,
+            FormNameCheck.conditionNotRequired(names, newFragmentCondition)
+          ) as Expression<Condition, OperatorCondition>;
+
+          newFragment.children.push({ ...field, condition: newFieldCondition });
+        }
+
+        newStep.children.push({
+          ...newFragment,
+          condition: newFragmentCondition,
+        });
+      }
+
+      newDescriptionPart.push(newStep);
+    }
+
+    const newDescription = description
+      .slice(0, location[0])
+      .concat(newDescriptionPart);
+
+    if (_delete) {
+      if (location[1] == null && location[2] == null)
+        newDescription.splice(location[0], 1);
+      else if (location[1] != null && location[2] == null)
+        newDescription[location[0]].children.splice(location[1] as number, 1);
+      else
+        newDescription[location[0]].children[
+          location[1] as number
+        ].children.splice(location[2] as number, 1);
+    }
+
+    return newDescription;
+  };
   export const conditions = (
     _description: FormDescription,
     _location: [number | null, number | null, number | null],
@@ -38,7 +121,7 @@ export namespace FormNormalize {
       description[location[0]].children[location[1] as number].children.forEach(
         (field) => names.push(field.name)
       );
-    else
+    else if (location[1] !== null && location[2] !== null)
       names.push(
         description[location[0]].children[location[1] as number].children[
           location[2] as number

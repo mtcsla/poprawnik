@@ -90,8 +90,30 @@ export namespace ValidatorsObject {
         components: [],
         operators: [],
       };
+      const fragmentCondition = names.find((name) => name.name === key)
+        ?.fragmentCondition ?? {
+        components: [],
+        operators: [],
+      };
+
       const active = Evaluate.sequence(
-        condition,
+        {
+          components: [
+            condition,
+            fragmentCondition?.components?.length
+              ? fragmentCondition
+              : {
+                  variable: null,
+                  comparator: null,
+                  value: {
+                    type: null,
+                    value: null,
+                  },
+                  simpleValue: true,
+                },
+          ],
+          operators: ["&"],
+        },
         values,
         description,
         listIndex

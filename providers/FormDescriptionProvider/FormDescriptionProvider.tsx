@@ -92,7 +92,7 @@ export type FormActionWithoutSave =
 
 export type FormAction = FormActionWithoutSave;
 export type NameType = {
-  name: string, required: boolean, options: string[], type: FieldType, step: number, fragment: number, field: number, list: number | null, valueType: FieldValueType, fragmentConditional: boolean, condition?: Expression<Condition, OperatorCondition>
+  name: string, required: boolean, options: string[], type: FieldType, step: number, fragment: number, field: number, list: number | null, valueType: FieldValueType, fragmentConditional: boolean, condition?: Expression<Condition, OperatorCondition> | ConditionCalculationSequence
 };
 
 

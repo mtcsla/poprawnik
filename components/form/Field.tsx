@@ -5,6 +5,8 @@ import { ErrorMessage, Field } from 'formik';
 import React from 'react';
 import { FormikContextValue, FormValues, NestedFormValue, useFormValue, useTopLevelFormData } from '../../pages/forms/[id]/form';
 import { FieldDescription, FormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { Expression } from '../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
+import { Condition, OperatorCondition } from '../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
 import { ErrorMessageCallback } from '../form-edit/FieldEditor';
 import { Evaluate } from '../utility/Evaluate';
 import { Validators } from '../utility/ValidatorFactories';
@@ -19,14 +21,16 @@ export type FieldProps<Type> = {
   listElementValues?: FormValues<NestedFormValue>
   listIndex?: number,
 
+
   element: Type,
   formDescription: FormDescription
+  fragmentCondition?: Expression<Condition, OperatorCondition>
 }
 
 /**
  * Make sure the field is a child to formik!
 */
-const UserField = ({ element, fullWidth, display, valueDisplay, context, listElementValues, formDescription }: FieldProps<FieldDescription>): JSX.Element => {
+const UserField = ({ element, fullWidth, display, valueDisplay, context, listElementValues, formDescription, fragmentCondition }: FieldProps<FieldDescription>): JSX.Element => {
   const FieldWrapper = styled.span`
     ${element.fullWidth ? 'flex: 1; min-width: 100%;' : 'width: 49%; max-width: 49%;'}
     @media (max-width: 700px) {
@@ -39,10 +43,10 @@ const UserField = ({ element, fullWidth, display, valueDisplay, context, listEle
 
   const TypedField = React.useMemo(() => {
     if (element.type === 'date')
-      return <UserDateField {...{ element, display, context, formDescription }} />
+      return <UserDateField {...{ element, display, context, formDescription, fragmentCondition }} />
     else if (element.type === 'select')
-      return <UserSelectField {...{ element, display, context, formDescription }} />
-    else return <UserTextField {...{ element, display, context, formDescription }} />
+      return <UserSelectField {...{ element, display, context, formDescription, fragmentCondition }} />
+    else return <UserTextField {...{ element, display, context, formDescription, fragmentCondition }} />
   }, []
   )
 
@@ -51,11 +55,16 @@ const UserField = ({ element, fullWidth, display, valueDisplay, context, listEle
       valueDisplay
         ? <div className='border rounded px-2 py-2 w-full flex flex-col'>
           <p className='text-sm bg-white px-1 -mt-5  text-slate-500 self-start'>{element.label}</p>
-          <p className='px-1 py-0 my-0 truncate'>{
-            element.type === 'date'
-              ? (listElementValues?.[element.name] as Date)?.toLocaleDateString('pl-PL') ?? ''
-              : listElementValues?.[element.name as string] as any
-          }</p>
+          <p className='px-1 py-0 my-0 truncate'>
+            {
+              (listElementValues?.[element.name as string] as string)?.length === 0 || listElementValues?.[element.name as string] == null
+                ? <pre className='pl-0.5 inline text-sm'>Brak</pre>
+                : (
+                  element.type === 'date'
+                    ? (listElementValues?.[element.name] as Date)?.toLocaleDateString('pl-PL') ?? ''
+                    : listElementValues?.[element.name as string] as any
+                )
+            }</p>
         </div>
         : <>
           {TypedField}
@@ -67,7 +76,7 @@ const UserField = ({ element, fullWidth, display, valueDisplay, context, listEle
 
 
 
-const UserDateField = ({ element, display, context, formDescription }: FieldProps<FieldDescription>) => {
+const UserDateField = ({ element, display, context, formDescription, fragmentCondition }: FieldProps<FieldDescription>) => {
   const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = context ? React.useContext(context) : useFormValue();
 
   const topData = useTopLevelFormData();
@@ -76,7 +85,13 @@ const UserDateField = ({ element, display, context, formDescription }: FieldProp
   React.useEffect(() => {
     setDisabled(
       formDescription ?
-        !Evaluate.sequence(element.condition, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition()
+        !Evaluate.sequence({
+          components: [
+            element.condition,
+            fragmentCondition?.components?.length ? fragmentCondition : { variable: null, comparator: null, value: { type: null, value: null }, simpleValue: true }
+          ]
+          , operators: ['&']
+        }, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition()
         : false
     )
   }, [topData.values, formDescription, topData.currentListIndex]);
@@ -102,7 +117,7 @@ const UserDateField = ({ element, display, context, formDescription }: FieldProp
   </FormControl>
 
 }
-const UserSelectField = ({ element, context, display, formDescription }: FieldProps<FieldDescription>) => {
+const UserSelectField = ({ element, context, display, formDescription, fragmentCondition }: FieldProps<FieldDescription>) => {
   const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = context ? React.useContext(context) : useFormValue();
 
   const validatorFunction = React.useMemo(() => Validators.factory(element).select(), [element]);
@@ -114,7 +129,14 @@ const UserSelectField = ({ element, context, display, formDescription }: FieldPr
   React.useEffect(() => {
     setDisabled(
       formDescription ?
-        !Evaluate.sequence(element.condition, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition()
+        !Evaluate.sequence(
+          {
+            components: [
+              element.condition,
+              fragmentCondition?.components?.length ? fragmentCondition : { variable: null, comparator: null, value: { type: null, value: null }, simpleValue: true }
+            ]
+            , operators: ['&']
+          }, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition()
         : false
     )
   }, [topData.values, formDescription, topData.currentListIndex]);
@@ -139,7 +161,7 @@ const UserSelectField = ({ element, context, display, formDescription }: FieldPr
     </Field>
   </FormControl>
 }
-const UserTextField = ({ element, context, display, formDescription }: FieldProps<FieldDescription>) => {
+const UserTextField = ({ element, context, display, formDescription, fragmentCondition }: FieldProps<FieldDescription>) => {
   const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = context ? React.useContext(context) : useFormValue();
 
   const validatorFunction = React.useMemo(() => Validators.factory(element).text(), [element])
@@ -150,7 +172,13 @@ const UserTextField = ({ element, context, display, formDescription }: FieldProp
   React.useEffect(() => {
     setDisabled(
       formDescription
-        ? !Evaluate.sequence(element.condition, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition()
+        ? !Evaluate.sequence({
+          components: [
+            element.condition,
+            fragmentCondition?.components?.length ? fragmentCondition : { variable: null, comparator: null, value: { type: null, value: null }, simpleValue: true }
+          ]
+          , operators: ['&']
+        }, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition()
         : false
     );
   }, [topData.values, formDescription, topData.currentListIndex]);

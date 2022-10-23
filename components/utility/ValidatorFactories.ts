@@ -26,8 +26,8 @@ export namespace Validators {
 
           if (field.numberType === "real") {
             if (
-              !value.match(/^\-?[1-9]?[0-9]*[,.]?[0-9]+$/) &&
-              !value.match(/^\-?[1-9][0-9]*$/)
+              !value?.match(/^\-?[1-9]?[0-9]*[,.]?[0-9]+$/) &&
+              !value?.match(/^\-?[1-9][0-9]*$/)
             )
               return "To pole musi zawierać poprawną liczbę rzeczywistą lub całkowitą.";
           } else if (!value.match(/^\-?[1-9]?[0-9]*$/))

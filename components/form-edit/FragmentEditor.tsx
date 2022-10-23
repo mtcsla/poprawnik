@@ -61,7 +61,7 @@ const FragmentEditor = () => {
     const newQuery = cloneDeep(router.query);
 
     newQuery.new = '1'
-    newQuery.field = description[step as number].children[fragment as number].children.length.toString()
+    newQuery.field = description[step as number].children[fragment as number]?.children.length.toString()
 
     router.push({ pathname: router.pathname, query: newQuery });
   }
@@ -185,10 +185,10 @@ const FragmentEditor = () => {
         <p>Dodaj pola, tytuł oraz opis.</p>
 
         <TextField
-          value={description[step as number].children[fragment as number].title || ''}
+          value={description[step as number].children[fragment as number]?.title || ''}
           onChange={(e) => modifyDescription(['fragment_set_title', [step as number, fragment as number, e.target.value]])}
           label='tytuł' className="mt-4 mr-4 flex-1 bg-white w-full" />
-        <TextField value={description[step as number].children[fragment as number].subtitle || ''}
+        <TextField value={description[step as number].children[fragment as number]?.subtitle || ''}
           onChange={(e) => modifyDescription(['fragment_set_subtitle', [step as number, fragment as number, e.target.value]])}
           label='opis' className='mt-4 flex-1 bg-white w-full' />
       </span>
@@ -196,11 +196,11 @@ const FragmentEditor = () => {
       <span className="items-center mt-6 justify-between mb-4 flex w-full">
         <pre className="text-base" >Pola fragmentu aktywne</pre>
         <div className="border-b flex-1 ml-4 mr-4" />
-        <p className="uppercase text-sm font-bold">{!description[step as number].children[fragment as number].condition?.components?.length ? 'zawsze' : 'warunkowo'}</p>
+        <p className="uppercase text-sm font-bold">{!description[step as number].children[fragment as number]?.condition?.components?.length ? 'zawsze' : 'warunkowo'}</p>
       </span>
 
       {description[step as number].children[fragment as number]?.condition?.components?.length ?
-        <ConditionCalculationDisplay first type='condition' sequence={description[step as number].children[fragment as number].condition ?? { operators: [], components: [] }} />
+        <ConditionCalculationDisplay first type='condition' sequence={description[step as number].children[fragment as number]?.condition ?? { operators: [], components: [] }} />
         : null
       }
       <Button className="self-end border-none px-0" onClick={() => setEditingCondition(true)} size='small'>Zmień</Button>
@@ -211,8 +211,8 @@ const FragmentEditor = () => {
           exit={() => setEditingCondition(false)}
           save={condition => {
             if (
-              currentDescription[step as number].children[fragment as number].condition?.components?.length
-              || description[step as number].children[fragment as number].condition?.components?.length
+              currentDescription[step as number].children[fragment as number]?.condition?.components?.length
+              || description[step as number].children[fragment as number]?.condition?.components?.length
             ) {
               modifyDescription(['fragment_set_condition', [step as number, fragment as number, condition as Expression<Condition, OperatorCondition>]])
               setEditingCondition(false);
@@ -221,7 +221,7 @@ const FragmentEditor = () => {
               setConditionToAdd(condition as Expression<Condition, OperatorCondition>);
             }
           }}
-          initValue={description[step as number].children[fragment as number].condition ?? { operators: [], components: [] }}
+          initValue={description[step as number].children[fragment as number]?.condition ?? { operators: [], components: [] }}
         />
         : null
       }

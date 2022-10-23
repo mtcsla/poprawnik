@@ -2,7 +2,7 @@ import { ArrowDownward, ArrowDropDown, ArrowDropUp, ArrowForwardIos, ArrowUpward
 import { Button, ButtonGroup } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
-import { useFormValue } from '../../pages/forms/[id]/form';
+import { useFormValue, useTopLevelFormData } from '../../pages/forms/[id]/form';
 import { StepDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { InitialValues } from '../utility/InitialValues';
 import { FieldProps } from './Field';
@@ -16,11 +16,13 @@ export interface StepProps extends FieldProps<StepDescription> {
 
 const UserStep = ({ element, context, nested, display, setEditingElement, listElementValues, formDescription }: StepProps) => {
   const { values, setFieldValue, setFieldError } = useFormValue();
+  const topLevelData = useTopLevelFormData();
 
   const fragments = React.useMemo(() => element.children.map(
     (element, index) => <UserFragment {...{ element, index, context, valueDisplay: display, formDescription, listElementValues }} key={index} />),
     element.type === 'step' ? [element] : [element, listElementValues]
   );
+  const formikData = React.useContext(context ?? React.createContext({} as any));
 
 
   const listElements =
@@ -30,7 +32,7 @@ const UserStep = ({ element, context, nested, display, setEditingElement, listEl
       return element.type === 'list' ?
         (values[element.name] as []).map(
           (value, index) =>
-            <div className='pt-0 flex flex-col mb-8 border rounded-lg'>
+            <div className={`pt-0 flex flex-col mb-8 border rounded-lg ${(topLevelData.currentListIndex != null && index === values[element.name]?.length - 1 && topLevelData.newElement) ? 'hidden' : ''}`}>
               <div className='bg-slate-100 flex items-center justify-between rounded-t-lg w-full h-14 mb-8 px-4 sm:px-8 py-4'>
                 <pre className='text-black my-2'>Wartość <b className=' ml-1 text-lg'>{index + 1}</b></pre>
 
@@ -69,7 +71,7 @@ const UserStep = ({ element, context, nested, display, setEditingElement, listEl
             </div>
         )
         : [<></>]
-    }, [values[element.name]])
+    }, [values[element.name], topLevelData.currentListIndex, formikData?.errors?.[element.name]])
 
   return element.type === 'step' || nested
     ? <div className='inline-flex w-full gap-4 flex-col'>

@@ -127,6 +127,13 @@ export const TemplateNestingParentEditor = ({ editing, adding, editorPath }: { e
       return !!(element as ExistsElement)?.variables.length;
     if (type === 'list')
       return !!(element as ListElement)?.list;
+    if (type === 'textFormatting') {
+      return !!(element as TextFormattingElement)?.textFormattingType && (
+        (element as TextFormattingElement)?.textFormattingType === 'effect'
+          ? (element as TextFormattingElement)?.effect
+          : ((element as TextFormattingElement)?.align && (element as TextFormattingElement)?.element)
+      );
+    }
     return !!element;
   };
 
@@ -188,6 +195,7 @@ export const TemplateNestingParentEditor = ({ editing, adding, editorPath }: { e
         break;
       case 'textFormatting':
         if (
+          _.isEqual((initState as TextFormattingElement).textFormattingType, (parent as TextFormattingElement).textFormattingType) &&
           (initState as TextFormattingElement).element === (parent as TextFormattingElement).element
           &&
           (initState as TextFormattingElement).effect === (parent as TextFormattingElement).effect

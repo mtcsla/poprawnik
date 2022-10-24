@@ -16,13 +16,15 @@ import { FormValues, NestedFormValue, RootFormValue } from '../../../forms/[id]/
 export const listContext = React.createContext<string>('');
 export const existsContext = React.createContext<string[]>([]);
 export const textFormattingContext = React.createContext<{
+  textFormattingType: 'effect' | 'element',
   effect: TextFormattingElement['effect'];
   element: TextFormattingElement['element'];
   align: TextFormattingElement['align'];
 }>({
+  textFormattingType: 'effect',
   effect: 'normal',
   element: 'p',
-  align: 'left'
+  align: 'left',
 });
 
 const EditDocumentTemplate = () => {
@@ -42,9 +44,18 @@ const EditDocumentTemplate = () => {
   const [valuesExpanded, setValuesExpanded] = React.useState<boolean>(false);
   const [editorOpen, setEditorOpen] = React.useState<boolean>(false);
 
+  const [url, setUrl] = React.useState<string>('');
+
+  React.useEffect(() => {
+  }, []);
+
   React.useEffect(() => {
     if (!id) return;
-    setValues(JSON.parse(sessionStorage.getItem(`--${id}-data`) ?? '{}'));
+    const newValues = JSON.parse(sessionStorage.getItem(`--${id}-data`) ?? '{}')
+    setValues(newValues);
+
+    const newUrl = `/api/template/generate.pdf?perm=owner&id=${id}&data=${encodeURIComponent(JSON.stringify(newValues))}`;
+    setUrl(newUrl);
   }, [id])
   React.useEffect(() => {
     if (!router.isReady)
@@ -75,7 +86,7 @@ const EditDocumentTemplate = () => {
     {formDescription.length && id && Object.keys(templateDescription).length
       ? <listContext.Provider value={''}>
         <existsContext.Provider value={[]}>
-          <textFormattingContext.Provider value={{ effect: 'normal', element: 'p', align: 'left' }}>
+          <textFormattingContext.Provider value={{ textFormattingType: 'effect', effect: 'normal', element: 'p', align: 'left' }}>
             <TemplateDescriptionProvider id={id as string} form={formDescription} initTemplate={templateDescription}>
               <div className="w-full flex-col flex pb-8 mb-2">
 
@@ -140,11 +151,15 @@ const EditDocumentTemplate = () => {
                     </div>
                   </>
                 }
-                <Button disabled={!Object.keys(values).length}
-                  className={`p-4 mt-8 bg-blue-500 text-white hover:bg-blue-400 ${!Object.keys(values).length ? 'bg-gray-300 hover:bg-gray-300' : ''}`}>
-                  Podgląd pisma
-                  <FormatAlignJustify className='ml-2' />
-                </Button>
+                <Link href={url} passHref>
+                  <a className='w-full' target='_blank'>
+                    <Button disabled={!Object.keys(values).length}
+                      className={`p-4 mt-8 bg-blue-500 w-full text-white hover:bg-blue-400 ${!Object.keys(values).length ? 'bg-gray-300 hover:bg-gray-300' : ''}`}>
+                      Podgląd pisma
+                      <FormatAlignJustify className='ml-2' />
+                    </Button>
+                  </a>
+                </Link>
               </div>
             </TemplateDescriptionProvider>
 

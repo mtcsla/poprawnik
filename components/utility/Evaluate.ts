@@ -17,6 +17,7 @@ import {
   NameType,
 } from "../../providers/FormDescriptionProvider/FormDescriptionProvider";
 import { Expression } from "../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider";
+import _ from "lodash";
 export namespace Evaluate {
   interface RuntimeNameType extends NameType {
     condition:
@@ -57,21 +58,44 @@ export namespace Evaluate {
     });
     return names;
   };
-  const getValue = (
+  export const getValue = (
     name: string,
     values: FormValues<RootFormValue>,
     description: FormDescription,
-    listIndex?: number
+    listIndex?: number | [string, number][]
   ) => {
+    if (name.endsWith("~"))
+      return (values[name.slice(0, -1)] as FormValues<NestedFormValue>[])
+        .length;
     const nameDetails: Partial<NameType> = getNames(description).find(
       (n) => n.name === name
     ) as Partial<NameType>;
-    if (listIndex != null && nameDetails.list != null)
+
+    let indexInList: number | null = null;
+    if (_.isArray(listIndex) ? listIndex?.length : listIndex != null) {
+      if (nameDetails.list != null) {
+        if (_.isArray(listIndex)) {
+          indexInList = (
+            listIndex.find(
+              (i) => i[0] === description[nameDetails.list as number].name
+            ) as [string, number]
+          )[1];
+        } else {
+          indexInList = listIndex as number;
+        }
+      }
+
+      if (indexInList == null) {
+        throw new Error("indexInList is undefined");
+      }
+    }
+
+    if (indexInList != null && nameDetails.list != null)
       return (
         values[
           description[nameDetails.list as number].name as string
         ] as FormValues<NestedFormValue>[]
-      )[listIndex][nameDetails.name as string];
+      )[indexInList][nameDetails.name as string];
     return values[nameDetails.name as string];
   };
 
@@ -79,7 +103,7 @@ export namespace Evaluate {
     _sequence: ConditionCalculationSequence,
     values: FormValues<RootFormValue>,
     description: FormDescription,
-    listIndex?: number
+    listIndex?: number | [string, number][]
   ): number => {
     const sequence = cloneDeep(_sequence);
     if (sequence.components.length === 0) return NaN;
@@ -106,7 +130,7 @@ export namespace Evaluate {
 
         if (sequence.operators[i] !== operator) continue;
 
-        const currentValue =
+        let currentValue =
           !(sequence.components[i] as ConditionCalculationSequence)
             .components ||
           !(sequence.components[i] as ConditionCalculationSequence).operators
@@ -122,7 +146,7 @@ export namespace Evaluate {
                 description,
                 listIndex
               ).calculation();
-        const nextValue =
+        let nextValue =
           !(sequence.components[i + 1] as ConditionCalculationSequence)
             .components ||
           !(sequence.components[i + 1] as ConditionCalculationSequence)
@@ -139,6 +163,8 @@ export namespace Evaluate {
                 description,
                 listIndex
               ).calculation();
+        if (_.isString(currentValue)) currentValue = parseFloat(currentValue);
+        if (_.isString(nextValue)) nextValue = parseFloat(nextValue);
 
         switch (sequence.operators[i]) {
           case "^":
@@ -179,7 +205,7 @@ export namespace Evaluate {
     calculation: Calculation,
     values: FormValues<RootFormValue>,
     description: FormDescription,
-    listIndex?: number
+    listIndex?: number | [string, number][]
   ): number => {
     if (calculation.type === "constant")
       if (typeof calculation.value === "string")
@@ -200,7 +226,7 @@ export namespace Evaluate {
     _sequence: ConditionCalculationSequence,
     values: FormValues<RootFormValue>,
     description: FormDescription,
-    listIndex?: number
+    listIndex?: number | [string, number][]
   ): boolean => {
     const sequence = cloneDeep(_sequence);
     if (sequence.components.length === 0) return true;
@@ -291,7 +317,7 @@ export namespace Evaluate {
     condition: Condition,
     values: FormValues<RootFormValue>,
     description: FormDescription,
-    listIndex?: number
+    listIndex?: number | [string, number][]
   ): boolean => {
     const names = getNames(description);
 
@@ -369,7 +395,7 @@ export namespace Evaluate {
     sequence: ConditionCalculationSequence,
     values: FormValues<RootFormValue>,
     description: FormDescription,
-    listIndex?: number
+    listIndex?: number | [string, number][]
   ) => ({
     calculation: () => calculation(sequence, values, description, listIndex),
     condition: () => condition(sequence, values, description, listIndex),

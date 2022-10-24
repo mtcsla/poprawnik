@@ -15,10 +15,33 @@ export const EditTemplateElementText = ({ path, index, onChange, element }: {
     });
   }, [text]);
 
+  const process = React.useCallback((text: string) => {
+    let newText = text;
+    newText = newText.replaceAll('\n', '⮐')
+    newText = newText.replaceAll(' ', '•');
+    newText = newText.replaceAll('\t', '••');
+    newText = newText.replaceAll('••', '⇥');
+    return newText;
+  }, [])
+  const normalize = React.useCallback((text: string) => {
+    let newText = text;
+    newText = newText.replaceAll('⇥', '\t');
+    newText = newText.replaceAll('•', ' ');
+    newText = newText.replaceAll('⮐', '\n');
+    return newText
+  }, []);
+
   return <div className='w-full flex flex-col'>
+    {text}
     <textarea
-      value={text}
-      onChange={(e) => setText(e.target.value)}
+      defaultValue={normalize(text)}
+      onChange={(e) => {
+        const newText = e.target.value;
+
+        setText(
+          process(newText)
+        )
+      }}
       className='w-full rounded-lg border p-2 sm:p-4' placeholder='treść tekstu' style={{ minHeight: 200 }} />
   </div>;
 };

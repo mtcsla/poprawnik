@@ -29,8 +29,9 @@ export const EditTemplateElement = ({ disabled, path, index, openMenu, menuTarge
       if (element.type === 'text') {
 
         const textFormatting = React.useContext(textFormattingContext);
+        const El = getTextElement(textFormatting?.textFormattingType, textFormatting?.element ?? 'p', textFormatting?.align ?? 'left', textFormatting?.effect ?? 'normal');
 
-        const El = getTextElement(textFormatting.element, textFormatting.align, textFormatting.effect);
+
         return <div className='flex flex-col' >
           <pre className={`text-xs ${hovered ? 'text-blue-500' : ''} -mb-2.5 z-30 ml-4  px-1 bg-white self-start`}>Tekst</pre>
           <div className={`p-2 ${hovered ? 'border-blue-500 text-blue-500' : ''} text-sm flex-col flex sm:p-4 rounded-lg border`}>
@@ -101,7 +102,7 @@ export const EditTemplateElement = ({ disabled, path, index, openMenu, menuTarge
 };
 
 
-const getTextElement = (element: TextFormattingElement['element'], align: TextFormattingElement['align'], effect: TextFormattingElement['effect']) => {
+const getTextElement = (textFormattingType: TextFormattingElement['textFormattingType'], element: TextFormattingElement['element'], align: TextFormattingElement['align'], effect: TextFormattingElement['effect']) => {
   const Effect = getTextEffect(effect);
 
   switch (element) {
@@ -134,10 +135,12 @@ const getTextEffect = (effect: TextFormattingElement['effect']) => {
 const getTextAlignment = (alignment: TextFormattingElement['align']) => {
   switch (alignment) {
     case 'left':
-      return 'text-left';
+      return 'text-left text-el';
     case 'center':
-      return 'text-center';
+      return 'text-center text-el';
     case 'right':
-      return 'text-right';
+      return 'text-right text-el';
+    default:
+      return 'text-el';
   }
 }

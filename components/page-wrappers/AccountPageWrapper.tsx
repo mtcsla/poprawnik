@@ -1,4 +1,4 @@
-import { ArrowLeft, Edit, Gavel, Lock, Logout, PersonRounded, Shield, ShoppingBag } from '@mui/icons-material';
+import { ArrowLeft, Edit, Gavel, Lock, Logout, Person, PersonRounded, Shield, ShoppingBag } from '@mui/icons-material';
 import { Accordion, AccordionDetails, AccordionSummary, Button, List, ListItem, Paper, SwipeableDrawer, Tooltip, useTheme } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -73,6 +73,7 @@ const AccountPageWrapper = ({ children }: { children: React.ReactNode }) => {
               </List>
 
             </AccountPageAccordion>
+            <AccountPageLink caption="Weryfikator" link={'/account/verifier'} icon={Person} />
             <AccountPageLink caption="Panel administratora" link={'/account/admin'} icon={Shield} />
           </List>
         </span>

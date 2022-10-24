@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash';
 import React from "react";
 import { firestore } from '../../buildtime-deps/firebase';
 import { Calculation, Condition, OperatorCalculation, OperatorCondition } from '../../components/form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
+import { FormValues, RootFormValue } from '../../pages/forms/[id]/form';
 import { FormDescription } from "../FormDescriptionProvider/FormDescriptionProvider";
 import { ModifyTemplate } from './ModifyTemplate';
 
@@ -26,6 +27,8 @@ export interface TemplateElementPrototype<Child> extends MarkedForDeletion {
 
 export interface TextFormattingElement extends TemplateElementPrototype<TemplateDescription> {
   type: 'textFormatting',
+  textFormattingType: 'element' | 'effect',
+
   element: 'h1' | 'h2' | 'h3' | 'h4' | 'p';
   effect: 'normal' | 'italic' | 'bold' | 'strikethrough' | 'underline';
   align: 'left' | 'center' | 'right';
@@ -52,6 +55,7 @@ export interface CalculationElement extends TemplateElementPrototype<never> {
   calculation: Expression<Calculation, OperatorCalculation>;
 }
 export interface VariableElement extends TemplateElementPrototype<never> {
+  value(value: any, values: FormValues<RootFormValue>, formDescription: FormDescription): unknown;
   type: 'variable';
   variable: string;
 }

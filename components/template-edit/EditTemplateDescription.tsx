@@ -218,7 +218,7 @@ export const EditTemplateDescription = (
     <Dialog open={addingElement || (editingElement != null)}>
 
       <DialogTitle><pre className='text-sm'>{addingElement ? 'Dodajesz' : 'Edytujesz'} element</pre></DialogTitle>
-      <DialogContent className='flex flex-col'>
+      <DialogContent style={{ minWidth: 600 }} className='flex flex-col'>
         <Tabs value={elementType}
           className='rounded-lg overflow-x-auto mb-8 border'>
           <Tab onClick={() => element
@@ -227,10 +227,6 @@ export const EditTemplateDescription = (
             && element.type !== 'calculation' && elementValid ? setWarning('calculation') : handleTypeChange('calculation')} value={'calculation'} label='obliczenia' />
           <Tab onClick={() => element
             && element.type !== 'variable' && elementValid ? setWarning('variable') : handleTypeChange('variable')} value={'variable'} label='zmienna' />
-          <Tab onClick={() => element
-            && element.type !== 'enter' && elementValid ? setWarning('enter') : handleTypeChange('enter')} value={'enter'} label='enter' />
-          <Tab onClick={() => element
-            && element.type !== 'space' && elementValid ? setWarning('space') : handleTypeChange('space')} value={'space'} label='spacja' />
         </Tabs>
         {elementType === 'text'
           ? <EditTemplateElementText

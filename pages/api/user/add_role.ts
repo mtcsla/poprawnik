@@ -62,7 +62,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   for (const role of newRoles) {
-    if (!targetRoles.includes("role"))
+    if (!targetRoles.includes(role))
       await firebaseAdmin
         .auth()
         .setCustomUserClaims(targetToken, { role: true });

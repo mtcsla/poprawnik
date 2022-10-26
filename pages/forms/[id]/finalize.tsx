@@ -89,9 +89,9 @@ const FormFinalize = () => {
   )
 
   return <BodyScrollLock>
-    <div className="top-0 p-4 sm:p-8 bottom-0 left-0 right-0 fixed bg-white" style={{ backgroundImage: 'url(/bg-new.svg)', backgroundSize: 'cover', zIndex: 201 }}>
+    <div className="top-0 p-4 sm:p-8 overflow-y-auto bottom-0 left-0 right-0 fixed bg-white" style={{ backgroundImage: 'url(/bg-new.svg)', backgroundSize: 'cover', zIndex: 201 }}>
       <div className='w-full flex h-full justify-center'>
-        <div className='p-4 sm:p-8 h-full flex flex-col w-full bg-white justify-between rounded-lg bg-opacity-90' style={{ maxWidth: 800 }}>
+        <div className='p-4 sm:p-8 min-h-full flex flex-col h-fit w-full bg-white justify-between rounded-lg bg-opacity-90' style={{ maxWidth: 800 }}>
           <div className='flex flex-col'>
             <pre className='text-xs'>Kupujesz pismo</pre>
             <pre className='font-bold mb-4 text-black'>{formDoc?.title}</pre>

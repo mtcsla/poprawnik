@@ -141,6 +141,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
+
   }, [router.pathname])
 
   useEffect(() => {

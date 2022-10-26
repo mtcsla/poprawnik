@@ -1,5 +1,6 @@
 import { Article, Feed, Gavel, Lock } from "@mui/icons-material";
 import { Accordion, AccordionSummary, Tooltip, Typography } from "@mui/material";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import ArticlesList from "./sidebar-lists/ArticlesList";
@@ -12,8 +13,12 @@ export const NavigationMenu = () => {
 
 
   return <div className={'flex flex-col w-full pl-1'}>
-    <MenuAccordion linkFragment={'documents'} icon={<Article {...{ sx }} color={'primary'} className={'mr-4'} />}
-      title={'Pisma'} onChange={() => setExpanded(0)} expanded={expanded == 0} />
+    <Link passHref href='/forms'>
+      <a>
+        <MenuAccordion linkFragment={'forms'} icon={<Article {...{ sx }} color={'primary'} className={'mr-4'} />}
+          title={'Pisma'} onChange={() => setExpanded(0)} expanded={expanded == 0} />
+      </a>
+    </Link>
     <Tooltip title={<div className='p-1 rounded bg-black bg-opacity-70 text-white'>Już niedługo!</div>} placement='right' >
       <span>
         <MenuAccordion linkFragment={'calculators'} icon={<Lock {...{ sx }} color={'primary'} className={'mr-4 text-slate-400'} />}

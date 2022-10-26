@@ -1,5 +1,5 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, query, where } from '@firebase/firestore';
-import { Add, Article, Help } from '@mui/icons-material';
+import { Add, Article, DoneAll, Help, QuestionAnswer } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton } from '@mui/material';
 import Link from 'next/link';
@@ -23,12 +23,21 @@ export interface IFormData {
   formData: any;
   templateData: any;
 
+  awaitingVerification?: boolean,
+  reasonForRejection?: string,
+
+  price?: number,
+  published?: boolean,
+
   id: string
 }
 
 const YourForms = ({ }) => {
   const [forms, setForms] = React.useState<IFormData[] | null>(null)
+  const [publishedForms, setPublishedForms] = React.useState<IFormData[] | null>(null)
+
   const [creatingForm, setCreatingForm] = React.useState<boolean>(false);
+
   const [error, setError] = React.useState<string>('');
   const [deleting, setDeleting] = React.useState<boolean>(false);
   const [confirmDelete, setConfirmDelete] = React.useState<number>(-1);
@@ -47,6 +56,15 @@ const YourForms = ({ }) => {
         })
 
         setForms(newForms);
+      })
+      getDocs(query(collection(firestore, 'products'), where('author', '==', userProfile.uid))).then(snasphot => {
+        const newForms: any[] = [];
+
+        snasphot.forEach(doc => {
+          newForms.push({ id: doc.id, ...doc.data() });
+        })
+
+        setPublishedForms(newForms);
       })
     }
 
@@ -90,7 +108,7 @@ const YourForms = ({ }) => {
 
   return <article className='flex flex-col w-full mb-8'>
     <h1>
-      <Article className='-translate-y-0.5 mr-2' color='primary' /> Twoje pisma
+      <Article className='-translate-y-0.5 mr-2' color='primary' /> Twoje projekty pism
     </h1>
     <p >
       Tutaj możesz tworzyć pisma, które sprzedasz w naszym serwisie
@@ -111,10 +129,15 @@ const YourForms = ({ }) => {
         </div>
         :
 
-        forms.map((form: IFormData) =>
+        forms.filter((form: IFormData) => !form.published).map((form: IFormData) => <>
           <div
-            className={"p-4 flex flex-col rounded-lg justify-between border h-32 mt-8 "}
+            className={"p-4 flex relative flex-col rounded-lg justify-between border h-32 mt-8 "}
           >
+            {form.awaitingVerification
+              ? <pre className='text-xs self-end absolute right-0 -top-5'>
+                <QuestionAnswer className='mr-2' />Oczekuje na weryfikację</pre>
+              : null
+            }
             <div className={'flex justify-between'}>
               <p className={'truncate'}>
                 {form.title || <i>BRAK TYTUŁU</i>}
@@ -129,7 +152,10 @@ const YourForms = ({ }) => {
                     sx={{ border: 'none' }}
                   >
 
-                    Edytuj
+                    {form.awaitingVerification
+                      ? 'Zobacz'
+                      : 'Edytuj'
+                    }
                   </Button>
                 </a>
               </Link>
@@ -143,7 +169,9 @@ const YourForms = ({ }) => {
                 Usuń
               </p>
             </div>
+
           </div>
+        </>
         )
 
       }
@@ -191,6 +219,37 @@ const YourForms = ({ }) => {
         </LoadingButton>
       </DialogActions>
     </Dialog>
+
+    <h1 className='mt-8'>
+      <DoneAll className='-translate-y-0.5 mr-2 ' color='primary' /> Opublikowane pisma
+    </h1>
+    <p >
+      Tutaj możesz tworzyć pisma, które sprzedasz w naszym serwisie
+    </p>
+    {
+      publishedForms
+        ? publishedForms.map(
+          (form: any) => <Link href={'/forms/' + form.id}>
+            <div style={{ minHeight: 150 }} className='mt-8 border p-4 rounded-lg cursor-pointer justify-between flex bg-slate-50 hover:bg-blue-50 hover:border-blue-500' key={form.id}>
+              <div className='flex flex-col justify-between'>
+                <p className={'truncate'}>
+                  {form.title || <i>BRAK TYTUŁU</i>}
+                </p>
+
+                <p className={'truncate text-slate-500'}>
+                  {form.description || <i>Brak opisu</i>}
+                </p>
+              </div>
+              <div>
+                <pre className='text-xs text-slate-600 truncate'>
+                  Zweryfikowano przez
+                </pre>
+              </div>
+            </div>
+          </Link>
+        )
+        : null
+    }
 
     <h1 className='mt-8'>
       <Help className='-translate-y-0.5 mr-2' color='primary' /> Pomoc

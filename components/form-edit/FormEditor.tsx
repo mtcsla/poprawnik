@@ -45,6 +45,8 @@ const FormEditor = () => {
   const [location, setLocation] = React.useState<FormEditorLocation>([null, null, null]);
   const locationProviderValue = { location, setLocation }
 
+  const [verifying, setVerifying] = React.useState(false);
+
   const router = useRouter();
 
   const newStep = (type: 'step' | 'list', name?: string) => {
@@ -66,6 +68,10 @@ const FormEditor = () => {
   }
   const currentDescriptionRef = React.useRef(currentDescription)
   React.useEffect(() => { currentDescriptionRef.current = currentDescription }, [currentDescription])
+  React.useEffect(() => {
+    if (router.isReady)
+      setVerifying(router.query.verifying === 'true');
+  }, [router.isReady])
 
   React.useEffect(() => {
     const handler = (url: string) => {
@@ -155,9 +161,14 @@ const FormEditor = () => {
       </Formik>
     </Dialog>
 
-    <span className='flex justify-end'>
-      <Button size='small' className='border-none px-0' onClick={() => setDialogOpen(true)}>dodaj krok</Button>
-    </span>
+    {
+      verifying
+        ? null
+        : <span className='flex justify-end'>
+          <Button size='small' className='border-none px-0' onClick={() => setDialogOpen(true)}>dodaj krok</Button>
+        </span>
+
+    }
     {currentDescription.length ?
       <Tabs className='border rounded-lg mb-6' onChange={(e, value) => selectStep(value)} value={parseInt(selectedStep)}>
         {currentDescription.map((step, index) =>

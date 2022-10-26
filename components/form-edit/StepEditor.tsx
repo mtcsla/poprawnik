@@ -38,10 +38,15 @@ const StepEditor = () => {
 
   const router = useRouter();
 
+  const [verifying, setVerifying] = React.useState(false);
+  React.useEffect(() => {
+    if (router.isReady)
+      setVerifying(router.query.verifying === 'true');
+  }, [router.isReady])
 
   const save = (item: 'subtitle' | 'listMessage' | 'listItemName' | 'listMinMaxItems') => {
     setSaving(true);
-    const last = description[step as number][item];
+    const last = currentDescription[step as number][item];
     const newDescription: FormDescription = cloneDeep(currentDescription);
 
     let ref: React.MutableRefObject<any>;
@@ -95,35 +100,6 @@ const StepEditor = () => {
       )
   }
   const deleteStep = (newForm: FormDescription, newTemplate: TemplateDescription) => {
-    /*setSaving(true);
-
-    const newDescription = FormNormalize.conditions(cloneDeep(currentDescription), location, true)
-    const lastDescription = cloneDeep(currentDescription);
-
-    updateFirestoreDoc(newDescription).
-      then(
-        () => {
-          router.replace({
-            pathname: router.pathname, query: Object.assign(
-              router.query, step as number ? { step: step as number - 1 } : {}
-            )
-          })
-          modifyCurrentDescription(['form_set_description', newDescription]);
-          setSaving(false); setEditing(null);
-          setDeleteDialogOpen(false);
-        }).
-      catch(
-        () => {
-          setError(true);
-          modifyCurrentDescription?.(['form_set_description', lastDescription]);
-
-          setSaving(false); setEditing(null);
-          setTimeout(() => setError(false), 5000)
-        }
-
-      )
-      */
-
     setSaving(true);
     updateFirestoreDoc(newForm, newTemplate).then(() => {
       modifyCurrentDescription(['form_set_description', newForm]);
@@ -181,7 +157,7 @@ const StepEditor = () => {
     <span className='flex items-center justify-between'>
       <pre className='text-xs mt-2'>Krótki opis</pre>
       {editing !== 'subtitle' ?
-        <Button size='small' disabled={!!editing} className='border-none mt-4 px-0' onClick={() => setEditing('subtitle')}>edytuj</Button>
+        <Button size='small' disabled={!!editing || verifying} className='border-none mt-4 px-0' onClick={() => setEditing('subtitle')}>edytuj</Button>
         : <span className='flex items-center'>
           <Button size='small' className='border-none mt-4 px-0 mr-4' disabled={saving} color='error' onClick={() => setEditing(null)}>anuluj</Button>
           <LoadingButton size='small' loading={saving} onClick={() => save('subtitle')} className='border-none mt-4 px-0'>zapisz</LoadingButton>
@@ -198,7 +174,7 @@ const StepEditor = () => {
       <span className='flex justify-between items-center'>
         <pre className='text-xs mt-6'>Nazwa wartości</pre>
         {editing !== 'listItemName' ?
-          <Button size='small' disabled={!!editing} className='border-none mt-4 px-0' onClick={() => setEditing('listItemName')}>edytuj</Button>
+          <Button size='small' disabled={!!editing || verifying} className='border-none mt-4 px-0' onClick={() => setEditing('listItemName')}>edytuj</Button>
           : <span className='flex items-center'>
             <Button size='small' className='border-none mt-4 px-0 mr-4' disabled={saving} color='error' onClick={() => setEditing(null)}>anuluj</Button>
             <LoadingButton size='small' loading={saving} onClick={() => save('listItemName')} className='border-none mt-4 px-0'>zapisz</LoadingButton>
@@ -229,9 +205,9 @@ const StepEditor = () => {
       <span className='flex justify-between items-center'>
         <pre className='text-xs mt-6'>Minimalna i maksymalna liczba wartości</pre>
         {editing !== 'listMinMaxItems' ?
-          <Button size='small' disabled={!!editing} className='border-none mt-4 px-0' onClick={() => {
+          <Button size='small' disabled={!!editing || verifying} className='border-none mt-4 px-0' onClick={() => {
             setEditing('listMinMaxItems');
-            setListMinMaxItems(description[step as number].listMinMaxItems ?? { min: null, max: null })
+            setListMinMaxItems(currentDescription[step as number].listMinMaxItems ?? { min: null, max: null })
           }}>edytuj</Button>
           : <span className='flex items-center'>
             <Button size='small' className='border-none mt-4 px-0 mr-4' disabled={saving} color='error' onClick={() => setEditing(null)}>anuluj</Button>
@@ -301,7 +277,7 @@ const StepEditor = () => {
       <span className='flex items-center justify-between'>
         <pre className='text-xs mt-4'>Tekst wskazówki</pre>
         {editing !== 'listMessage' ?
-          <Button size='small' disabled={!!editing} className='border-none mt-4 px-0' onClick={() => setEditing('listMessage')}>edytuj</Button>
+          <Button size='small' disabled={!!editing || verifying} className='border-none mt-4 px-0' onClick={() => setEditing('listMessage')}>edytuj</Button>
           : <span className='flex items-center'>
             <Button size='small' className='border-none mt-4 px-0 mr-4' disabled={saving} color='error' onClick={() => setEditing(null)}>anuluj</Button>
             <LoadingButton size='small' loading={saving} onClick={() => save('listMessage')} className='border-none mt-4 px-0'>zapisz</LoadingButton>
@@ -321,7 +297,7 @@ const StepEditor = () => {
     <div className='flex mt-6 items-center justify-between mb-2'>
       <pre className='text-xs mt-2'>Fragmenty</pre>
 
-      <Button size='small' className='border-none px-0' onClick={() => { setEditing(null); newFragment(); }}>Dodaj fragment</Button>
+      <Button size='small' disabled={verifying} className='border-none px-0' onClick={() => { setEditing(null); newFragment(); }}>Dodaj fragment</Button>
     </div>
     {currentDescription[step as number].children.length ?
       currentDescription[step as number].children.map((fragment, index) =>
@@ -340,9 +316,12 @@ const StepEditor = () => {
     }
 
 
-    <LoadingButton disabled={!!editing} loading={saving} color='error' className={`mt-2 p-4 bg-red-100 border-none`} onClick={() => setDeleteDialogOpen(true)}>
-      <Delete className='mr-2' />Usuń krok
-    </LoadingButton>
+    {verifying
+      ? null
+      : <LoadingButton disabled={!!editing} loading={saving} color='error' className={`mt-2 p-4 bg-red-100 border-none`} onClick={() => setDeleteDialogOpen(true)}>
+        <Delete className='mr-2' />Usuń krok
+      </LoadingButton>
+    }
     {typeof fragment === 'number' ? <BodyScrollLock><FragmentEditor /></BodyScrollLock> : null}
   </> : null;
 }

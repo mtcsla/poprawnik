@@ -72,8 +72,9 @@ export namespace Evaluate {
     ) as Partial<NameType>;
 
     let indexInList: number | null = null;
-    if (_.isArray(listIndex) ? listIndex?.length : listIndex != null) {
-      if (nameDetails.list != null) {
+
+    if (nameDetails.list != null) {
+      if (_.isArray(listIndex) ? listIndex?.length : listIndex != null) {
         if (_.isArray(listIndex)) {
           indexInList = (
             listIndex.find(

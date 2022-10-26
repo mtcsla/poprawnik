@@ -16,12 +16,18 @@ const EditDocumentForm = () => {
   const router = useRouter();
   const { userProfile } = useAuth();
 
+  const [verifying, setVerifying] = React.useState<boolean>(false);
+
+
+
 
   React.useEffect(() => {
     if (router.isReady) {
-      const newQuery = router.query.random === 'true' ? { id: router.query.id, random: true } : { id: router.query.id }
-
-
+      let newQuery: any = router.query.random === 'true' ? { id: router.query.id, random: true } : { id: router.query.id }
+      if (router.query.verifying === 'true') {
+        newQuery = { ...newQuery, verifying: 'true' }
+        setVerifying(true);
+      }
       router.replace({ pathname: router.pathname, query: newQuery })
     }
     if (userProfile && router.isReady && router.query['id']) {
@@ -32,7 +38,11 @@ const EditDocumentForm = () => {
             router.push('/account/lawyer');
             return;
           }
+          if (document.data()?.awaitingVerification && router.query.verifying !== 'true')
+            router.push('/account/lawyer/edit-document?id=' + router.query['id']);
           setForm(document.data() as IFormData);
+        }).catch(() => {
+          router.push('/account/lawyer');
         })
     }
     if (router.isReady && !router.query['id'])
@@ -46,7 +56,7 @@ const EditDocumentForm = () => {
     </Button>
     <h1>
       <Bookmark className="-translate-y-0.5 mr-1" color='primary' />
-      Edytujesz formularz pisma
+      {verifying ? 'Weryfikujesz' : 'Edytujesz'} formularz pisma
     </h1>
     {userProfile && form ?
       <>

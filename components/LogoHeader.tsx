@@ -1,3 +1,4 @@
+import styled from "@emotion/styled";
 import { DragHandle, Facebook, Instagram } from "@mui/icons-material";
 import { Button, Paper, useTheme } from "@mui/material";
 import Link from "next/link";
@@ -11,28 +12,42 @@ const LogoHeader = ({
   caption,
   captionLink,
   social,
-  inAccountPage
+  noPadding,
+  noBackground,
+  inAccountPage,
+  noWidth
 }: {
   border: boolean;
   openSidebar?: () => void;
   noText?: boolean;
   caption?: string;
+  noPadding?: boolean;
   captionLink?: string;
+  noBackground?: boolean;
   social?: boolean;
   inAccountPage?: true;
+  noWidth?: boolean;
 }) => {
   const theme = useTheme()
   const { width } = useWindowSize();
-  return (
-    <Paper
-      variant="outlined"
-      style={{ width: "18rem", maxWidth: 320, height: "4rem" }}
-      classes={!border ? { root: "border-b-0" } : {}}
-      className={
-        `bg-${width != null && width >= 1100 ? 'white' : 'transparent'} rounded-none flex items-center border-l-0 border-t-0 border-r-0  px-5 ${inAccountPage ? '' : 'pr-3'}`
-      }
-    >
-      {openSidebar ? (
+
+  const TopComponent = styled(Paper) <{ noWidth: boolean | undefined }>`
+  ${props => props.noWidth ? 'width: auto;' : 'width: 18rem;'}
+      maxWidth: 320;
+      height: 4rem;
+  `
+
+
+  return <TopComponent
+    noWidth={noWidth}
+    variant="outlined"
+    classes={!border ? { root: "border-b-0" } : {}}
+    className={
+      `bg-${width != null && width >= 1100 && !noBackground ? 'white' : 'transparent'} rounded-none flex items-center border-l-0 border-t-0 border-r-0  ${noPadding ? '' : `px-5 ${inAccountPage ? '' : 'pr-3'}`}`
+    }
+  >
+    {
+      openSidebar ? (
         <Button
           sx={{ paddingLeft: "0.3rem", paddingRight: "0.3rem" }}
           onClick={openSidebar}
@@ -40,21 +55,22 @@ const LogoHeader = ({
           className={"mr-3 bg-white"}
         >
           <DragHandle />
-        </Button>
+        </Button >
       ) : null}
 
-      <Link passHref href='/dashboard'>
-        <a>
-          <Logo
-            style={{ height: "3rem", width: "3rem" }}
-            color={theme.palette.primary.dark}
-            height={100}
-            width={100}
-          />
-        </a>
-      </Link>
+    <Link passHref href='/dashboard'>
+      <a>
+        <Logo
+          style={{ height: "3rem", width: "3rem" }}
+          color={theme.palette.primary.dark}
+          height={100}
+          width={100}
+        />
+      </a>
+    </Link>
 
-      {noText ? null : (
+    {
+      noText ? null : (
         <div className={'flex justify-between w-full'}>
           <div className={'flex items-center'}>
             <div style={{ height: "2rem" }} className="border-l-2 ml-3 mr-3"></div>
@@ -79,9 +95,9 @@ const LogoHeader = ({
             : null
           }
         </div>
-      )}
-    </Paper>
-  );
+      )
+    }
+  </TopComponent>
 }
 
 

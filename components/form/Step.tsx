@@ -32,8 +32,8 @@ const UserStep = ({ element, context, nested, display, setEditingElement, listEl
       return element.type === 'list' ?
         (values[element.name] as []).map(
           (value, index) =>
-            <div className={`pt-0 flex flex-col mb-8 border rounded-lg ${(topLevelData.currentListIndex != null && index === values[element.name]?.length - 1 && topLevelData.newElement) ? 'hidden' : ''}`}>
-              <div className='bg-slate-100 flex items-center justify-between rounded-t-lg w-full h-14 mb-8 px-4 sm:px-8 py-4'>
+            <div className={`pt-0 flex flex-col bg-white mb-8 border rounded-lg ${(topLevelData.currentListIndex != null && index === values[element.name]?.length - 1 && topLevelData.newElement) ? 'hidden' : ''}`}>
+              <div className=' flex items-center justify-between rounded-t-lg w-full h-14 mb-8 px-4 sm:px-8 py-4'>
                 <pre className='text-black my-2'>Wartość <b className=' ml-1 text-lg'>{index + 1}</b></pre>
 
                 <ButtonGroup>

@@ -68,8 +68,9 @@ const theme = createTheme({
         input: {
           transition: 'background-color 0.3s ease-in-out',
           '&.Mui-disabled': {
-            backgroundColor: colors.slate[50]
+            backgroundColor: colors.transparent
           },
+          backgroundColor: colors.white
         },
         notchedOutline: {
           borderColor: colors.slate[200],

@@ -39,7 +39,7 @@ const EditDocumentTemplate = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
 
   const [formDescription, setFormDescription] = React.useState<FormDescription>([]);
-  const [templateDescription, setTemplateDescription] = React.useState<any>({});
+  const [templateDescription, setTemplateDescription] = React.useState<any>([]);
 
   const [valuesExpanded, setValuesExpanded] = React.useState<boolean>(false);
   const [editorOpen, setEditorOpen] = React.useState<boolean>(false);
@@ -70,8 +70,11 @@ const EditDocumentTemplate = () => {
         router.replace('/account/lawyer')
         return;
       }
+      if (doc.data()?.awaitingVerification && router.query.verifying !== 'true')
+        router.push('/account/lawyer/edit-document?id=' + router.query['id']);
+
       setFormDescription(doc.data()?.formData ?? []);
-      setTemplateDescription(doc.data()?.templateData ?? {});
+      setTemplateDescription(doc.data()?.templateData ?? []);
       setLoading(false);
     }).catch((err) => {
 
@@ -83,7 +86,7 @@ const EditDocumentTemplate = () => {
       <ArrowBack />
       Wróć do pisma
     </Button>
-    {formDescription.length && id && Object.keys(templateDescription).length
+    {formDescription.length && id
       ? <listContext.Provider value={''}>
         <existsContext.Provider value={[]}>
           <textFormattingContext.Provider value={{ textFormattingType: 'effect', effect: 'normal', element: 'p', align: 'left' }}>

@@ -22,7 +22,7 @@ import restricted from "../restricted.json";
 import unauthenticated from "../unauthenticated.json";
 import BodyScrollLock from "./BodyScrollLock";
 
-export const possibleRoles = ["user", "admin", "lawyer", "editor"];
+export const possibleRoles = ["user", "admin", "lawyer", "editor", "verifier"];
 
 
 
@@ -154,9 +154,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setRedirecting(true)
 
         if (currentPathname.includes('login'))
-          router.push(router.query['redirect'] as string || '/').then(() => setRedirecting(false))
+          router.replace(router.query['redirect'] as string || '/').then(() => setRedirecting(false))
         else
-          router.push('/').then(() => setRedirecting(false))
+          router.replace('/').then(() => setRedirecting(false))
         return
       }
     if (!userProfile)

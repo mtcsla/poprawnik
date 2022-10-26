@@ -73,7 +73,7 @@ const AccountPageWrapper = ({ children }: { children: React.ReactNode }) => {
               </List>
 
             </AccountPageAccordion>
-            <AccountPageLink caption="Weryfikator" link={'/account/verifier'} icon={Person} />
+            <AccountPageLink caption="Panel weryfikacji" link={'/account/verifier'} icon={Person} />
             <AccountPageLink caption="Panel administratora" link={'/account/admin'} icon={Shield} />
           </List>
         </span>

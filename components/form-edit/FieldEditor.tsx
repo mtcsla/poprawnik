@@ -42,6 +42,12 @@ const FieldEditor = () => {
 
   const router = useRouter();
 
+  const [verifying, setVerifying] = React.useState(false);
+  React.useEffect(() => {
+    if (router.isReady)
+      setVerifying(router.query.verifying === 'true');
+  }, [router.isReady])
+
 
   const fieldDescription = description[step as number].children[fragment as number].children[field as number]
   const deleteField = (newDescription: FormDescription, newTemplate: TemplateDescription) => {
@@ -239,14 +245,14 @@ const FieldEditor = () => {
 
         <div className="flex-1 sm:p-8 md:p-12 overflow-y-auto h-full bg-slate-50  border-l flex-col flex items-start ">
           <div className="flex flex-col w-full m-auto">
-            <h1 className="flex items-center"><Edit color='primary' className="mr-2" />Edytujesz pole</h1>
+            <h1 className="flex items-center"><Edit color='primary' className="mr-2" />{verifying ? 'Weryfikujesz' : 'Edytujesz'} pole</h1>
             <p className="mb-8">Naciśnij 'gotowe' kiedy skończysz.</p>
 
 
             <div className="flex flex-col w-full">
               <Field as={TextField} error={errors.name && touched.name}
                 placeholder={'np. imie_wnioskodawcy'}
-                disabled={router?.query?.new != '1'}
+                disabled={router?.query?.new != '1' || verifying}
                 validate={
                   router?.query?.new != '1' ? () => null :
                     (value: string) => {
@@ -265,7 +271,7 @@ const FieldEditor = () => {
                   <Field
                     as={Select}
                     name='type'
-                    disabled={router?.query?.new != '1'}
+                    disabled={router?.query?.new != '1' || verifying}
                     onChange={(e: { target: { value: string } }) => {
                       setFieldValue('valueType', null);
                       setFieldValue('numberType', null);
@@ -291,7 +297,7 @@ const FieldEditor = () => {
                   <FormControl disabled={values.type !== 'text' || router?.query?.new != '1'} error={(errors.valueType && touched.valueType) as boolean} size='small' className="w-full">
                     <InputLabel>wartość pola</InputLabel>
                     <Field as={Select} variant='outlined'
-                      disabled={values.type !== 'text' || router?.query?.new != '1'}
+                      disabled={verifying || values.type !== 'text' || router?.query?.new != '1'}
                       name='valueType'
                       defaultValue={null}
                       onChange={({ target }: { target: { value: string } }) => {
@@ -319,6 +325,7 @@ const FieldEditor = () => {
                       (value: string) => !value ? 'To pole jest wymagane.' : null
                     }
                     label='tytuł pola'
+                    disabled={verifying}
                     name='label' className='bg-white' size='small'
                   />
                   <ErrorMessage name='label'>{ErrorMessageCallback}</ErrorMessage>
@@ -326,7 +333,7 @@ const FieldEditor = () => {
                 <div className="w-4" />
                 <span className="flex flex-col flex-1">
                   <Field as={TextField}
-                    disabled={values.type !== 'text'}
+                    disabled={values.type !== 'text' || verifying}
                     error={values.type === 'text' && errors.placeholder && touched.placeholder}
                     validate={
                       (value: string) => (!value && values.type === 'text') ? 'To pole jest wymagane.' : null
@@ -344,6 +351,7 @@ const FieldEditor = () => {
                 <Field as={TextField} error={errors.description && touched.description}
                   label='krótki opis pola'
                   placeholder="np. Imię i nazwisko wnioskodawcy."
+                  disabled={verifying}
                   name='description' className='bg-white mt-4' size='small'
                   validate={(value: string) => !value ? 'To pole jest wymagane.' : null}
                 />
@@ -354,6 +362,7 @@ const FieldEditor = () => {
 
               <Field as={TextField} error={errors.hint && touched.hint}
                 label='tekst wskazówki'
+                disabled={verifying}
                 name='hint' className='bg-white mt-4' size='small'
               />
               <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
@@ -362,7 +371,7 @@ const FieldEditor = () => {
                 <FormControl disabled={values.valueType !== 'number'} error={(errors.numberType && touched.numberType) as boolean} size='small' className="w-full">
                   <InputLabel>rodzaj liczby</InputLabel>
                   <Field as={Select} variant='outlined'
-                    disabled={values.valueType !== 'number'}
+                    disabled={values.valueType !== 'number' || verifying}
                     name='numberType'
                     defaultValue={null}
                     validate={values.valueType !== 'number'
@@ -387,6 +396,7 @@ const FieldEditor = () => {
                       <FormControl className='w-full' size={'small'}>
                         <Field as={DatePicker}
                           name='min'
+                          disabled={verifying}
                           value={values.min ? new Date(values.min) : null}
                           onChange={(date: Date) => setFieldValue('min', date.toString())}
                           renderInput={(params: any) =>
@@ -402,6 +412,7 @@ const FieldEditor = () => {
                     <span className="flex flex-col flex-1">
                       <Field as={DatePicker}
                         name='max'
+                        disabled={verifying}
                         value={values.max ? new Date(values.max) : null}
                         onChange={(date: Date) => setFieldValue('max', date.toString())}
                         validate={(date: string) => {
@@ -428,7 +439,7 @@ const FieldEditor = () => {
 
                     <span className="inline-flex items-start gap-3">
                       <span className="flex flex-col flex-1">
-                        <Field as={TextField} disabled={!values.numberType || values.valueType !== 'number'} error={errors.min && touched.min}
+                        <Field as={TextField} disabled={verifying || !values.numberType || values.valueType !== 'number'} error={errors.min && touched.min}
                           label='wartość minimalna'
                           validate={
                             values.valueType !== 'number' || !values.numberType ? () => { } :
@@ -452,7 +463,7 @@ const FieldEditor = () => {
                         <p className="text-xs text-slate-500 self-end">Pole opcjonalne.</p>
                       </span>
                       <span className="flex flex-col flex-1">
-                        <Field as={TextField} disabled={!values.numberType || values.valueType !== 'number'} error={errors.max && touched.max}
+                        <Field as={TextField} disabled={verifying || !values.numberType || values.valueType !== 'number'} error={errors.max && touched.max}
                           validate={
                             values.valueType !== 'number' || !values.numberType ? () => { } :
                               (value: string) => {
@@ -488,13 +499,17 @@ const FieldEditor = () => {
 
 
 
-              <FormControlLabel className="mt-5" control={<Checkbox checked={values.required} onChange={(e, value) => {
-                if (values.required === false || fieldDescription.required === false)
-                  setFieldValue('required', value)
-                else
-                  setSettingOptional(true)
-              }} name='required' />} label='Pole wymagane' />
-              <FormControlLabel control={<Checkbox name='fullWidth' checked={values.fullWidth} onChange={(e, value) => { setFieldValue('fullWidth', value) }} />} label='Pełna szerokość' />
+              <FormControlLabel className="mt-5" control={<Checkbox
+                disabled={verifying}
+                checked={values.required} onChange={(e, value) => {
+                  if (values.required === false || fieldDescription.required === false)
+                    setFieldValue('required', value)
+                  else
+                    setSettingOptional(true)
+                }} name='required' />} label='Pole wymagane' />
+              <FormControlLabel control={<Checkbox
+                disabled={verifying}
+                name='fullWidth' checked={values.fullWidth} onChange={(e, value) => { setFieldValue('fullWidth', value) }} />} label='Pełna szerokość' />
 
 
 
@@ -511,10 +526,10 @@ const FieldEditor = () => {
                 : null
               }
               <span className="w-full flex items-center justify-between">
-                <Button disabled={!values?.condition?.components?.length} onClick={() => setDeleteConditionOpen(true)} className="self-end mt-4 border-none p-0" color='error' size='small' >
+                <Button disabled={verifying || !values?.condition?.components?.length} onClick={() => setDeleteConditionOpen(true)} className="self-end mt-4 border-none p-0" color='error' size='small' >
                   Usuń warunek
                 </Button>
-                <Button onClick={() => setEditingCondition(true)} className="self-end mt-4 border-none p-0" size='small' >
+                <Button disabled={verifying} onClick={() => setEditingCondition(true)} className="self-end mt-4 border-none p-0" size='small' >
                   Zmień
                 </Button>
               </span>
@@ -538,7 +553,8 @@ const FieldEditor = () => {
             </div>
 
 
-            <Button className="w-full mt-8 bg-blue-100 border-none"
+            <Button disabled={verifying} className={`w-full mt-8 ${verifying ? 'bg-gray-100' : 'bg-blue-100'} border-none`}
+
               onClick={() => {
                 if (!isValid)
                   alertError()
@@ -551,7 +567,7 @@ const FieldEditor = () => {
               Gotowe
             </Button>
             {router?.query?.new === '1' ? null :
-              <Button size='small' color='error' className="w-full mt-2 bg-red-100 border-none"
+              <Button disabled={verifying} size='small' color='error' className={`w-full mt-2 ${verifying ? 'bg-gray-100' : 'bg-red-100'} border-none`}
                 onClick={() => {
                   setDeleteDialogOpen(true)
                 }}
@@ -561,7 +577,10 @@ const FieldEditor = () => {
             }
             <Button className="border-none self-end" size='small' color='error' onClick={() => setDialogOpen(true)}>
               <ArrowBack className='mr-2' />
-              Anuluj
+              {verifying
+                ? 'Wróć'
+                : 'Anuluj'
+              }
             </Button>
           </div>
         </div>

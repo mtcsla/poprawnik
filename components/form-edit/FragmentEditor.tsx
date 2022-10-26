@@ -35,6 +35,12 @@ const FragmentEditor = () => {
 
   const [step, fragment, field] = location;
 
+  const [verifying, setVerifying] = React.useState(false);
+  React.useEffect(() => {
+    if (router.isReady)
+      setVerifying(router.query.verifying === 'true');
+  }, [router.isReady])
+
 
   React.useEffect(() => {
     if (router.isReady) {
@@ -68,21 +74,6 @@ const FragmentEditor = () => {
 
 
   const deleteFragment = (newForm: FormDescription, newTemplate: TemplateDescription) => {
-    /* const newDescription = cloneDeep(currentDescription);
-    const lastDescription = cloneDeep(currentDescription);
-
-    setSaving(true);
-    modifyCurrentDescription(['form_set_description', FormNormalize.conditions(newDescription, location, true)]);
-    updateFirestoreDoc(newDescription).then(() => {
-      setSaving(false);
-      router.back()
-      router.replace({ pathname: router.pathname, query: { id: router.query.id, step: step as number } });
-    }).catch(() => {
-      modifyCurrentDescription(['form_set_description', lastDescription])
-      setSaving(false);
-      setError(true);
-      setTimeout(() => setError(false), 5000)
-    })*/
 
     setSaving(true);
     updateFirestoreDoc(newForm, newTemplate).then(() => {
@@ -172,7 +163,7 @@ const FragmentEditor = () => {
       <pre className="top-12 left-12 absolute flex whitespace-nowrap items-center"><Visibility className="mr-2" /> Podgląd fragmentu</pre>
       <span className='m-auto w-full flex flex-col'>
         <Fragment editor={true} fragment={description[step as number].children[fragment as number]} />
-        <Button className="mt-8 self-end border-none" size='small' onClick={newField}>
+        <Button disabled={verifying || saving} className="mt-8 self-end border-none" size='small' onClick={newField}>
           <Add className='mr-2' />
           dodaj pole
         </Button>
@@ -181,14 +172,16 @@ const FragmentEditor = () => {
     <div className="flex-1 bg-slate-50 h-full sm:p-8 md:p-12 border-l flex-col flex items-start justify-center">
 
       <span className="w-full flex flex-col">
-        <h1 className="flex items-center truncate"><Edit className="mr-2" color='primary' /> Edytujesz fragment </h1>
+        <h1 className="flex items-center truncate"><Edit className="mr-2" color='primary' /> {verifying ? 'Weryfikujesz' : 'Edytujesz'} fragment </h1>
         <p>Dodaj pola, tytuł oraz opis.</p>
 
         <TextField
+          disabled={saving || verifying}
           value={description[step as number].children[fragment as number]?.title || ''}
           onChange={(e) => modifyDescription(['fragment_set_title', [step as number, fragment as number, e.target.value]])}
           label='tytuł' className="mt-4 mr-4 flex-1 bg-white w-full" />
         <TextField value={description[step as number].children[fragment as number]?.subtitle || ''}
+          disabled={saving || verifying}
           onChange={(e) => modifyDescription(['fragment_set_subtitle', [step as number, fragment as number, e.target.value]])}
           label='opis' className='mt-4 flex-1 bg-white w-full' />
       </span>
@@ -203,7 +196,7 @@ const FragmentEditor = () => {
         <ConditionCalculationDisplay first type='condition' sequence={description[step as number].children[fragment as number]?.condition ?? { operators: [], components: [] }} />
         : null
       }
-      <Button className="self-end border-none px-0" onClick={() => setEditingCondition(true)} size='small'>Zmień</Button>
+      <Button className="self-end border-none px-0" disabled={verifying || saving} onClick={() => setEditingCondition(true)} size='small'>Zmień</Button>
 
       {editingCondition ?
         <ConditionCalculationEditor
@@ -227,7 +220,7 @@ const FragmentEditor = () => {
       }
 
       <div className='flex flex-col mt-8 w-full'>
-        <LoadingButton disabled={description[step as number]?.children[fragment as number]?.children?.length < 1} loading={saving} className={`border-none w-full mb-4 ${saving ? 'bg-gray-100' : 'bg-blue-100'}`} onClick={
+        <LoadingButton disabled={description[step as number]?.children[fragment as number]?.children?.length < 1 || verifying} loading={saving} className={`border-none w-full mb-4 ${saving || verifying ? 'bg-gray-100' : 'bg-blue-100'}`} onClick={
           () => {
 
             setSaving(true)
@@ -251,11 +244,15 @@ const FragmentEditor = () => {
 
         {
           router?.query?.new == '1' ? null :
-            <Button disabled={saving} color='error' size='small' onClick={() => setDeleteDialogOpen(true)} className={`border-none ${saving ? 'bg-gray-100' : 'bg-red-100'} w-full mb-4`}>Usuń fragment</Button>
+            <Button disabled={saving || verifying} color='error' size='small' onClick={() => setDeleteDialogOpen(true)} className={`border-none ${saving || verifying ? 'bg-gray-100' : 'bg-red-100'} w-full mb-4`}>Usuń fragment</Button>
         }
-        <Button disabled={saving} className="border-none self-end" size='small' color='error' onClick={() => setDialogOpen(true)}>
+        <Button disabled={saving} className="border-none self-end" size='small' color='error' onClick={() => { if (verifying) router.back(); else setDialogOpen(true) }}>
           <ArrowBack className='mr-2' />
-          Anuluj
+          {verifying
+            ? 'Wróć'
+            : 'Anuluj'
+
+          }
         </Button>
       </div>
     </div>

@@ -38,8 +38,8 @@ const EditDocumentTemplate = () => {
 
   const [loading, setLoading] = React.useState<boolean>(true);
 
-  const [formDescription, setFormDescription] = React.useState<FormDescription>([]);
-  const [templateDescription, setTemplateDescription] = React.useState<any>([]);
+  const [formDescription, setFormDescription] = React.useState<FormDescription | null>(null);
+  const [templateDescription, setTemplateDescription] = React.useState<any>(null);
 
   const [valuesExpanded, setValuesExpanded] = React.useState<boolean>(false);
   const [editorOpen, setEditorOpen] = React.useState<boolean>(false);
@@ -75,6 +75,11 @@ const EditDocumentTemplate = () => {
 
       setFormDescription(doc.data()?.formData ?? []);
       setTemplateDescription(doc.data()?.templateData ?? []);
+
+      console.log(
+        doc.data()?.templateData ?? []
+      );
+
       setLoading(false);
     }).catch((err) => {
 
@@ -86,86 +91,88 @@ const EditDocumentTemplate = () => {
       <ArrowBack />
       Wróć do pisma
     </Button>
-    {formDescription.length && id
+    {formDescription && id
       ? <listContext.Provider value={''}>
         <existsContext.Provider value={[]}>
           <textFormattingContext.Provider value={{ textFormattingType: 'effect', effect: 'normal', element: 'p', align: 'left' }}>
-            <TemplateDescriptionProvider id={id as string} form={formDescription} initTemplate={templateDescription}>
-              <div className="w-full flex-col flex pb-8 mb-2">
+            {templateDescription ?
+              <TemplateDescriptionProvider id={id as string} form={formDescription} initTemplate={templateDescription}>
+                <div className="w-full flex-col flex pb-8 mb-2">
 
-                <h1 className="inline-flex gap-2 mb-1"><Bookmark color='primary' /> Edytujesz wzór pisma</h1>
-                <p>Wypełnij formularz przykładowymi danymi, aby szybko generować podgląd.</p>
+                  <h1 className="inline-flex gap-2 mb-1"><Bookmark color='primary' /> Edytujesz wzór pisma</h1>
+                  <p>Wypełnij formularz przykładowymi danymi, aby szybko generować podgląd.</p>
 
-                {Object.keys(values).length === 0 || formDescription.length === 0
-                  ? <div className='border sm:p-8 p-4 bg-slate-50 mt-8 rounded-lg flex justify-center items-center'>
-                    <pre>Brak przykładowych danych</pre>
-                  </div>
-                  : <>
-                    <span className='flex mt-8 items-center justify-between'>
-                      <pre>dane</pre>
-                      <Button className='border-none' onClick={() => setValuesExpanded(!valuesExpanded)} size='small'>
-                        <ArrowDropDown className={`${valuesExpanded ? 'rotate-180' : ''} mr-2`} />
-                        {valuesExpanded ? 'zwiń' : 'rozwiń'} dane
-                      </Button>
-                    </span>
-                    <div
-                      onClick={() => { if (!valuesExpanded) setValuesExpanded(true) }}
-                      className={`w-full rounded-lg relative h-auto border ${!valuesExpanded ? 'hover:border-blue-500 hover:bg-blue-100 cursor-pointer' : ''}`} style={!valuesExpanded ? { maxHeight: 200, overflowY: 'hidden' } : {}}>
-                      <div className='absolute right-0 left-0 bottom-0 top-0 rounded-lg' style={{
-                        background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 75%)',
-                        display: valuesExpanded ? 'none' : 'block'
-                      }} />
-                      <div className='flex flex-col p-4 sm:p-8  '>
-                        <ValuesDisplay values={values} description={formDescription} />
-                      </div>
+                  {Object.keys(values).length === 0 || formDescription.length === 0
+                    ? <div className='border sm:p-8 p-4 bg-slate-50 mt-8 rounded-lg flex justify-center items-center'>
+                      <pre>Brak przykładowych danych</pre>
                     </div>
-                  </>
-                }
-                <Link href={`/forms/${id}/form?testing=true`}>
-                  <Button className='w-full mt-8 p-4 bg-blue-500 text-white hover:bg-blue-400'> {Object.keys(values).length ? 'Edytuj dane' : 'Wypełnij formularz'} <Edit className='ml-2' /></Button>
-                </Link>
-                <Dialog className='w-screen h-screen m-0' open={!loading && editorOpen}>
-                  <DialogContent sx={{ width: '98vw' }} className='relative h-screen'>
-                    <BodyScrollLock>
-                      <Button style={{ top: '2.5rem', right: '1.5vw' }} className='fixed  border-none' onClick={() => setEditorOpen(false)}><Close /></Button>
-                      <TemplateEditor />
-                    </BodyScrollLock>
-                  </DialogContent>
-                </Dialog>
-                {loading
-                  ? null
-                  :
-                  <>
-                    <pre className='mt-8 mb-4'>Wzór pisma</pre>
-                    <div onClick={() => setEditorOpen(true)} className='w-full hover:border-blue-500 cursor-pointer overflow-x-hidden h-96 border rounded-lg  relative overflow-y-hidden'>
-                      <div className='absolute right-0 left-0 bottom-0 top-0 rounded-lg' style={{
-                        background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 75%)',
-                        zIndex: 200,
-                      }} />
-                      <div className='absolute top-0 left-0 right-0 bottom-0'>
-                        <div className='relative top-0 bottom-0 left-0 right-0' style={{ maxWidth: '100vw' }}>
-                          {!editorOpen
-                            ?
-                            <TemplateEditor display />
-                            : null
-                          }
+                    : <>
+                      <span className='flex mt-8 items-center justify-between'>
+                        <pre>dane</pre>
+                        <Button className='border-none' onClick={() => setValuesExpanded(!valuesExpanded)} size='small'>
+                          <ArrowDropDown className={`${valuesExpanded ? 'rotate-180' : ''} mr-2`} />
+                          {valuesExpanded ? 'zwiń' : 'rozwiń'} dane
+                        </Button>
+                      </span>
+                      <div
+                        onClick={() => { if (!valuesExpanded) setValuesExpanded(true) }}
+                        className={`w-full rounded-lg relative h-auto border ${!valuesExpanded ? 'hover:border-blue-500 hover:bg-blue-100 cursor-pointer' : ''}`} style={!valuesExpanded ? { maxHeight: 200, overflowY: 'hidden' } : {}}>
+                        <div className='absolute right-0 left-0 bottom-0 top-0 rounded-lg' style={{
+                          background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 75%)',
+                          display: valuesExpanded ? 'none' : 'block'
+                        }} />
+                        <div className='flex flex-col p-4 sm:p-8  '>
+                          <ValuesDisplay values={values} description={formDescription} />
                         </div>
                       </div>
-                    </div>
-                  </>
-                }
-                <Link href={url} passHref>
-                  <a className='w-full' target='_blank'>
-                    <Button disabled={!Object.keys(values).length}
-                      className={`p-4 mt-8 bg-blue-500 w-full text-white hover:bg-blue-400 ${!Object.keys(values).length ? 'bg-gray-300 hover:bg-gray-300' : ''}`}>
-                      Podgląd pisma
-                      <FormatAlignJustify className='ml-2' />
-                    </Button>
-                  </a>
-                </Link>
-              </div>
-            </TemplateDescriptionProvider>
-
+                    </>
+                  }
+                  <Link href={`/forms/${id}/form?testing=true`}>
+                    <Button className='w-full mt-8 p-4 bg-blue-500 text-white hover:bg-blue-400'> {Object.keys(values).length ? 'Edytuj dane' : 'Wypełnij formularz'} <Edit className='ml-2' /></Button>
+                  </Link>
+                  <Dialog className='w-screen h-screen m-0' open={!loading && editorOpen}>
+                    <DialogContent sx={{ width: '98vw' }} className='relative h-screen'>
+                      <BodyScrollLock>
+                        <Button style={{ top: '2.5rem', right: '1.5vw' }} className='fixed  border-none' onClick={() => setEditorOpen(false)}><Close /></Button>
+                        <TemplateEditor />
+                      </BodyScrollLock>
+                    </DialogContent>
+                  </Dialog>
+                  {loading
+                    ? null
+                    :
+                    <>
+                      <pre className='mt-8 mb-4'>Wzór pisma</pre>
+                      <div onClick={() => setEditorOpen(true)} className='w-full hover:border-blue-500 cursor-pointer overflow-x-hidden h-96 border rounded-lg  relative overflow-y-hidden'>
+                        <div className='absolute right-0 left-0 bottom-0 top-0 rounded-lg' style={{
+                          background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 75%)',
+                          zIndex: 200,
+                        }} />
+                        <div className='absolute top-0 left-0 right-0 bottom-0'>
+                          <div className='relative top-0 bottom-0 left-0 right-0' style={{ maxWidth: '100vw' }}>
+                            {!editorOpen
+                              ?
+                              <TemplateEditor display />
+                              : null
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  }
+                  <Link href={url} passHref>
+                    <a className='w-full' target='_blank'>
+                      <Button disabled={!Object.keys(values).length}
+                        className={`p-4 mt-8 bg-blue-500 w-full text-white hover:bg-blue-400 ${!Object.keys(values).length ? 'bg-gray-300 hover:bg-gray-300' : ''}`}>
+                        Podgląd pisma
+                        <FormatAlignJustify className='ml-2' />
+                      </Button>
+                    </a>
+                  </Link>
+                </div>
+              </TemplateDescriptionProvider>
+              : null
+            }
           </textFormattingContext.Provider>
         </existsContext.Provider>
       </listContext.Provider> : null

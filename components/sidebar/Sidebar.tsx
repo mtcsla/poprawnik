@@ -19,7 +19,7 @@ const Sidebar = ({ }) => {
   return <SidebarPaper variant='outlined' style={
     { width: '18rem', paddingRight: 2, maxWidth: 320 }
   }
-    className='flex flex-col items-center bg-white  pr-2.5  justify-between h-full  rounded-none'>
+    className='flex flex-col items-center bg-white border-0  pr-2.5  justify-between h-full  rounded-none'>
     <div className={'flex flex-col items-center'}>
       <LogoHeader border={false} />
       <div className="w-full pl-2 mt-3">

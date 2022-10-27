@@ -41,6 +41,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     []
   );
 
+
   return (
     <div className="w-full h-full flex" >
       {width && width > 1100 ? <div className={'h-full fixed'}><Sidebar /></div> : null}
@@ -131,8 +132,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
               </Button>
 
               <Button
-                sx={userProfile?.photoURL ? { padding: 0 } : { padding: '0.4rem' }}
-                className='bg-white'
+                className={`bg-white ${userProfile?.photoURL ? 'p-0' : 'p-04-rem'}`}
                 id="account-button"
                 aria-controls={anchorEl ? "account-menu" : undefined}
                 aria-haspopup="true"

@@ -122,6 +122,10 @@ h6 {
   background: #0070f3;
 }
 
+.p-04-rem {
+  padding: 0.4rem;
+}
+
 article h1 {
   @apply mb-1;
 }

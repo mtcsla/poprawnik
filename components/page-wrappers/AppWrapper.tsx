@@ -4,7 +4,7 @@ import {
   Logout, NotificationsOutlined, Search
 } from "@mui/icons-material";
 import {
-  Button, Menu,
+  Avatar, Button, Menu,
   MenuItem, SwipeableDrawer
 } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
@@ -131,7 +131,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
               </Button>
 
               <Button
-                sx={{ padding: "0.4rem" }}
+                sx={{ padding: userProfile?.photoURL ? 0 : "0.4rem" }}
                 className='bg-white'
                 id="account-button"
                 aria-controls={anchorEl ? "account-menu" : undefined}
@@ -139,7 +139,10 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                 aria-expanded={anchorEl ? "true" : undefined}
                 onClick={handleClick}
               >
-                <AccountCircle sx={{ fontSize: "20px !important" }} />
+                {userProfile?.photoURL ?
+                  <Avatar variant="square" className="rounded-lg" style={{ height: 34, width: 34 }} src={userProfile.photoURL as string} />
+                  : <AccountCircle sx={{ fontSize: "20px !important" }} />
+                }
               </Button>
 
               <AccountMenu {...{ anchorEl, handleClose, router, userProfile, signOut }} />

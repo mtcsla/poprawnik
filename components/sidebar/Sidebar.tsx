@@ -19,10 +19,10 @@ const Sidebar = ({ }) => {
   return <SidebarPaper variant='outlined' style={
     { width: '18rem', paddingRight: 2, maxWidth: 320 }
   }
-    className='flex flex-col items-center bg-white border-0  pr-2.5  justify-between h-full  rounded-none'>
+    className='flex flex-col items-center bg-white pr-2.5 border-none justify-between h-full  rounded-none'>
     <div className={'flex flex-col items-center'}>
       <LogoHeader border={false} />
-      <div className="w-full pl-2 mt-3">
+      <div className="w-full pl-1 -mr-1 mt-3">
         <LoggedInUserDisplay />
       </div>
       <NavigationMenu />
@@ -37,7 +37,7 @@ const Sidebar = ({ }) => {
 
       <h4 className='mb-3 text-xs w-full pl-4 pr-4 text-right flex items-center capitalize pb-2 pt-2'
       >
-        <div className='border-t mr-3 flex-1' />
+        <div className='border-t border-blue-200 mr-3 flex-1' />
         Iusinus © 2022
       </h4>
     </div>
@@ -94,7 +94,7 @@ export function LoggedInUserDisplay() {
             : ''
         }>
           <div
-            className={'w-full border p-2 hover:border-blue-500 hover:bg-blue-50 cursor-pointer rounded-xl self-center  flex items-center justify-start pl-2  ml-2 pr-4 mb-2'}>
+            className={'w-full  p-2 hover:border-blue-500 border-none hover:bg-blue-50 cursor-pointer rounded-xl self-center  flex items-center justify-start pl-2  ml-2 pr-4 mb-2'}>
             {userProfile ?
               <Avatar src={userProfile.photoURL} variant="circular" />
               :
@@ -105,11 +105,11 @@ export function LoggedInUserDisplay() {
                 height: 40,
                 fontSize: '1.2rem'
               }}
-                className={'cursor-pointer flex items-center justify-center'}
+                className={'cursor-pointer border-none bg-blue-100 flex items-center justify-center'}
               >
                 <QuestionMark color={'primary'} className='absolute z-0' />
               </Box>}
-            <div className='flex flex-col ml-3'>
+            <div className='flex flex-1 flex-col items-end ml-3'>
               {userProfile ?
                 <>
                   <p className={'text-sm'}>{userProfile?.displayName} </p>

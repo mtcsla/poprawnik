@@ -131,7 +131,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
               </Button>
 
               <Button
-                sx={{ padding: userProfile?.photoURL ? 0 : "0.4rem" }}
+                sx={userProfile?.photoURL ? { padding: 0 } : { padding: '0.4rem' }}
                 className='bg-white'
                 id="account-button"
                 aria-controls={anchorEl ? "account-menu" : undefined}

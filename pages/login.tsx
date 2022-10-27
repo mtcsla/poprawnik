@@ -17,17 +17,20 @@ const LogIn = () => {
   const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
 
+  const [loadingGoogle, setLoadingGoogle] = React.useState(false);
+  const [loadingFacebook, setLoadingFacebook] = React.useState(false);
+
   const { signIn, userProfile } = useAuth();
 
 
   const signInGoogle = () => {
-    setLoading(true);
+    setLoadingGoogle(true);
     signIn()?.google().catch(
       err => { setError(getErrorMessage(err.message) as string); setLoading(false) }
     ).then(() => setLoading(false));
   };
   const signInFacebook = () => {
-    setLoading(true);
+    setLoadingFacebook(true);
     signIn()?.facebook().catch(
       err => { setError(getErrorMessage(err.message) as string); setLoading(false) }
     ).then(() => setLoading(false));
@@ -71,6 +74,7 @@ const LogIn = () => {
           <Field as={TextField} validate={(value: string) => !value ? "To pole jest wymagane." : null}
             name='email' label={'adres e-mail'} type={'text'} className={'mt-4'}
             error={touched.email && errors.email}
+            disabled={loading || loadingGoogle || loadingFacebook}
           />
           <ErrorMessage name={'email'}>{ErrorMessageFunction}</ErrorMessage>
 
@@ -78,26 +82,33 @@ const LogIn = () => {
           <Field as={TextField}
             validate={(value: string) => value.length < 6 ? "Hasło musi mieć przynajmniej 6 znaków." : !value ? 'To pole jest wymagane' : null}
             name='password' label={'hasło'} className={'mt-2'} type={'password'}
+            disabled={loading || loadingGoogle || loadingFacebook}
             error={touched['password'] && errors['password']} />
           <ErrorMessage name={'password'}>{ErrorMessageFunction}</ErrorMessage>
 
-          <Button loading={loading} className={`mt-4  p-2 ${loading ? 'bg-gray-300' : 'bg-blue-500'} text-white`}
+          <Button loading={loading} disabled={loadingGoogle || loadingFacebook} className={`mt-4  p-2 ${loading ? 'bg-gray-300' : 'bg-blue-500'} text-white`}
             onClick={async () => {
               await validateForm(values);
               isValid ? submitForm() : setError('Wypełnij pola poprawnie.')
-            }}>Dalej <ArrowRight /></Button>
+            }}>
+            <span className={`${loading ? 'opacity-0' : null} flex items-center`}>
+              Dalej
+              <ArrowRight />
+            </span>
+
+          </Button>
           <p
             className={'text-xs text-red-500'}>{error}</p>
           <p className={'text-sm mt-4'}>Lub zaloguj się przez:</p>
-          <Button onClick={signInGoogle} loading={loading} className={`mt-2 p-2 ${loading ? 'bg-gray-100' : 'bg-red-200 text-red-500'} border-none flex`}>
-            <div className={'flex-1 flex items-center justify-between pl-2 pr-2'}><Google
-              className={'mr-2'} />
+          <Button onClick={signInGoogle} loading={loadingGoogle} disabled={loading || loadingFacebook} className={`mt-2 p-2 ${loadingFacebook || loading ? 'bg-gray-100' : 'bg-red-200 text-red-500'} border-none flex`}>
+            <div className={`flex-1 ${loadingGoogle ? 'opacity-0' : null} flex items-center justify-between pl-2 pr-2`}>
+              <Google className={'mr-2'} />
               <div className={'flex-1 justify-center'}>Google</div>
             </div>
           </Button>
-          <Button loading={loading} className={`mt-2 ${loading ? 'bg-gray-100' : 'bg-blue-200 text-blue-500'} p-2 border-none flex`}>
-            <div className={'flex-1 flex items-center justify-between pl-2 pr-2'}><Facebook
-              className={'mr-2'} />
+          <Button loading={loadingFacebook} disabled={loading || loadingGoogle} className={`mt-2 ${loadingGoogle || loading ? 'bg-gray-100' : 'bg-blue-200 text-blue-500'} p-2 border-none flex`}>
+            <div className={`flex-1 ${loadingGoogle ? 'opacity-0' : null} flex items-center justify-between pl-2 pr-2`}>
+              <Facebook className={'mr-2'} />
               <div className={'flex-1 justify-center'}>Facebook</div>
             </div>
           </Button>

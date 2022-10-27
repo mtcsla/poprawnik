@@ -123,7 +123,7 @@ h6 {
 }
 
 .p-04-rem {
-  padding: 0.4rem;
+  padding: 0.4rem !important;
 }
 
 article h1 {

@@ -27,13 +27,13 @@ const LogIn = () => {
     setLoadingGoogle(true);
     signIn()?.google().catch(
       err => { setError(getErrorMessage(err.message) as string); setLoading(false) }
-    ).then(() => setLoading(false));
+    ).then(() => setLoadingGoogle(false));
   };
   const signInFacebook = () => {
     setLoadingFacebook(true);
     signIn()?.facebook().catch(
       err => { setError(getErrorMessage(err.message) as string); setLoading(false) }
-    ).then(() => setLoading(false));
+    ).then(() => setLoadingFacebook(false));
   };
 
   const router = useRouter();
@@ -86,13 +86,13 @@ const LogIn = () => {
             error={touched['password'] && errors['password']} />
           <ErrorMessage name={'password'}>{ErrorMessageFunction}</ErrorMessage>
 
-          <Button loading={loading} disabled={loadingGoogle || loadingFacebook} className={`mt-4  p-2 ${loading ? 'bg-gray-300' : 'bg-blue-500'} text-white`}
+          <Button loading={loading} disabled={loadingGoogle || loadingFacebook} className={`mt-4  p-2 ${loadingFacebook || loadingGoogle ? 'bg-gray-300' : 'bg-blue-500'} text-white`}
             onClick={async () => {
               await validateForm(values);
               isValid ? submitForm() : setError('Wypełnij pola poprawnie.')
             }}>
             <span className={`${loading ? 'opacity-0' : null} flex items-center`}>
-              Dalej
+              Zaloguj się
               <ArrowRight />
             </span>
 
@@ -107,7 +107,8 @@ const LogIn = () => {
             </div>
           </Button>
           <Button loading={loadingFacebook} disabled={loading || loadingGoogle} className={`mt-2 ${loadingGoogle || loading ? 'bg-gray-100' : 'bg-blue-200 text-blue-500'} p-2 border-none flex`}>
-            <div className={`flex-1 ${loadingGoogle ? 'opacity-0' : null} flex items-center justify-between pl-2 pr-2`}>
+            <div className={`flex-1 ${loadingFacebook ? 'opacity-0' : null} flex items-center justify-between pl-2 pr-2`}>
+
               <Facebook className={'mr-2'} />
               <div className={'flex-1 justify-center'}>Facebook</div>
             </div>

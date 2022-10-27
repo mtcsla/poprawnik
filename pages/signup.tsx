@@ -14,33 +14,41 @@ export async function getStaticProps() {
 }
 
 const SignUp = ({ redirect }: { redirect?: string }) => {
-  const { signIn, signUp } = useAuth();
-  const [error, setError] = React.useState("");
+  const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
 
-  const router = useRouter();
+  const [loadingGoogle, setLoadingGoogle] = React.useState(false);
+  const [loadingFacebook, setLoadingFacebook] = React.useState(false);
+
+  const { signIn, signUp, userProfile } = useAuth();
 
 
   const signInGoogle = () => {
-    setLoading(true);
-    signIn(redirect || '/')?.google().catch(
-      err => setError(getErrorMessage(err.message) as string)
-    ).then(() => setLoading(false));
+    setLoadingGoogle(true);
+    signIn()?.google().catch(
+      err => { setError(getErrorMessage(err.message) as string); setLoading(false) }
+    ).then(() => setLoadingGoogle(false));
   };
   const signInFacebook = () => {
-    setLoading(true);
-    signIn(redirect || '/')?.facebook().catch(
-      err => setError(getErrorMessage(err.message) as string)
-    ).then(() => setLoading(false));
+    setLoadingFacebook(true);
+    signIn()?.facebook().catch(
+      err => { setError(getErrorMessage(err.message) as string); setLoading(false) }
+    ).then(() => setLoadingFacebook(false));
   };
 
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (userProfile) {
+      router.push(router.query.redirect as string ?? '/');
+    }
+  }, [userProfile])
+
   return (
-    <Paper
-      style={{ maxWidth: "18rem" }}
-      className={"flex flex-col items-center"}
-      variant={"outlined"}
-    >
-      <LogoHeader border={false} noText={false} />
+    <Paper className={'flex flex-col items-center w-full min-w-fit border-none bg-white bg-opacity-90 rounded-lg'} sx={{ maxWidth: 500 }} variant={'outlined'}>
+      <div className="self-start pl-5 pt-2">
+        <LogoHeader border={false} noPadding noBackground noText={false} />
+      </div>
       <div className={"flex-1 flex flex-col p-5 pt-2 w-full"}>
         <pre className={"w-full text-lg"}>ZAŁÓŻ KONTO</pre>
         <p className={"text-sm"}>
@@ -95,7 +103,7 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
             };
             return (
               <>
-                <Field
+                <Field disabled={loading || loadingGoogle || loadingFacebook}
                   error={errors.email && touched.email}
                   as={TextField}
                   name={"email"}
@@ -108,7 +116,7 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
                   {ErrorMessageFunction}
                 </ErrorMessage>
 
-                <Field
+                <Field disabled={loading || loadingGoogle || loadingFacebook}
                   error={errors.name && touched.name}
                   as={TextField}
                   name={"name"}
@@ -121,7 +129,7 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
                   {ErrorMessageFunction}
                 </ErrorMessage>
 
-                <Field
+                <Field disabled={loading || loadingGoogle || loadingFacebook}
                   error={errors.surname && touched.surname}
                   as={TextField}
                   name={"surname"}
@@ -134,7 +142,7 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
                   {ErrorMessageFunction}
                 </ErrorMessage>
 
-                <Field
+                <Field disabled={loading || loadingGoogle || loadingFacebook}
                   error={errors.password && touched.password}
                   as={TextField}
                   name={"password"}
@@ -148,7 +156,7 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
                   {ErrorMessageFunction}
                 </ErrorMessage>
 
-                <Field
+                <Field disabled={loading || loadingGoogle || loadingFacebook}
                   error={errors.repeatPassword && touched.repeatPassword}
                   as={TextField}
                   name={"repeatPassword"}
@@ -162,17 +170,16 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
                   {ErrorMessageFunction}
                 </ErrorMessage>
 
-                <Button
+                <Button loading={loading} disabled={loadingGoogle || loadingFacebook} className={`mt-4  p-2 ${loadingFacebook || loadingGoogle ? 'bg-gray-300' : 'bg-blue-500'} text-white`}
                   onClick={async () => {
                     await validateForm(values);
-                    isValid
-                      ? submitForm()
-                      : setError("Wypełnij pola poprawnie.");
-                  }}
-                  loading={loading}
-                  className={"mt-4"}
-                >
-                  DALEJ <ArrowRight />
+                    isValid ? submitForm() : setError('Wypełnij pola poprawnie.')
+                  }}>
+                  <span className={`${loading ? 'opacity-0' : null} flex items-center`}>
+                    Zarejestruj się
+                    <ArrowRight />
+                  </span>
+
                 </Button>
                 <p className={"text-xs text-red-500"}>{error}</p>
               </>
@@ -180,16 +187,17 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
           }}
         </Formik>
         <p className={"text-sm mt-4"}>Lub zarejestruj się przez:</p>
-        <Button onClick={signInGoogle} loading={loading} className={"mt-2 flex"}>
-          <div className={"flex-1 flex items-center justify-between pl-2 pr-2"}>
-            <Google className={"mr-2"} />
-            <div className={"flex-1 justify-center"}>Google</div>
+        <Button onClick={signInGoogle} loading={loadingGoogle} disabled={loading || loadingFacebook} className={`mt-2 p-2 ${loadingFacebook || loading ? 'bg-gray-100' : 'bg-red-200 text-red-500'} border-none flex`}>
+          <div className={`flex-1 ${loadingGoogle ? 'opacity-0' : null} flex items-center justify-between pl-2 pr-2`}>
+            <Google className={'mr-2'} />
+            <div className={'flex-1 justify-center'}>Google</div>
           </div>
         </Button>
-        <Button loading={loading} className={"mt-2 flex"}>
-          <div className={"flex-1 flex items-center justify-between pl-2 pr-2"}>
-            <Facebook className={"mr-2"} />
-            <div className={"flex-1 justify-center"}>Facebook</div>
+        <Button loading={loadingFacebook} disabled={loading || loadingGoogle} className={`mt-2 ${loadingGoogle || loading ? 'bg-gray-100' : 'bg-blue-200 text-blue-500'} p-2 border-none flex`}>
+          <div className={`flex-1 ${loadingFacebook ? 'opacity-0' : null} flex items-center justify-between pl-2 pr-2`}>
+
+            <Facebook className={'mr-2'} />
+            <div className={'flex-1 justify-center'}>Facebook</div>
           </div>
         </Button>
       </div>

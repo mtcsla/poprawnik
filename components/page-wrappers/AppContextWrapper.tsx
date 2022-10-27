@@ -144,7 +144,8 @@ const theme = createTheme({
           '&.Mui-expanded': {
             marginTop: '0.5rem !important',
             marginBottom: '0 !important',
-          }
+          },
+          marginBottom: 0,
         }
       }
     },

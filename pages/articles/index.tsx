@@ -47,7 +47,7 @@ const Articles = ({ articles }: { articles: IArticleContents[] }) => {
                   backdropFilter: "blur(20px)",
                 }}
                 className={
-                  "flex flex-col w-full rounded-xl hover:border-blue-400 hover:bg-slate-50 mt-4 transition-transform cursor-pointer border"
+                  "flex flex-col w-full rounded-xl hover:bg-blue-50 mt-4 transition-transform cursor-pointer"
                 }
               >
                 <div

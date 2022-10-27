@@ -42,9 +42,9 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
   const { width } = useWindowSize();
 
   return <BodyScrollLock>
-    <div className='flex p-4 sm:p-8 fixed top-0 overflow-y-auto right-0 left-0 bottom-0 items-stretch bg-white ' style={{ zIndex: 201, backgroundImage: 'url(/bg-new.svg)', backgroundSize: 'cover' }}>
-      <div className='h-full flex' style={{ flex: width != null && width < 1100 ? 1 : 0.5 }} >
-        <div className='flex h-fit min-h-full flex-col flex-1 bg-white px-4 pb-4 pt-3 sm:px-8 sm:pb-8 sm:pt-6 rounded-lg bg-opacity-90 self-stretch'>
+    <div className={`flex sm:p-8 fixed top-0 overflow-y-auto right-0 left-0 bottom-0 items-stretch bg-white `} style={{ zIndex: 201, backgroundImage: 'url(/bg-new.svg)', backgroundSize: 'cover' }}>
+      <div className='h-full' style={{ flex: width != null && width < 1100 ? 1 : 0.5 }} >
+        <div className='flex h-fit min-h-full flex-col flex-1 bg-white px-8 pb-8 pt-6 sm:rounded-lg bg-opacity-90 self-stretch'>
           <LogoHeader noPadding social={false} border={false} />
           <pre className='mt-4 self-end'>Zamierzasz wykonać pismo</pre>
           <pre className='text-xs mt-4'>Tytuł pisma</pre>
@@ -100,6 +100,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
           </Link>
 
         </div>
+        <div className='sm:h-8' />
       </div>
     </div>
   </BodyScrollLock>

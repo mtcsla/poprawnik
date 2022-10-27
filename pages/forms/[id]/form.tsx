@@ -206,8 +206,8 @@ const FormDisplay = () => {
 
   return <BodyScrollLock>
     <div className="bg-white overflow-y-auto fixed top-0 bottom-0 right-0 left-0" style={{ zIndex: 201, backgroundImage: 'url(/bg-new.svg)', backgroundSize: 'cover' }}>
-      <div className='w-full h-full sm:p-8 p-4'>
-        <Body className='w-full h-auto mx-auto bg-white bg-opacity-90 p-4 sm:p-8 rounded-lg min-h-full flex flex-col'>
+      <div className='w-full h-full sm:p-8'>
+        <Body className='w-full h-auto mx-auto bg-white bg-opacity-90 p-8 sm:rounded-lg min-h-full flex flex-col'>
           <Link href={`/forms/${router.query.id}`}>
             <Button size='small' className='bg-blue-100 rounded mb-4 border-none w-full flex items-center justify-between'>
               <ArrowBack />
@@ -401,7 +401,7 @@ const FormDisplay = () => {
           }
 
         </Body>
-        <div className='sm:h-8 h-4' />
+        <div className='sm:h-8' />
       </div>
     </div>
   </BodyScrollLock>;

@@ -8,7 +8,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
       backgroundImage: 'url(/bg-new.svg)',
       backgroundSize: 'cover',
     }}
-    className={'flex items-center justify-center'}
+    className={'flex fixed  items-center justify-center'}
   >
     {children}
   </div>

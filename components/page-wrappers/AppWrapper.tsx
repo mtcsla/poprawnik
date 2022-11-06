@@ -131,19 +131,33 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                 <NotificationsOutlined sx={{ fontSize: "20px !important" }} />
               </Button>
 
-              <Button
-                className={`bg-white ${userProfile?.photoURL ? 'p-0' : 'p-04-rem'}`}
-                id="account-button"
-                aria-controls={anchorEl ? "account-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={anchorEl ? "true" : undefined}
-                onClick={handleClick}
-              >
-                {userProfile?.photoURL ?
-                  <Avatar variant="square" className="rounded-lg" style={{ height: 34, width: 34 }} src={userProfile.photoURL as string} />
-                  : <AccountCircle sx={{ fontSize: "20px !important" }} />
-                }
-              </Button>
+
+              {
+
+                userProfile?.photoURL ?
+                  <Button className="p-0"
+                    id='account-button'
+                    aria-controls={anchorEl ? "account-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={anchorEl ? "true" : undefined}
+                    onClick={handleClick}
+                  >
+                    <Avatar variant="square" className="rounded-lg" style={{ height: '2rem', width: '2rem' }} src={userProfile.photoURL as string} />
+                  </Button>
+                  :
+                  <Button
+                    className={`p-4`}
+                    id="account-button"
+                    aria-controls={anchorEl ? "account-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={anchorEl ? "true" : undefined}
+                    onClick={handleClick}
+                  >
+
+                    <AccountCircle sx={{ fontSize: "20px !important" }} />
+
+                  </Button>
+              }
 
               <AccountMenu {...{ anchorEl, handleClose, router, userProfile, signOut }} />
             </div>

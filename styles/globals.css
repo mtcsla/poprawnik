@@ -10,6 +10,16 @@
     url("/public/fonts/PlusJakartaSans-Bold.woff2") format("woff2");
 }
 
+@keyframes blink-caret {
+  from,
+  to {
+    @apply border-transparent;
+  }
+  50% {
+    @apply border-slate-200;
+  }
+}
+
 div.MuiPaper-root:before {
   background: transparent;
 }

@@ -35,10 +35,10 @@ const Sidebar = ({ }) => {
         <a className={'text-xs ml-4 text-slate-500 hover:text-blue-500'}>Warunki świadczenia usług</a>
       </Link>
 
-      <h4 className='mb-3 text-xs w-full pl-4 pr-4 text-right flex items-center capitalize pb-2 pt-2'
+      <h4 className='mb-3 text-xs w-full pl-4 pr-4 text-right flex items-center  pb-2 pt-2'
       >
-        <div className='border-t border-blue-200 mr-3 flex-1' />
-        Iusinus © 2022
+        <div className='border-t border-slate-100 mr-3 flex-1' />
+        Trustree sp.j. © 2022
       </h4>
     </div>
   </SidebarPaper>;

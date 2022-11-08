@@ -44,8 +44,8 @@ const LogIn = () => {
     }
   }, [userProfile])
 
-  return <div className="h-full w-full sm:p-8 flex overflow-y-auto bg-white bg-opacity-90 sm:bg-transparent">
-    <Paper className={'flex flex-col items-center m-auto w-full min-w-fit sm:h-fit border-none bg-transparent sm:bg-white sm:bg-opacity-90 rounded-lg'} sx={{ maxWidth: 600 }} variant={'outlined'}>
+  return <div className="h-full w-full sm:p-8 flex overflow-y-auto bg-white sm:bg-transparent">
+    <Paper className={'flex flex-col items-center m-auto w-full min-w-fit sm:h-fit border-none bg-transparent bg-white rounded-lg'} sx={{ maxWidth: 600 }} variant={'outlined'}>
       <div className="self-start pl-5 pt-2">
         <LogoHeader border={false} noPadding noBackground noText={false} />
       </div>

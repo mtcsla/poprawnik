@@ -34,7 +34,6 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
   const handleRouteChange = () => setOpen(false);
   useEffect(() => {
-
     Router.events.on("routeChangeStart", handleRouteChange)
     return () => Router.events.off("routeChangeStart", handleRouteChange);
   },
@@ -109,7 +108,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                 width && width > 430
                   ? <div
                     className={
-                      "mr-3 border bg-slate-50 hover:bg-slate-100 cursor-text transition-colors flex items-center p-2"
+                      "mr-3  bg-slate-50 hover:bg-slate-100 cursor-text transition-colors flex items-center p-2"
                     }
                     style={{ height: 35, width: 200, borderRadius: 10 }}
                   >
@@ -127,25 +126,37 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
               {/*NOTIFICATIONS*/}
 
-              <Button className="mr-3 bg-white" sx={{ padding: "0.4rem" }}>
+              <Button className="mr-3 bg-slate-50 hover:bg-slate-100 text-blue-500   border-none" sx={{ padding: "0.4rem" }}>
                 <NotificationsOutlined sx={{ fontSize: "20px !important" }} />
               </Button>
 
-              <Button
-                className={`bg-white ${userProfile?.photoURL ? 'p-0' : 'p-04-rem'}`}
-                id="account-button"
-                aria-controls={anchorEl ? "account-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={anchorEl ? "true" : undefined}
-                onClick={handleClick}
-              >
-                {userProfile?.photoURL ?
-                  <Avatar variant="square" className="rounded-lg" style={{ height: 34, width: 34 }} src={userProfile.photoURL as string} />
-                  : <AccountCircle sx={{ fontSize: "20px !important" }} />
-                }
-              </Button>
 
-              <AccountMenu {...{ anchorEl, handleClose, router, userProfile, signOut }} />
+              {
+
+                userProfile?.photoURL ?
+                  <div
+                    role='button' onClick={(e) => handleClick(e as any)}
+                    aria-controls={anchorEl ? "account-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={anchorEl ? "true" : undefined}
+                  >
+                    <Avatar variant="square" className="rounded-xl m-0 p-0" style={{ height: '2rem', width: '2rem' }} src={userProfile.photoURL as string} />
+                  </div>
+                  :
+                  <Button
+                    className="p-1.5 border-none bg-slate-50 hover:bg-slate-100 text-blue-500  "
+                    aria-controls={anchorEl ? "account-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={anchorEl ? "true" : undefined}
+                    onClick={handleClick}
+                  >
+
+                    <AccountCircle sx={{ fontSize: "20px !important" }} />
+
+                  </Button>
+              }
+
+              <AccountMenu {...{ anchorEl, setAnchorEl, handleClose, router, userProfile, signOut }} />
             </div>
           </div>
         </AppBar>
@@ -169,7 +180,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                     <ArrowLeft className={"mr-1"} /> Strona startowa
                   </a>
                 </Link>
-                Iusinus © 2022
+                Trustree sp.j. © 2022
               </div>
             </footer>
           </div>
@@ -192,8 +203,9 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const AccountMenu = ({ anchorEl, handleClose, router, userProfile, signOut }: {
+const AccountMenu = ({ anchorEl, handleClose, router, setAnchorEl, userProfile, signOut }: {
   anchorEl: HTMLElement | null,
+  setAnchorEl: React.Dispatch<React.SetStateAction<HTMLElement | null>>,
   handleClose: () => void,
   router: NextRouter,
   userProfile: any,
@@ -218,7 +230,7 @@ const AccountMenu = ({ anchorEl, handleClose, router, userProfile, signOut }: {
             </p>
           </MenuItem>
         </Link>
-        <MenuItem onClick={signOut}>
+        <MenuItem onClick={() => { signOut(); setAnchorEl(null) }}>
           <Logout color={"primary"} />{" "}
           <p style={{ fontSize: "0.8rem" }} className={"ml-2"}>
             Wyloguj się

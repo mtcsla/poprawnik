@@ -23,6 +23,8 @@ const FormsIndex = () => {
     <h1><Edit className="-translate-y-0.5 mr-1" color='primary' /> Wszystkie pisma</h1>
     <p>Tutaj znajdziesz listę wszystkich pism w naszej ofercie.</p>
 
+
+
     {
       !products.length
         ?
@@ -42,27 +44,34 @@ const FormsIndex = () => {
         </>
         :
         products.map(
-          (product) =>
-            <Link passHref href={`/forms/${product.id}`} >
-              <a>
-                <div key={product.id} style={{ minHeight: 120 }} className="flex hover:text-blue-500 hover:bg-blue-50 hover:border-blue-500 flex-col justify-between p-4 my-4 bg-white rounded-lg border">
+          (product, index, arr) =>
+            <span className='flex flex-col items-stretch'>
+              <Link passHref href={`/forms/${product.id}`} >
+                <a>
+                  <div key={product.id} style={{ minHeight: 120 }} className="flex hover:text-blue-500 hover:bg-blue-50  flex-col justify-between py-4 my-4 bg-white rounded-lg">
 
-                  <pre>{product.title}</pre>
-                  <span className='inline-flex gap-4 justify-between w-full items-center'>
-                    <p className="self-end">{(product.price / 100).toFixed(
-                      2
-                    ).toString().replace('.', ',')} zł</p>
-                    <span className='inline-flex gap-3 items-center'>
-                      <Avatar src={product.authorPictureURL} />
-                      <span className='flex flex-col'>
-                        <p className='font-bold text-sm'>{product.authorName}</p>
-                        <pre className='text-sm'>Deweloper</pre>
+                    <pre>{product.title}</pre>
+                    <span className='inline-flex gap-4 justify-between w-full items-center'>
+                      <p className="self-end">{(product.price / 100).toFixed(
+                        2
+                      ).toString().replace('.', ',')} zł</p>
+                      <span className='inline-flex gap-3 items-center'>
+                        <Avatar src={product.authorPictureURL} />
+                        <span className='flex flex-col'>
+                          <p className='font-bold text-sm'>{product.authorName}</p>
+                          <pre className='text-sm'>Deweloper</pre>
+                        </span>
                       </span>
                     </span>
-                  </span>
-                </div>
-              </a>
-            </Link>
+                  </div>
+                </a>
+              </Link>
+              {
+                index != arr.length - 1
+                  ? <div className='border-t my-4' />
+                  : null
+              }
+            </span>
         )
 
     }

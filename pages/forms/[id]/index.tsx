@@ -3,6 +3,7 @@ import { Avatar, Button } from '@mui/material';
 import { GetStaticPropsContext } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { ExplanationAnimation } from '../..';
 import { firebaseAdmin } from '../../../buildtime-deps/firebaseAdmin';
 import LogoHeader from '../../../components/LogoHeader';
 import useWindowSize from '../../../hooks/WindowSize';
@@ -42,13 +43,13 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
   const { width } = useWindowSize();
 
   return <BodyScrollLock>
-    <div className={`flex sm:p-8 fixed top-0 overflow-y-auto right-0 left-0 bottom-0 items-stretch bg-white `} style={{ zIndex: 201, backgroundImage: 'url(/bg-new.svg)', backgroundSize: 'cover' }}>
-      <div className='h-full' style={{ flex: width != null && width < 1100 ? 1 : 0.5 }} >
-        <div className='flex h-fit min-h-full flex-col flex-1 bg-white px-8 pb-8 pt-6 sm:rounded-lg bg-opacity-90 self-stretch'>
-          <LogoHeader noPadding social={false} border={false} />
+    <div className={`inline-flex gap-12 sm:pr-12 fixed top-0 overflow-y-auto right-0 left-0 bottom-0 items-stretch bg-white `} style={{ zIndex: 201, backgroundImage: 'url(/bg-new-light.svg)', backgroundSize: 'cover' }}>
+      <div className='h-full' style={{ flex: width != null && width < 1100 ? 1 : 0.7 }} >
+        <div className='flex h-fit min-h-full flex-col flex-1 px-8 py-8   sm:px-12 sm:pb-12 pt-6 bg-white self-stretch'>
+          <LogoHeader noPadding noBackgroundImportant social={false} border={false} />
           <pre className='mt-4 self-end'>Zamierzasz wykonać pismo</pre>
           <pre className='text-xs mt-4'>Tytuł pisma</pre>
-          <h2 className='mt-1 mb-4 flex'><Bookmark color='primary' className='mr-2 translate-y-1' />{form?.title}</h2>
+          <pre className='mt-1 font-bold text-2xl whitespace-normal text-black mb-4 flex'><Bookmark color='primary' className='mr-2 translate-y-1' />{form?.title}</pre>
           <div className='inline-flex self-stretch gap-3 flex-wrap sm:gap-6  justify-between'>
             <div className='self-end flex flex-col mt-4'>
               <pre className='text-xs'>Stworzone przez</pre>
@@ -66,7 +67,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
               <div className='items-center flex w-fit'>
                 {
                   form?.verifiedBy === 'admin'
-                    ? <><LogoHeader noBackground noWidth={true} noPadding noText border={false} />
+                    ? <><LogoHeader noBackground={true} noBackgroundImportant noWidth={true} noPadding noText border={false} />
 
                       <span className='flex flex-col ml-2'>
                         <p className='text-sm whitespace-nowrap truncate'>
@@ -81,8 +82,8 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
               </div>
             </div>
             <div className='flex flex-col flex-1'>
-              <pre className='mt-2 text-sm'>Opis</pre>
-              <p style={{ minHeight: 100 }} className='w-full p-2 mt-2 sm:p-4 h-full bg-white rounded-lg border'>{form?.description}</p>
+              <pre className='mt-2 text-sm bg-blue-100 px-2 sm:px-4 py-1 text-black rounded'>Opis</pre>
+              <p style={{ minHeight: 100 }} className='w-full  p-2 mt-2 sm:p-4 h-full bg-slate-50 rounded-lg'>{form?.description}</p>
             </div>
           </div>
           <div className='flex-1' />
@@ -95,12 +96,15 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
           <p className='text-sm text-slate-500 self-end'>(przejście dalej nie oznacza zakupu pisma - decyzję o zakupie podejmiesz po wypełnieniu formularza)</p>
           <Link passHref href={`/forms/${router.query.id}/form`}>
             <a className='w-full'>
-              <Button className='w-full p-2 mt-8 sm:p-4 bg-blue-400 text-white' >Przejdź do formularza <ArrowRight className='ml-1' /></Button>
+              <Button className='w-full p-2 mt-8 sm:p-4 bg-blue-400 text-white border-none' >Przejdź do formularza <ArrowRight className='ml-1' /></Button>
             </a>
           </Link>
 
         </div>
-        <div className='sm:h-8' />
+      </div>
+      <div className='h-full flex flex-col justify-center w-full' style={{ flex: 1 / 2 }}>
+        <pre className='text-lg mb-2 self-end text-right mt-auto text-white'>Jak to działa?</pre>
+        <ExplanationAnimation className='mx-auto mb-auto w-full' textWhite active />
       </div>
     </div>
   </BodyScrollLock>

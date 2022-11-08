@@ -502,7 +502,7 @@ const FieldEditor = () => {
               <FormControlLabel className="mt-5" control={<Checkbox
                 disabled={verifying}
                 checked={values.required} onChange={(e, value) => {
-                  if (values.required === false || fieldDescription.required === false)
+                  if (values.required === false || fieldDescription?.required === false)
                     setFieldValue('required', value)
                   else
                     setSettingOptional(true)

@@ -14,6 +14,7 @@ const LogoHeader = ({
   social,
   noPadding,
   noBackground,
+  noBackgroundImportant,
   inAccountPage,
   noWidth
 }: {
@@ -24,6 +25,7 @@ const LogoHeader = ({
   noPadding?: boolean;
   captionLink?: string;
   noBackground?: boolean;
+  noBackgroundImportant?: boolean;
   social?: boolean;
   inAccountPage?: true;
   noWidth?: boolean;
@@ -43,7 +45,7 @@ const LogoHeader = ({
     variant="outlined"
     classes={!border ? { root: "border-b-0" } : {}}
     className={
-      `bg-${width != null && width >= 1100 && !noBackground ? 'white' : 'transparent'} rounded-none flex items-center border-l-0 border-t-0 border-r-0  ${noPadding ? '' : `px-5 ${inAccountPage ? '' : 'pr-3'}`}`
+      `${noBackgroundImportant ? 'bg-transparent' : `bg-${width != null && width >= 1100 && !noBackground ? 'white' : 'transparent'}`} rounded-none flex items-center border-l-0 border-t-0 border-r-0  ${noPadding ? '' : `px-5 ${inAccountPage ? '' : 'pr-3'}`}`
     }
   >
     {

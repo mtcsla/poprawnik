@@ -1,7 +1,7 @@
 import { doc, getDoc, updateDoc } from '@firebase/firestore';
 import { ArrowBack, Bookmark, CancelPresentation, DoneAll, Warning } from "@mui/icons-material";
 import { LoadingButton } from '@mui/lab';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, TextField } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, MenuItem, Select, Skeleton, TextField } from '@mui/material';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import React from "react";
@@ -17,6 +17,8 @@ const EditForm = () => {
   const [title, setTitle] = React.useState<string>('');
   const [description, setDescription] = React.useState<string>('');
   const [price, setPrice] = React.useState<number | null>(null);
+  const [category, setCategory] = React.useState<string>('');
+  const [newCategory, setNewCategory] = React.useState<string>('');
 
   const [finalPrice, setFinalPrice] = React.useState<number | null>(null);
 
@@ -28,6 +30,41 @@ const EditForm = () => {
   const [editingDescription, setEditingDescription] = React.useState<boolean>(false);
   const [editingTitle, setEditingTitle] = React.useState<boolean>(false);
   const [editingPrice, setEditingPrice] = React.useState<boolean>(false);
+  const [editingCategory, setEditingCategory] = React.useState<boolean>(false);
+
+  const [invalidMessages, setInvalidMessages] = React.useState<[React.ReactNode, React.ReactNode]>(['', '']);
+  const [errorDialogOpen, setErrorDialogOpen] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    const newErrors: [React.ReactNode, React.ReactNode] = ['', ''];
+    if (
+      !title
+      || !description
+      || !price
+      || !category
+    ) {
+      newErrors[0] = <p className='text-red-500 mb-2'>
+        Aby oddać pismo do weryfikacji, musisz dodać tytuł, opis, proponowaną cenę i kategorię.
+      </p>
+    }
+    if (
+      category === 'new'
+      && !newCategory
+    ) {
+      newErrors[1] = <p className='text-red-500 mb-2'>
+        Kategoria jest ustawiona jako "nowa kategoria", ale nie podano jej nazwy.
+      </p>
+    }
+    setInvalidMessages(newErrors);
+  }, [
+    title,
+    description,
+    price,
+    category,
+    newCategory,
+  ])
+
+
 
   const [completeDialogOpen, setCompleteDialogOpen] = React.useState<boolean>(false);
   const [completeError, setCompleteError] = React.useState<string>('');
@@ -77,9 +114,12 @@ const EditForm = () => {
         }
 
         setForm({ id: snapshot.id, ...snapshot.data() } as IFormData);
-        setTitle(snapshot.data()?.title);
-        setDescription(snapshot.data()?.description);
+        setTitle(snapshot.data()?.title ?? '');
+        setDescription(snapshot.data()?.description ?? '');
         setPrice(snapshot.data()?.price ?? null);
+        setCategory(snapshot.data()?.category ?? '');
+        setNewCategory(snapshot?.data()?.category === 'new' ? (snapshot.data()?.newCategory ?? '') : '');
+
       }).catch(err => {
         router.push('/account/lawyer')
       });
@@ -145,7 +185,7 @@ const EditForm = () => {
       </span>
       {!editingTitle
         ? <p className="p-4 border rounded-lg">{form.title || 'BRAK'}</p>
-        : <TextField size='small' defaultValue={title} onChange={({ target }) => setTitle(target.value)} />
+        : <TextField defaultValue={title} onChange={({ target }) => setTitle(target.value)} />
       }
       <span className="flex items-center mt-2 justify-between">
         <pre className="text-sm">sugerowana cena (bez VAT)</pre>
@@ -166,8 +206,44 @@ const EditForm = () => {
       {!editingPrice
         ? <p className="p-4 border rounded-lg">{form.price || 'BRAK'}</p>
         //@ts-ignore
-        : <TextField type='number' size='small' defaultValue={price} onChange={({ target }) => setPrice(parseFloat(target.value) !== NaN ? parseFloat(target.value) : null)} />
+        : <TextField type='number' defaultValue={price} onChange={({ target }) => setPrice(parseFloat(target.value) !== NaN ? parseFloat(target.value) : null)} />
       }
+
+
+      <span className="flex items-center mt-2 justify-between">
+        <pre className="text-sm">kategoria pisma</pre>
+        {!editingCategory
+          ? <LoadingButton size='small' className='border-none' disabled={editing || verifying || form.awaitingVerification}
+            onClick={() => { setEditing(true); setEditingCategory(true); }}>
+            zmień
+          </LoadingButton>
+          : <LoadingButton loading={loading} size='small' className='border-none'
+            onClick={() => {
+              updateProperty({ category, newCategory }, () => setEditingCategory(false))
+            }}>
+            zapisz
+          </LoadingButton>
+        }
+      </span>
+      {!editingCategory
+        ? <p className="p-4 border rounded-lg">{(form.category === 'new' ? 'nowa kategoria' : form.category) || 'BRAK'}</p>
+        //@ts-ignore
+        : <FormControl className='w-full'>
+          <Select defaultValue={category} value={category} onChange={(e) => setCategory(e.target.value)}>
+            <MenuItem value='new'>nowa kategoria</MenuItem>
+          </Select>
+        </FormControl>
+      }
+      {category === 'new' ? <>
+        <span className="flex items-center mt-2 mb-2 justify-between">
+          <pre className="text-sm">nazwa nowej kategorii</pre>
+        </span>
+        {!editingCategory
+          ? <p className="p-4 border rounded-lg">{newCategory || 'BRAK'}</p>
+          //@ts-ignore
+          : <TextField placeholder='np. Prawo spadkowe' defaultValue={newCategory} onChange={({ target }) => setNewCategory(target.value)} />
+        }
+      </> : null}
 
       <span className="flex items-center justify-between mt-3">
         <pre className="text-sm">opis</pre>
@@ -260,6 +336,23 @@ const EditForm = () => {
 
         </DialogActions>
       </Dialog>
+      <Dialog open={errorDialogOpen}>
+
+        <DialogTitle>
+          <pre className='text-sm text-red-500'>Dane pisma zawierają błędy</pre>
+        </DialogTitle>
+        <DialogContent>
+          <p className='text-sm mb-2'>Nie możesz zatwierdzić pisma, dopóki nie poprawisz błędów:</p>
+
+          {
+            invalidMessages
+          }
+        </DialogContent>
+
+        <DialogActions>
+          <Button color='error' disabled={loading} onClick={() => setErrorDialogOpen(false)} className='border-none'>Wróć</Button>
+        </DialogActions>
+      </Dialog>
 
       {verifying
         ? <>
@@ -272,7 +365,14 @@ const EditForm = () => {
             Odeślij do poprawki
           </Button>
         </>
-        : <Button onClick={() => setCompleteDialogOpen(true)} disabled={form.awaitingVerification} className={`mt-4 p-4 ${form.awaitingVerification ? 'bg-gray-300 text-white' : 'bg-blue-500 text-white hover:bg-blue-400'} `}>
+        : <Button onClick={() => {
+          if (
+            invalidMessages[0] || invalidMessages[1]
+          )
+            setErrorDialogOpen(true);
+          else
+            setCompleteDialogOpen(true);
+        }} disabled={form.awaitingVerification} className={`mt-4 p-4 ${form.awaitingVerification ? 'bg-gray-300 text-white' : 'bg-blue-500 text-white hover:bg-blue-400'} `}>
           <DoneAll className='mr-2' />
           {form.awaitingVerification
             ? 'Oddano do weryfikacji'
@@ -332,9 +432,10 @@ const EditForm = () => {
       <span className='flex items-center w-full mt-1'>
         <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
       </span>
-    </>}
+    </>
+    }
 
-  </article>;
+  </article >;
 }
 
 export default EditForm;

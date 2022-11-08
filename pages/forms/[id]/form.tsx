@@ -47,6 +47,11 @@ const formikContext = React.createContext<FormikContextValue>(formikValue);
 export const useFormValue = () => React.useContext(formikContext);
 
 const Body = styled.div`
+    padding: 1rem !important;
+  @media (min-width: 400px) {
+    padding: 2rem !important;
+  }
+
   @media (min-width: 800px) {
     max-width: 800px;
   }
@@ -174,7 +179,10 @@ const FormDisplay = () => {
 
     if (currentStep < description.length - 1) {
       setCurrentStep(currentStep + 1);
+      document.getElementById('fixed-parent')?.scrollTo({ top: 0, behavior: 'smooth' });
+
       router.push(`/forms/${router.query.id}/form?step=${currentStep + 1}${testing ? '&testing=true' : ''}`);
+
       return;
     }
 
@@ -205,23 +213,24 @@ const FormDisplay = () => {
 
 
   return <BodyScrollLock>
-    <div className="bg-white overflow-y-auto fixed top-0 bottom-0 right-0 left-0" style={{ zIndex: 201, backgroundImage: 'url(/bg-new.svg)', backgroundSize: 'cover' }}>
-      <div className='w-full h-full sm:p-8'>
-        <Body className='w-full h-auto mx-auto bg-white bg-opacity-90 p-8 sm:rounded-lg min-h-full flex flex-col'>
+    <div id='fixed-parent' className="bg-white overflow-y-auto fixed top-0 bottom-0 right-0 left-0" style={{ zIndex: 201, /*backgroundImage: 'url(/bg-new-light.svg)',*/ backgroundSize: 'cover' }}>
+      <div className='w-full h-full sm:px-8'>
+        <Body className='w-full h-auto mx-auto bg-white min-h-full flex flex-col'>
           <Link href={`/forms/${router.query.id}`}>
-            <Button size='small' className='bg-blue-100 rounded mb-4 border-none w-full flex items-center justify-between'>
+            <Button size='small' className='bg-red-400 text-white mb-4 border-none w-full flex items-center justify-between'>
               <ArrowBack />
               Wróć do strony pisma
             </Button>
           </Link>
 
-          <pre className='text-xs self-end'>Wypełniasz formularz do pisma</pre>
-          <pre className='self-end mb-4 text-black'>{formDoc?.title}</pre>
+          <pre className='text-xs self-end whitespace-normal'>Wypełniasz formularz do pisma</pre>
+          <pre className='self-end mb-4 whitespace-normal text-right text-black'>{formDoc?.title}</pre>
           <span className='flex flex-col'>
             <div className="flex justify-between mb-4 flex-wrap items-center">
               <span className='-ml-5 -mt-4'>
                 <LogoHeader
                   border={false}
+                  noBackground
                   social={false}
                 />
               </span>
@@ -378,7 +387,7 @@ const FormDisplay = () => {
                         <div className={`${loading ? '' : 'mt-auto'} w-full flex`}>
                           <Button
                             disabled={!buttonActive}
-                            className={`p-2.5 w-full ${buttonActive ? 'bg-blue-200  hover:bg-blue-100' : 'bg-gray-300'}`}
+                            className={`p-2.5 w-full ${buttonActive ? 'bg-blue-500 text-white  hover:bg-blue-400' : 'bg-gray-300'}`}
                             onClick={() => {
                               if (!isValid) {
                                 submitForm();
@@ -401,10 +410,9 @@ const FormDisplay = () => {
           }
 
         </Body>
-        <div className='sm:h-8' />
       </div>
     </div>
-  </BodyScrollLock>;
+  </BodyScrollLock >;
 }
 
 

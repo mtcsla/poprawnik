@@ -25,6 +25,8 @@ export interface IFormData {
 
   awaitingVerification?: boolean,
   reasonForRejection?: string,
+  category?: string,
+  newCategory?: string,
 
   price?: number,
   published?: boolean,
@@ -113,12 +115,13 @@ const YourForms = ({ }) => {
     <p >
       Tutaj możesz tworzyć pisma, które sprzedasz w naszym serwisie
     </p>
+    <div className='mt-8' />
     {userProfile && forms ? <>
       {forms.length === 0 ?
         <div className='flex flex-col'>
           <div
             className={
-              "p-4 mt-2 flex items-center justify-center rounded-lg border h-32  "
+              "p-4  flex items-center justify-center rounded-lg border h-32  "
             }
           >
             <div className={"flex flex-col"}>
@@ -128,10 +131,9 @@ const YourForms = ({ }) => {
           </div>
         </div>
         :
-
-        forms.filter((form: IFormData) => !form.published).map((form: IFormData) => <>
+        forms.filter((form: IFormData) => !form.published).map((form: IFormData, index: number, arr: IFormData[]) => <>
           <div
-            className={"p-4 flex relative flex-col rounded-lg justify-between border h-32 mt-8 "}
+            className={"py-4 flex relative flex-col rounded-lg justify-between h-32  "}
           >
             {form.awaitingVerification
               ? <pre className='text-xs self-end absolute right-0 -top-5'>
@@ -171,6 +173,11 @@ const YourForms = ({ }) => {
             </div>
 
           </div>
+          {
+            index < arr.length - 1
+              ? <div className='w-full border-t my-4 border-slate-100' />
+              : null
+          }
         </>
         )
 
@@ -230,7 +237,7 @@ const YourForms = ({ }) => {
       publishedForms
         ? publishedForms.map(
           (form: any) => <Link href={'/forms/' + form.id}>
-            <div style={{ minHeight: 150 }} className='mt-8 border p-4 rounded-lg cursor-pointer justify-between flex bg-slate-50 hover:bg-blue-50 hover:border-blue-500' key={form.id}>
+            <div style={{ minHeight: 150 }} className='mt-8 p-4 rounded-lg cursor-pointer justify-between flex bg-slate-50 hover:bg-blue-50 ' key={form.id}>
               <div className='flex flex-col justify-between'>
                 <p className={'truncate'}>
                   {form.title || <i>BRAK TYTUŁU</i>}

@@ -101,7 +101,6 @@ const EditDocumentTemplate = () => {
 
                   <h1 className="inline-flex gap-2 mb-1"><Bookmark color='primary' /> Edytujesz wzór pisma</h1>
                   <p>Wypełnij formularz przykładowymi danymi, aby szybko generować podgląd.</p>
-
                   {Object.keys(values).length === 0 || formDescription.length === 0
                     ? <div className='border sm:p-8 p-4 bg-slate-50 mt-8 rounded-lg flex justify-center items-center'>
                       <pre>Brak przykładowych danych</pre>
@@ -160,15 +159,17 @@ const EditDocumentTemplate = () => {
                       </div>
                     </>
                   }
-                  <Link href={url} passHref>
-                    <a className='w-full' target='_blank'>
-                      <Button disabled={!Object.keys(values).length}
-                        className={`p-4 mt-8 bg-blue-500 w-full text-white hover:bg-blue-400 ${!Object.keys(values).length ? 'bg-gray-300 hover:bg-gray-300' : ''}`}>
-                        Podgląd pisma
-                        <FormatAlignJustify className='ml-2' />
-                      </Button>
-                    </a>
-                  </Link>
+                  <span className={JSON.stringify(values) == '{}' ? 'pointer-events-none' : ''}>
+                    <Link href={url} passHref>
+                      <a className='w-full' target='_blank'>
+                        <Button disabled={JSON.stringify(values) == '{}'}
+                          className={`p-4 mt-8 w-full text-white  ${JSON.stringify(values) == '{}' ? 'bg-gray-300 hover:bg-gray-300' : 'bg-blue-500 hover:bg-blue-400'}`}>
+                          Podgląd pisma
+                          <FormatAlignJustify className='ml-2' />
+                        </Button>
+                      </a>
+                    </Link>
+                  </span>
                 </div>
               </TemplateDescriptionProvider>
               : null

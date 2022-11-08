@@ -55,6 +55,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       published: true,
       awaitingVerification: false,
     });
+
     await firebaseAdmin
       .firestore()
       .doc(`/products/${id}`)
@@ -67,6 +68,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         description: data.description,
 
         price: parseFloat(req.query.price as string) * 100 ?? 100,
+        category: data.category,
 
         author: data.author,
         authorName: data.authorName,
@@ -74,6 +76,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
         verifiedBy: decodedToken.admin ? "admin" : decodedToken.uid,
       });
+    await firebaseAdmin.firestore().doc(`/products-stats/${id}`).set({
+      timesSold: 0,
+    });
 
     res.status(200).send({ message: "OK" });
   } catch (err) {

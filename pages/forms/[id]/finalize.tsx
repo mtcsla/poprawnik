@@ -89,9 +89,18 @@ const FormFinalize = () => {
   )
 
   return <BodyScrollLock>
-    <div className="top-0 sm:p-8 overflow-y-auto bottom-0 flex flex-col left-0 right-0 fixed bg-white" style={{ backgroundImage: 'url(/bg-new.svg)', backgroundSize: 'cover', zIndex: 201 }}>
+    <div className="top-0 sm:px-8 overflow-y-auto bottom-0 flex flex-col left-0 right-0 fixed bg-white" style={{ /*backgroundImage: 'url(/bg-new-light.svg)',*/ backgroundSize: 'cover', zIndex: 201 }}>
       <div className='w-full h-full justify-center'>
-        <div className='mx-auto p-8 min-h-full flex flex-col h-fit w-full bg-white justify-between sm:rounded-lg bg-opacity-90' style={{ maxWidth: 800 }}>
+        <div className='mx-auto p-8 min-h-full flex flex-col h-fit w-full bg-white justify-between ' style={{ maxWidth: 800 }}>
+          <div className='flex-col flex'>
+            <Link href={`/forms/${router.query.id}/form`}>
+              <Button color='error' className='w-full bg-red-400 text-white self-start border-none'><ArrowBack className='mr-2' /> Wróć do formularza</Button>
+            </Link>
+            <p className='text-sm text-slate-500 mt-2'>
+              Po opłaceniu pisma nie będzie możliwości zmiany jego treści, więc jeśli chcesz coś zmienić lub sprawdzić poprawność danych, wróć do formularza.
+            </p>
+          </div>
+
           <div className='flex flex-col'>
             <pre className='text-xs'>Kupujesz pismo</pre>
             <pre className='font-bold mb-4 text-black'>{formDoc?.title}</pre>
@@ -107,12 +116,14 @@ const FormFinalize = () => {
             </span>
 
 
-
             <h2>
               <MonetizationOn color='primary' className='mr-2 -translate-y-0.5' />
               Opłać pismo
             </h2>
             <p>Zapłać za pismo, a my wygenerujemy je i dodamy do Twojego konta.</p>
+          </div>
+
+          <div className='flex flex-col'>
             {userProfile && clientSecret && formDoc ?
               <>
                 <pre className='text-xs mt-8 mb-2'>Wybierz formę płatności </pre>
@@ -122,31 +133,29 @@ const FormFinalize = () => {
                 <Elements stripe={stripePromise} options={{ clientSecret, locale: 'pl' }}>
                   <PaymentElement onChange={({ complete }) => setFormFilledOut(complete)} options={{
                   }} />
-                  <Button disabled={!formFilledOut} color='primary' className={`w-full ${formFilledOut ? 'bg-blue-100' : 'bg-gray-300 cursor-not-allowed text-white'} sm:p-4 p-2 self-start border-none mt-4`}>
-                    Zapłać {(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł<ArrowForward className='ml-2' />
-                  </Button>
                 </Elements>
               </>
               : error
                 ? <p className='p-2 mt-8 sm:p-4 border-red-500 rounded-lg bg-red-50 text-red-500 border'>{error}</p>
-                : <CircularProgress className='text-xl self-center m-12' />
+                : null
             }
           </div>
-          <p className='bg-amber-50 text-amber-500 border-amber-500 p-2 mt-2 sm:mt-4 sm:p-4'>
-            <Info className='mr-2 -translate-y-0.5' />
-            Strona zbudowana w trybie testowym - płatności wyłączone.
-          </p>
-
-          <div className='flex-col flex mt-4'>
-            <p className='text-sm text-slate-500'>
-              Po opłaceniu pisma nie będzie możliwości zmiany jego treści, więc jeśli chcesz coś zmienić lub sprawdzić poprawność danych, wróć do formularza.
+          {userProfile && clientSecret && formDoc
+            ? null
+            : <CircularProgress className='text-xl h-full self-center m-12' />
+          }
+          <Button disabled={!formFilledOut} color='primary' className={`w-full ${formFilledOut ? 'bg-blue-400 text-white' : 'bg-gray-500 cursor-not-allowed text-white'} sm:p-4 p-2 self-start border-none mt-4`}>
+            Zapłać {(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł<ArrowForward className='ml-2' />
+          </Button>
+          {false ?
+            <p className='bg-amber-50 text-amber-500 border-amber-500 p-2 rounded-lg mt-2 sm:mt-4 sm:p-4'>
+              <Info className='mr-2 -translate-y-0.5' />
+              Strona zbudowana w trybie testowym - płatności wyłączone.
             </p>
-            <Link href={`/forms/${router.query.id}/form`}>
-              <Button color='error' className='w-full bg-red-100 sm:p-4 p-2 self-start border-none mt-2'><ArrowBack className='mr-2' /> Wróć do formularza</Button>
-            </Link>
-          </div>
+            : null
+          }
+
         </div>
-        <div className='sm:h-8' />
       </div>
     </div>
   </BodyScrollLock>

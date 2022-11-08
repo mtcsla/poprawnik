@@ -24,11 +24,11 @@ const UserFragment = ({ element, index, context, valueDisplay, listElementValues
     ).condition()
   }, [topData.values])
 
-  return <div className={`flex relative flex-col w-full`}>
+  return <div className={`flex sm:bg-slate-50 sm:rounded sm:p-6 relative flex-col w-full`}>
     {
       !active ?
-        <div className='absolute -top-2 -left-2 -right-2 -bottom-2 z-50 bg-slate-400 bg-opacity-5 cursor-not-allowed rounded-lg flex items-center justify-center p-4' >
-          <pre className='text-base text-blue-500 bg-gray-50 px-4 p-1 rounded'>Nie dotyczy</pre>
+        <div className=' absolute top-0 left-0 right-0 bottom-0 z-50 bg-slate-100 bg-opacity-50 cursor-not-allowed rounded-lg flex items-center justify-center p-4' >
+          <pre className='text-base text-blue-500  px-4 p-1 rounded'>Nie dotyczy</pre>
         </div>
         : null
     }

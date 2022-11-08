@@ -397,15 +397,3 @@ const longestCommonPrefix = (str1: React.ReactNode[], str2: React.ReactNode[]): 
   return i;
 }
 
-
-
-const longestCommonPrefix = (str1: React.ReactNode[], str2: React.ReactNode[]): number => {
-  let i = 0;
-  if (str1.length == 0 || str2.length == 0)
-    return 0;
-  //@ts-ignore
-  while (str1[i] === str2[i] || str1[i]?.props?.children === str2[i]?.props?.children || str1[i]?.props?.children === str2[i] || str1[i] === str2[i]?.props?.children) {
-    i++;
-  }
-  return i;
-}

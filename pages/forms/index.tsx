@@ -23,8 +23,6 @@ const FormsIndex = () => {
     <h1><Edit className="-translate-y-0.5 mr-1" color='primary' /> Wszystkie pisma</h1>
     <p>Tutaj znajdziesz listę wszystkich pism w naszej ofercie.</p>
 
-
-
     {
       !products.length
         ?
@@ -48,7 +46,7 @@ const FormsIndex = () => {
             <span className='flex flex-col items-stretch'>
               <Link passHref href={`/forms/${product.id}`} >
                 <a>
-                  <div key={product.id} style={{ minHeight: 120 }} className="flex hover:text-blue-500 hover:bg-blue-50  flex-col justify-between py-4 my-4 bg-white rounded-lg">
+                  <div key={product.id} style={{ minHeight: 120 }} className="flex hover:text-blue-500 hover:bg-blue-50  flex-col justify-between p-4 my-4 bg-white rounded-lg">
 
                     <pre>{product.title}</pre>
                     <span className='inline-flex gap-4 justify-between w-full items-center'>

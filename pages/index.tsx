@@ -180,17 +180,17 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
                 </Link>
               </>
               : <>
+                <Link href='/signup' passHref>
+                  <a>
+                    <pre className='text-xs hover:text-black'>rejestracja</pre>
+                  </a>
+                </Link>
                 <Link href='/login' passHref>
                   <a>
                     <pre className='text-xs hover:text-black'>logowanie</pre>
                   </a>
                 </Link>
 
-                <Link href='/signup' passHref>
-                  <a>
-                    <pre className='text-xs hover:text-black'>rejestracja</pre>
-                  </a>
-                </Link>
               </>
             }
           </div>
@@ -253,7 +253,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       </div>
       : null
     }
-    <div className='w-full inline-flex gap-12 justify-between items-center flex-wrap-reverse sm:flex-nowrap p-8 sm:p-12 bg-slate-100 ' >
+    <div className='w-full inline-flex gap-12 justify-center items-center flex-wrap-reverse sm:flex-nowrap p-8 sm:p-12 bg-slate-100 ' >
       <img src='/court.svg' className='flex-1' style={{ minWidth: 250, maxWidth: '26rem' }} />
 
       <div style={{ maxWidth: '60rem', minWidth: 250 }} className='inline-flex  flex-col gap-2'>

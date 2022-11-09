@@ -5,8 +5,6 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     style={{
       width: '100vw',
       height: '100vh',
-      backgroundImage: 'url(/bg-new.svg)',
-      backgroundSize: 'cover',
     }}
     className={'flex fixed  items-center justify-center'}
   >

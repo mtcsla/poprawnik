@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { DragHandle, Facebook, Instagram } from "@mui/icons-material";
 import { Button, Paper, useTheme } from "@mui/material";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 import useWindowSize from '../hooks/WindowSize';
 
@@ -16,9 +17,11 @@ const LogoHeader = ({
   noBackground,
   noBackgroundImportant,
   inAccountPage,
+  textWhite,
   noWidth
 }: {
-  border: boolean;
+  border?: boolean;
+  textWhite?: boolean;
   openSidebar?: () => void;
   noText?: boolean;
   caption?: string;
@@ -32,6 +35,7 @@ const LogoHeader = ({
 }) => {
   const theme = useTheme()
   const { width } = useWindowSize();
+  const router = useRouter();
 
   const TopComponent = styled(Paper) <{ noWidth: boolean | undefined }>`
   ${props => props.noWidth ? 'width: auto;' : 'width: 18rem;'}
@@ -60,7 +64,7 @@ const LogoHeader = ({
         </Button >
       ) : null}
 
-    <Link passHref href='/dashboard'>
+    <Link passHref href={router.pathname === '/' ? '/dashboard' : '/'}>
       <a>
         <Logo
           style={{ height: "3rem", width: "3rem" }}
@@ -77,7 +81,7 @@ const LogoHeader = ({
           <div className={'flex items-center'}>
             <div style={{ height: "2rem" }} className="border-l-2 ml-3 mr-3"></div>
             <div className="flex flex-col">
-              <pre className="p-0 pt-0 pb-0 text-sm font-bold font-mono">
+              <pre className={`p-0 pt-0 pb-0 text-sm font-bold font-mono ${textWhite ? 'text-white' : ''}`}>
                 POPRAWNI<b className="text-blue-500">K</b>
               </pre>
               {captionLink ?
@@ -85,14 +89,14 @@ const LogoHeader = ({
                   <a className="text-xs pb-0 pt-0 text-blue-500">{caption || "Zrobimy wszystko za Ciebie."}</a>
                 </Link>
                 :
-                <p className="text-xs pb-0 pt-0">{caption || "Zrobimy wszystko za Ciebie."}</p>
+                <p className={`${textWhite ? 'text-slate-300' : ''} text-xs pb-0 pt-0`}>{caption || "Zrobimy wszystko za Ciebie."}</p>
               }
             </div>
           </div>
           {(social ?? true) ?
             <div className={`flex items-center justify-between pl-1.5 flex-col ${inAccountPage ? 'pr-4' : ''}`}>
-              <Facebook className={'text-slate-500'} />
-              <Instagram className={'text-slate-500'} />
+              <Facebook className={textWhite ? 'text-white' : 'text-slate-500'} />
+              <Instagram className={textWhite ? 'text-white' : 'text-slate-500'} />
             </div>
             : null
           }

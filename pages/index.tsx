@@ -6,6 +6,7 @@ import Link from 'next/link';
 import React, { HTMLAttributes } from 'react';
 import { firebaseAdmin } from '../buildtime-deps/firebaseAdmin';
 import { ExplanationAnimationSvg } from '../components/ExplanationAnimationSvg';
+import LogoHeader from '../components/LogoHeader';
 import useWindowSize from '../hooks/WindowSize';
 
 export const getStaticProps = async (ctx: GetStaticPropsContext) => {
@@ -49,6 +50,7 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
 const TitleContainer = styled.div`
   transition: margin-top .5s ease-in-out;
 `
+
 const Caret = styled.span`
   animation: blink-caret .75s step-end infinite;
   border-left-width: 8px;
@@ -198,10 +200,10 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       }
     </div>
     {width && width < 1024 ?
-      <div className='w-full bg-blue-100  inline-flex gap-12 lg:hidden  p-8 sm:p-12'>
-        <div className='inline-flex gap-3 mx-auto md:flex-initial flex-col'>
+      <div className='w-full bg-blue-100  justify-center inline-flex gap-12 lg:hidden  p-8 sm:p-12'>
+        <div className='w-full bg-blue-200 rounded-lg hidden  sm:block' />
+        <div className='inline-flex gap-3 min-w-fit initial flex-col'>
           <pre className='text-lg'>Jak to działa?</pre>
-
           <ExplanationAnimation
             active
           />
@@ -209,9 +211,46 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       </div>
       : null
     }
-    <div className='w-full py-8 sm:py-12'>
+    <div className='w-full inline-flex gap-12 justify-between items-center flex-wrap-reverse sm:flex-nowrap p-8 sm:p-12 bg-slate-100 ' >
+      <img src='/court.svg' className='flex-1' style={{ minWidth: 250, maxWidth: '26rem' }} />
+
+      <div style={{ maxWidth: '60rem', minWidth: 250 }} className='inline-flex  flex-col gap-2'>
+        <h2 className='text-2xl lg:text-4xl'>Prosta sprawa sądowa?</h2>
+        <p className='text-base lg:text-xl whitespace-normal'>
+          Nie w każdej sprawie potrzebna jest kompleksowa obsługa prawna. Dzięki naszym łatwym w obsłudze narzędziom pomożemy Ci stworzyć profesjonalne pismo, które możesz złożyć w sądzie, wygenerowane w przeciągu chwili. Wypełnij wszystkie dane w naszym generatorze i skorzystaj z naszej usługi.
+        </p>
+      </div>
+    </div>
+    <div className='w-full pt-8 pb-4  sm:pt-12 sm:pb-8'>
       <MostPopularProducts {...{ mostPopularProducts, categories }} />
     </div>
+    <footer className='mt-auto h-fit w-full inline-flex gap-2 flex-col justify-between items-stretch px-8 sm:px-12 py-4 sm:py-6 bg-slate-700 ' >
+      <LogoHeader noPadding noBackground border={false} textWhite />
+      <div className='flex gap-3 ml-2 flex-wrap w-full'>
+        <div className='flex flex-col gap-1'>
+          <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Strona startowa</li>
+          <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Pisma</li>
+          <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Artykuły</li>
+        </div>
+        <div className='flex flex-col gap-1'>
+          <li className='text-slate-400 text-sm'>Kalkulatory</li>
+          <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Logowanie</li>
+          <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Rejestracja</li>
+        </div>
+        <div className='ml-auto flex flex-col items-end self-end'>
+          <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
+            Polityka prywatności
+          </p>
+          <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
+            Warunki korzystania z serwisu
+          </p>
+
+          <p className='text-white mt-2 text-sm font-bold'>
+            Trustree sp.j. © 2022
+          </p>
+        </div>
+      </div>
+    </footer>
 
   </div >
 }
@@ -290,13 +329,13 @@ export const MostPopularProducts = ({
 export const ProductCard = ({ product, first }: { product: any, first?: boolean }) => {
   return <Link href={`/forms/${product.id}`} passHref>
     <a>
-      <div className={`my-1 flex p-4 sm:p-8 flex-col ${first ? 'ml-8 sm:ml-12' : 'ml-4 sm:ml-8'}  h-fit hover:bg-blue-50 shadow cursor-pointer bg-slate-50 rounded-lg mx-4 `} style={{
+      <div className={`my-1 flex mb-6 p-4 sm:p-8 flex-col ${first ? 'ml-8 sm:ml-12' : 'ml-4 sm:ml-8'}  h-fit hover:bg-blue-50 text-black hover:text-blue-500 shadow cursor-pointer bg-slate-50 rounded-lg mx-4 `} style={{
         minHeight: '24rem',
         width: '20rem'
       }} >
 
-        <pre className='flex font-bold text-black whitespace-normal mb-4 text-lg'>
-          <Bookmark color='primary' className='translate-y-1 mr-2 ' />
+        <pre className='flex font-bold text-inherit whitespace-normal mb-4 text-lg'>
+          <Bookmark className='translate-y-1.5 mr-2 ' />
           {
             product.title
           }</pre>
@@ -315,7 +354,7 @@ export const ProductCard = ({ product, first }: { product: any, first?: boolean 
             <pre className='text-sm'>deweloper</pre>
           </div>
         </div>
-        <pre className='self-end text-sm'>Cena: <b className='font-mono text-lg font-bold text-black'>{(product.price / 100).toFixed(2).replace('.', ',')}</b></pre>
+        <pre className='self-end text-sm text-inherit'><i className='not-italic font-mono text-slate-500'>Cena:</i> <b className='text-lg font-bold normal-case text-inherit'>{(product.price / 100).toFixed(2).replace('.', ',')}zł</b></pre>
       </div>
     </a>
   </Link>

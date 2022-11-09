@@ -82,7 +82,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
               </div>
             </div>
             <div className='flex flex-col flex-1'>
-              <pre className='mt-2 text-sm bg-blue-100 px-2 sm:px-4 py-1 text-black rounded'>Opis</pre>
+              <pre className='mt-2 text-sm bg-slate-700 px-2 sm:px-4 py-1 text-white rounded'>Opis</pre>
               <p style={{ minHeight: 100 }} className='w-full  p-2 mt-2 sm:p-4 h-full bg-slate-50 rounded-lg'>{form?.description}</p>
             </div>
           </div>

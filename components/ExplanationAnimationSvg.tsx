@@ -51,7 +51,7 @@ export const ExplanationAnimationSvg = ({ style, className }: {
       animation: printer-in 2s 13.5s forwards,print-page 1s 15.5s forwards, page-move-up 1s 17.5s forwards, page-move-left 1s 20.5s forwards, page-out 2s 30s forwards; 
   }
       #signature {
-        font-size: 0px;
+        font-size: 0px !important;
       animation: sign 1s 21.5s forwards;
   }
 
@@ -94,27 +94,27 @@ export const ExplanationAnimationSvg = ({ style, className }: {
       animation: card-in 2s 7s forwards, card-out 0.5s 10.5s forwards;
   }
       #terminal_ok_1 {
-        font-size: 0px;
+        font-size: 0px !important;
       animation: phone-ok 0.25s 11s forwards;
   }
       #terminal_ok_2 {
-        font-size: 0px;
+        font-size: 0px !important;
       animation: phone-ok 0.25s 11.25s forwards;
   }
       #phone_ok_1 {
-        font-size: 0px;
+        font-size: 0px !important;
       animation: phone-ok 0.25s 7s forwards;
   }
       #phone_ok_2 {
-        font-size: 0px;
+        font-size: 0px !important;
       animation: phone-ok 0.25s 7.25s forwards;
   }
       @keyframes sign {
         0% {
-          font- size: 0px;
+          font-size: 0px !important;
     }
       100% {
-        font-size: 16px;
+        font-size: 16px !important;
     }
   }
       @keyframes hammer-in {
@@ -228,10 +228,10 @@ export const ExplanationAnimationSvg = ({ style, className }: {
 
       @keyframes phone-ok {
         0% {
-          font- size: 0px;
+          font-size: 0px !important;
     }
       100% {
-        font-size: 16px;
+        font-size: 16px !important;
     }
   }
       @keyframes fly-in {
@@ -275,17 +275,17 @@ export const ExplanationAnimationSvg = ({ style, className }: {
 
 
       #progress_bar{
-        font-size: 0px;
+        font-size: 0px !important;
       animation: progress-bar 2s forwards;
       animation-delay: 0s;
   }
 
       @keyframes progress-bar {
         0% {
-          font- size: 0;
+          font-size: 0 !important;
     }
       100% {
-        font-size: 16px;
+        font-size: 16px !important;
     }
   }
       @keyframes cloud-in {

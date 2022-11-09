@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Bookmark, Search } from '@mui/icons-material';
+import { ArrowForward, Bookmark, Search } from '@mui/icons-material';
 import { Avatar, Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { GetStaticPropsContext } from 'next';
 import Link from 'next/link';
@@ -8,6 +8,7 @@ import { firebaseAdmin } from '../buildtime-deps/firebaseAdmin';
 import { ExplanationAnimationSvg } from '../components/ExplanationAnimationSvg';
 import LogoHeader from '../components/LogoHeader';
 import useWindowSize from '../hooks/WindowSize';
+import { useAuth } from '../providers/AuthProvider';
 
 export const getStaticProps = async (ctx: GetStaticPropsContext) => {
   let categories: string[] = [];
@@ -93,6 +94,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
   ];
 
   const { width } = useWindowSize();
+  const { userProfile } = useAuth();
 
   const time = 120;
   React.useEffect(() => {
@@ -161,43 +163,83 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 
   return <div
     className='fixed bg-white bg-blend-darken flex-1 lg:flex-auto flex flex-col items-stretch left-0 right-0 bottom-0 top-0 overflow-y-auto'>
-    <div style={{ maxHeight: '28rem', height: '28rem', backgroundImage: 'url(/bg-new-light.svg)', backdropFilter: 'grayscale(20%)', backgroundSize: 'cover' }} className='inline-flex gap-20 p-8 bg-opacity-50 sm:p-12 md:p-16 justify-between items-center'>
-      <span style={{ minHeight: '20rem' }} className='flex-col pt-8 flex-1 md:flex-initial h-full justify-between relative flex'>
-        <span className='flex flex-col'>
-          <Subtitle className={`text-slate-500 text-sm sm:text-base float-left top-0 right-0 left-0 ${subtitleNumber === 0 || (subtitleNumber == 1 && secondSubtitleVisible) ? 'opacity-100' : 'opacity-0'} `}>
-            {subtitleNumber >= 1 && secondSubtitleVisible ? 'My jesteśmy tak samo' : 'Czy w Twojej sprawie aby na pewno potrzebny jest'}
-          </Subtitle>
-          <TitleContainer className={`${titleMoved ? '-mt-12' : 'mt-2'} mb-2 flex flex-wrap items-stretch`}>
-            <Link passHref href='/dashboard'>
-              <a>
-                <Logo src='logo1.svg' className={`m-0 p-0 h-12 sm:h-16 ${logoVisible ? 'w-12 sm:w-16 mr-2 -ml-1' : 'w-0  m-0'}`} />
-              </a>
-            </Link>
-            <h1 style={{ letterSpacing: 1.5 }} id="main-page-title" className={`font-mono  self-center m-0 text-4xl sm:text-5xl lg:text-6xl  text-slate-600 ${title.length ? '' : 'text-transparent w-0'}`}>
-              {title.length ? title : '|'}
-            </h1>
-            <Caret className={`${title.length ? 'ml-1 sm:ml-2' : ''} ${logoVisible ? 'hidden' : ''}`} />
-          </TitleContainer>
-          <Subtitle className={`float-right text-sm sm:text-base bottom-0 right-0 left-0 text-slate-500 ${lastSubtitleVisible ? 'opacity-100' : 'opacity-0'} `}>
-            Wykonamy dla Ciebie pismo sądowe tak samo dobrze, jak dowolny prawnik.
-          </Subtitle>
-        </span>
-        <Button style={{ minWidth: 250, }} className='bg-slate-50 border-none text-slate-500 shadow hover:bg-blue-50 hover:text-blue-500 w-full mt-8 self-start p-3 flex justify-between'>
-          <Search />
-          Wyszukaj pismo
-        </Button>
-      </span>
+    <div style={{ maxHeight: '40rem', height: '40rem', backgroundImage: 'url(/bg-new-light.svg)', backdropFilter: 'grayscale(20%)', backgroundSize: 'cover' }} className='flex-col flex'>
+      <div className='w-full pb-4 sm:pb-8 pt-8 sm:pt-12 md:pt-16 px-8 sm:px-12 md:px-16 inline-flex items-center flex-wrap gap-4'>
+        <div className='inline-flex gap-4 items-center'>
+          <Avatar className='bg-slate-400' src={
+            userProfile?.photoURL
+          } />
+          <div className='inline-flex items-end flex-col gap-1'>
+            {userProfile
+              ? <>
+                <p className='text-sm'>{userProfile.displayName}</p>
+                <Link href='/account' passHref>
+                  <a>
+                    <pre className='text-xs hover:text-black'>konto</pre>
+                  </a>
+                </Link>
+              </>
+              : <>
+                <Link href='/login' passHref>
+                  <a>
+                    <pre className='text-xs hover:text-black'>logowanie</pre>
+                  </a>
+                </Link>
 
-      {width && width >= 1024
-        ?
-        <ExplanationAnimation
-          style={{
-            minWidth: '16rem'
-          }}
-          active
-        />
-        : null
-      }
+                <Link href='/signup' passHref>
+                  <a>
+                    <pre className='text-xs hover:text-black'>rejestracja</pre>
+                  </a>
+                </Link>
+              </>
+            }
+          </div>
+        </div>
+        <Link href='/dashboard' passHref>
+          <a className='ml-auto'>
+            <Button className='border-none bg-transparent ' size='small'>Do serwisu <ArrowForward className='ml-2' /></Button>
+          </a>
+        </Link>
+
+      </div>
+      <div className='inline-flex gap-20 px-8  pb-8 bg-opacity-50 sm:pb-12 md:pb-16  sm:px-12 md:px-16 pt-0 justify-between items-center'>
+        <span style={{ minHeight: '20rem' }} className='flex-col pt-8 flex-1 md:flex-initial h-full justify-between relative flex'>
+          <span className='flex flex-col'>
+            <Subtitle className={`text-slate-500 text-sm sm:text-base float-left top-0 right-0 left-0 ${subtitleNumber === 0 || (subtitleNumber == 1 && secondSubtitleVisible) ? 'opacity-100' : 'opacity-0'} `}>
+              {subtitleNumber >= 1 && secondSubtitleVisible ? 'My jesteśmy tak samo' : 'Czy w Twojej sprawie aby na pewno potrzebny jest'}
+            </Subtitle>
+            <TitleContainer className={`${titleMoved ? '-mt-12' : 'mt-2'} mb-2 flex flex-wrap items-stretch`}>
+              <Link passHref href='/dashboard'>
+                <a>
+                  <Logo src='logo1.svg' className={`m-0 p-0 h-12 sm:h-16 ${logoVisible ? 'w-12 sm:w-16 mr-2 -ml-1' : 'w-0  m-0'}`} />
+                </a>
+              </Link>
+              <h1 style={{ letterSpacing: 1.5 }} id="main-page-title" className={`font-mono  self-center m-0 text-4xl sm:text-5xl lg:text-6xl  text-slate-600 ${title.length ? '' : 'text-transparent w-0'}`}>
+                {title.length ? title : '|'}
+              </h1>
+              <Caret className={`${title.length ? 'ml-1 sm:ml-2' : ''} ${logoVisible ? 'hidden' : ''}`} />
+            </TitleContainer>
+            <Subtitle className={`float-right text-sm sm:text-base bottom-0 right-0 left-0 text-slate-500 ${lastSubtitleVisible ? 'opacity-100' : 'opacity-0'} `}>
+              Wykonamy dla Ciebie pismo sądowe tak samo dobrze, jak dowolny prawnik.
+            </Subtitle>
+          </span>
+          <Button style={{ minWidth: 250, }} className='bg-slate-50 border-none text-slate-500 shadow hover:bg-blue-50 hover:text-blue-500 w-full mt-8 self-start p-3 flex justify-between'>
+            <Search />
+            Wyszukaj pismo
+          </Button>
+        </span>
+
+        {width && width >= 1024
+          ?
+          <ExplanationAnimation
+            style={{
+              minWidth: '16rem'
+            }}
+            active
+          />
+          : null
+        }
+      </div>
     </div>
     {width && width < 1024 ?
       <div className='w-full bg-blue-100  justify-center inline-flex gap-12 lg:hidden  p-8 sm:p-12'>
@@ -224,7 +266,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
     <div className='w-full pt-8 pb-4  sm:pt-12 sm:pb-8'>
       <MostPopularProducts {...{ mostPopularProducts, categories }} />
     </div>
-    <footer className='mt-auto h-fit w-full inline-flex gap-2 flex-col justify-between items-stretch px-8 sm:px-12 py-4 sm:py-6 bg-slate-700 ' >
+    <footer className='mt-auto h-fit w-full inline-flex gap-2 flex-col justify-between items-stretch p-8 sm:p-12 pb-4 sm:pb-8 pt-2 sm:pt-6 bg-slate-700 ' >
       <LogoHeader noPadding noBackground border={false} textWhite />
       <div className='flex gap-3 ml-2 flex-wrap w-full'>
         <div className='flex flex-col gap-1'>
@@ -246,16 +288,22 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
         </div>
         <div className='flex flex-col gap-1'>
           <li className='text-slate-400 text-sm'>Kalkulatory</li>
-          <Link href='/login' passHref>
-            <a>
-              <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Logowanie</li>
-            </a>
-          </Link>
-          <Link href='/signup' passHref>
-            <a>
-              <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Rejestracja</li>
-            </a>
-          </Link>
+          {
+            userProfile
+              ? null
+              : <>
+                <Link href='/login' passHref>
+                  <a>
+                    <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Logowanie</li>
+                  </a>
+                </Link>
+                <Link href='/signup' passHref>
+                  <a>
+                    <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Rejestracja</li>
+                  </a>
+                </Link>
+              </>
+          }
         </div>
         <div className='ml-auto flex flex-col items-end self-end'>
           <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>

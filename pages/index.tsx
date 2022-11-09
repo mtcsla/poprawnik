@@ -228,14 +228,34 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       <LogoHeader noPadding noBackground border={false} textWhite />
       <div className='flex gap-3 ml-2 flex-wrap w-full'>
         <div className='flex flex-col gap-1'>
-          <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Strona startowa</li>
-          <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Pisma</li>
-          <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Artykuły</li>
+          <Link href='/dashboard' passHref>
+            <a>
+              <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Strona startowa</li>
+            </a>
+          </Link>
+          <Link href='/forms' passHref>
+            <a>
+              <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Pisma</li>
+            </a>
+          </Link>
+          <Link href='/articles' passHref>
+            <a>
+              <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Artykuły</li>
+            </a>
+          </Link>
         </div>
         <div className='flex flex-col gap-1'>
           <li className='text-slate-400 text-sm'>Kalkulatory</li>
-          <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Logowanie</li>
-          <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Rejestracja</li>
+          <Link href='/login' passHref>
+            <a>
+              <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Logowanie</li>
+            </a>
+          </Link>
+          <Link href='/signup' passHref>
+            <a>
+              <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Rejestracja</li>
+            </a>
+          </Link>
         </div>
         <div className='ml-auto flex flex-col items-end self-end'>
           <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>

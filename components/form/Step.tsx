@@ -55,7 +55,7 @@ const UserStep = ({ element, context, nested, display, setEditingElement, listEl
                   </div>
 
 
-                  <div className='sm:px-8 px-4 cursor-not-allowed'>
+                  <div className=' cursor-not-allowed'>
                     <UserStep listElementValues={value} nested={true} display formDescription={formDescription} key={index} element={element} />
                   </div>
                   <div className='flex w-full p-4 sm:px-6 px-4 justify-end'>

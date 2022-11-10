@@ -343,25 +343,25 @@ export const MostPopularProducts = ({
   const [category, setCategory] = React.useState('any');
 
   return <div className='flex flex-col w-full overflow-x-visible' >
-    <div className='flex flex-col w-full self-center' style={{ maxWidth: 1000 }} >
-      <pre className='px-8 sm:px-12 md:text-lg mb-4 text-right self-end'>Najpopularniejsze pisma</pre>
-      <div className='px-8 sm:px-12 w-full'>
+    <div className='flex flex-col w-full items-center px-8 sm:px-12 self-center'  >
+      <div className='flex flex-col w-full' style={{ maxWidth: 1000 }}>
+        <pre className='md:text-lg w-full mb-4 text-right self-end whitespace-normal'>Najpopularniejsze pisma</pre>
+        <FormControl className='w-fit'>
+          <InputLabel>kategoria</InputLabel>
+          <Select size='small' value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
+            <MenuItem value='any'>
+              wszystkie pisma
+            </MenuItem>
+            {
+              categories.map(category => <MenuItem value={category}>
+                {category}
+              </MenuItem>)
+            }
+          </Select>
+        </FormControl>
       </div>
-      <FormControl className='w-fit'>
-        <InputLabel>kategoria</InputLabel>
-        <Select size='small' value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
-          <MenuItem value='any'>
-            wszystkie pisma
-          </MenuItem>
-          {
-            categories.map(category => <MenuItem value={category}>
-              {category}
-            </MenuItem>)
-          }
-        </Select>
-      </FormControl>
     </div>
-    <div className='w-screen items-stretch mt-8 flex overflow-x-auto'>
+    <div className='w-screen items-stretch mt-8 flex overflow-x-auto' >
       {
         mostPopularProducts[category].map(product => <ProductCard {...{ product }} first />)
       }

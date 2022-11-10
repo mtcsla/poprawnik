@@ -34,7 +34,7 @@ const Purchases = () => {
           </div>
           <div className='flex items-center justify-between flex-wrap'>
             <p className='text-sm text-slate-500'>Zapłacono: <b>{purchase.product_price.toFixed(2).toString().replace('.', ',')}zł</b></p>
-            <div className='inline-flex items-center gap-2 ml-auto'>
+            <div className='inline-flex bg-white rounded items-center gap-2 ml-auto'>
               <Button className='border-none bg-white'><Download /></Button>
               <Button className='border-none bg-white' color='error'><Delete /></Button>
             </div>
@@ -43,7 +43,7 @@ const Purchases = () => {
         </div>
           {index < arr.length - 1
             ?
-            <div className='w-full border-t border-slate-100 my-4' />
+            <div className='w-full border-slate-100 my-4' />
             : null
           }
         </>)

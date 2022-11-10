@@ -108,8 +108,9 @@ const FormFinalize = () => {
           </div>
 
           <div className='flex flex-col'>
-            <pre className='text-xs'>Zamawiasz pismo</pre>
-            <pre className='font-bold mb-4 text-black'>{formDoc?.title}</pre>
+            <p className='text-sm text-slate-500 mt-6'>Zamawiasz pismo:</p>
+            <h2 className='font-bold text-black mb-0'>{formDoc?.title}</h2>
+            <pre className='text-xs mb-4 '>{formDoc?.category}</pre>
 
             <pre className='text-sm self-end'>Jesteś zalogowany jako</pre>
             <span className='inline-flex gap-4 self-end my-2 items-center'>
@@ -202,7 +203,7 @@ const PaymentForm = ({ formDoc, setError }: {
     const { error } = await stripe?.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/account/purchases?new=${formDoc.id}`,
+        return_url: `${window.location.origin}/account/purchases?redirected=true`,
       }
     })
     if (error.type === "card_error" || error.type === "validation_error") {
@@ -218,7 +219,7 @@ const PaymentForm = ({ formDoc, setError }: {
       <Alert severity='error' className='bg-red-100 text-red-500'>Wprowadź dane płatności.</Alert>
     </Snackbar>
     <PaymentElement onChange={({ complete }) => setFormFilledOut(complete)} />
-    <LoadingButton loading={submitting} color='primary' onClick={onSubmit} className={`w-full ${submitting ? 'bg-gray-100 text-transparent' : 'bg-blue-400 text-white'} sm:p-4 p-2 self-start border-none`}>
+    <LoadingButton loading={submitting} color='primary' onClick={onSubmit} className={`w-full ${submitting ? 'bg-gray-100 text-transparent' : 'bg-blue-400 text-white'} sm:p-4 p-2 mt-4 self-start border-none`}>
       Zapłać {(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł<ArrowForward className='ml-2' />
     </LoadingButton>
   </>

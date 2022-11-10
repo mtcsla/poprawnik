@@ -19,6 +19,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         await firebaseAdmin.firestore().collection("forms").doc(formId).get()
       ).data();
 
+      const productDoc = (
+        await firebaseAdmin.firestore().collection("product").doc(formId).get()
+      ).data();
+
       const data = (
         await firebaseAdmin
           .firestore()
@@ -37,7 +41,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         .add({
           product_id: formId,
           product_name: formDoc?.title,
-          product_price: formDoc?.price,
+          product_price: productDoc?.price,
+          product_category: productDoc?.category,
+          product_description: productDoc?.description,
           discount: 0,
           contents: templateToHtmlFile(
             data as FormValues<RootFormValue>,

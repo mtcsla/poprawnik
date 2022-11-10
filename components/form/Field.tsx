@@ -54,7 +54,7 @@ const UserField = ({ element, fullWidth, display, valueDisplay, context, listEle
     {
       valueDisplay
         ? <div className='border rounded px-2 py-2 w-full flex flex-col'>
-          <p className='text-sm bg-white px-1 -mt-5  text-slate-500 self-start'>{element.label}</p>
+          <p className='text-sm bg-slate-50 px-1 -mt-5  text-slate-500 self-start'>{element.label}</p>
           <p className='px-1 py-0 my-0 truncate'>
             {
               (listElementValues?.[element.name as string] as string)?.length === 0 || listElementValues?.[element.name as string] == null

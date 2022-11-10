@@ -57,6 +57,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         JSON.stringify({ message: "Failed to get form", code: 500 })
       );
     }
+    let productDoc: firebaseAdmin.firestore.DocumentSnapshot | null = null;
+    try {
+      productDoc = await firebaseAdmin
+        .firestore()
+        .collection("products")
+        .doc(req.body.id)
+        .get();
+    } catch {
+      throw new Error(
+        JSON.stringify({ message: "Failed to get product", code: 500 })
+      );
+    }
 
     let dataDoc: firebaseAdmin.firestore.WriteResult | null = null;
     delete req.body?.data?.["§valuesValid"];
@@ -77,9 +89,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let paymentIntent: Stripe.PaymentIntent | null = null;
 
     try {
-      console.log(formDoc.data()?.price * 100);
       paymentIntent = await stripe.paymentIntents.create({
-        amount: formDoc.data()?.price * 100,
+        amount: productDoc.data()?.price,
         currency: "pln",
         automatic_payment_methods: {
           enabled: true,

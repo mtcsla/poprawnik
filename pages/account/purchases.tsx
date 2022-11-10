@@ -1,5 +1,5 @@
 import { collection, getDocs, orderBy, query } from '@firebase/firestore';
-import { Delete, Download, ShoppingBag } from '@mui/icons-material';
+import { Delete, Download, Refresh, ShoppingBag } from '@mui/icons-material';
 import { Button, Skeleton } from '@mui/material';
 import { useRouter } from 'next/router';
 import React from "react";
@@ -12,22 +12,39 @@ const Purchases = () => {
   const { userProfile } = useAuth();
   const router = useRouter();
 
-
-  React.useEffect(() => {
+  const getPurchases = () => {
+    setPurchasesList(null);
     getDocs(query(collection(firestore, `user-data/${userProfile?.uid}/purchased-documents`), orderBy('date', 'desc'))).then(purchases => {
       const purchasesData: any[] = purchases.docs.map(purchase => ({ ...purchase.data(), id: purchase.id }));
 
       setPurchasesList(purchasesData);
-    })
+    });
+  }
+
+  React.useEffect(() => {
+    if (userProfile?.uid) getPurchases();
   }, [])
 
 
   return <article className="w-full pb-12 flex items-stretch flex-col ">
-
     <h1>
       <ShoppingBag color='primary' className='-translate-y-1' /> Twoje zakupy
     </h1>
-    <p className='mb-8'>Tutaj możesz uzyskać dostęp do zakupionych produktów.</p>
+    <p className='mb-8'>Tutaj możesz uzyskać dostęp do zakupionych pism.</p>
+    <div className='inline-flex mb-12 w-full gap-3 flex-wrap-reverse justify-between items-center '>
+      <p>
+        Jeśli pismo, które zakupiłeś nie pojawi się na liście w przeciągu 10 minut pomimo odświeżenia strony
+        powiadom nas o tym wysyłając wiadomość na adres <a href="mailto:pomoc@poprawnik.pl" className='font-bold text-blue-500'>pomoc@poprawnik.pl</a>.
+      </p>
+      <div className='flex flex-col ml-auto items-end'>
+        <p className='text-sm text-slate-500'>
+          Nie widzisz swojego pisma?
+        </p>
+        <Button onClick={getPurchases} disabled={!purchasesList} className={`border-none  text-white ${!purchasesList ? 'bg-gray-300' : 'bg-blue-400 hover:bg-blue-500'}`}>
+          Odśwież <Refresh className='ml-2' />
+        </Button>
+      </div>
+    </div>
     {purchasesList ? <>
       {purchasesList.length
         ?
@@ -45,7 +62,7 @@ const Purchases = () => {
             <pre className="text-sm ml-auto">{purchase.date.toDate().toLocaleDateString('pl-PL')}</pre>
           </div>
           <div className='flex items-center justify-between flex-wrap'>
-            <p className='text-sm'><b className='font-normal text-slate-500'>Zapłacono:</b> <b className='text-inherit'>{purchase.product_price.toFixed(2).toString().replace('.', ',')}zł</b></p>
+            <p className='text-sm'><b className='font-normal text-slate-500'>Zapłacono:</b> <b className='text-inherit'>{(purchase.product_price / 100).toFixed(2).toString().replace('.', ',')}zł</b></p>
             <div className='inline-flex bg-white rounded items-center gap-2 ml-auto'>
               <Button className='border-none bg-white'><Download /></Button>
               <Button className='border-none bg-white' color='error'><Delete /></Button>

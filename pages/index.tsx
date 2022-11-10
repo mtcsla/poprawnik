@@ -242,80 +242,87 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       </div>
     </div>
     {width && width < 1024 ?
-      <div className='w-full bg-blue-100  justify-center inline-flex gap-12 lg:hidden  p-8 sm:p-12'>
-        <div className='w-full bg-blue-200 rounded-lg hidden  sm:block' />
-        <div className='inline-flex gap-3 min-w-fit initial flex-col'>
-          <pre className='text-lg'>Jak to działa?</pre>
-          <ExplanationAnimation
-            active
-          />
+      <div className='w-full bg-blue-100  justify-center inline-flex lg:hidden  p-8 sm:p-12'>
+        <div style={{ maxWidth: 1000 }} className='inline-flex w-full gap-12 items-center justify-center  '>
+          <div className='w-full bg-blue-200 rounded-lg hidden  sm:block' />
+          <div className='inline-flex gap-3 min-w-fit initial flex-col'>
+            <pre className='text-lg'>Jak to działa?</pre>
+            <ExplanationAnimation
+              active
+            />
+          </div>
         </div>
       </div>
       : null
     }
-    <div className='w-full inline-flex gap-12 justify-center items-center flex-wrap-reverse sm:flex-nowrap p-8 sm:p-12 bg-slate-100 ' >
-      <img src='/court.svg' className='flex-1' style={{ minWidth: 250, maxWidth: '26rem' }} />
+    <div className='w-full inline-flex justify-center items-center pb-3 p-8 sm:p-12 bg-slate-100 ' >
+      <div className='inline-flex flex-wrap-reverse sm:gap-12 sm:flex-nowrap' style={{ maxWidth: 1000 }}>
+        <img src='/court.svg' className='flex-1' style={{ minWidth: 250, maxWidth: '26rem' }} />
 
-      <div style={{ maxWidth: '60rem', minWidth: 250 }} className='inline-flex  flex-col gap-2'>
-        <h2 className='text-2xl lg:text-4xl'>Prosta sprawa sądowa?</h2>
-        <p className='text-base lg:text-xl whitespace-normal'>
-          Nie w każdej sprawie potrzebna jest kompleksowa obsługa prawna. Dzięki naszym łatwym w obsłudze narzędziom pomożemy Ci stworzyć profesjonalne pismo, które możesz złożyć w sądzie, wygenerowane w przeciągu chwili. Wypełnij wszystkie dane w naszym generatorze i skorzystaj z naszej usługi.
-        </p>
+        <div style={{ maxWidth: '60rem', minWidth: 250 }} className='inline-flex  flex-col gap-2'>
+          <h2 className='text-2xl lg:text-4xl'><i>Prosta sprawa sądowa</i><b className='text-blue-500'>?</b></h2>
+          <p className='text-base lg:text-lg whitespace-normal'>
+            Nie w każdej sprawie potrzebna jest <b>kompleksowa obsługa prawna</b>. Dzięki naszym łatwym w obsłudze interfejsom stworzymy dla Ciebie <b>profesjonalne pismo</b>, które możesz złożyć w sądzie, wygenerowane w przeciągu chwili. Wybierz pismo, które Cię interesuje, wypełnij formularz i skorzystaj z naszej usługi.
+
+          </p>
+        </div>
       </div>
     </div>
-    <div className='w-full pt-8 pb-4  sm:pt-12 sm:pb-8'>
+    <div className='w-full pt-8 pb-4  sm:pt-12 sm:pb-8 overflow-x-clip'>
       <MostPopularProducts {...{ mostPopularProducts, categories }} />
     </div>
-    <footer className='mt-auto h-fit w-full inline-flex gap-2 flex-col justify-between items-stretch p-8 sm:p-12 pb-4 sm:pb-8 pt-2 sm:pt-6 bg-slate-700 ' >
-      <LogoHeader noPadding noBackground border={false} textWhite />
-      <div className='flex gap-3 ml-2 flex-wrap w-full'>
-        <div className='flex flex-col gap-1'>
-          <Link href='/dashboard' passHref>
-            <a>
-              <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Strona startowa</li>
-            </a>
-          </Link>
-          <Link href='/forms' passHref>
-            <a>
-              <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Pisma</li>
-            </a>
-          </Link>
-          <Link href='/articles' passHref>
-            <a>
-              <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Artykuły</li>
-            </a>
-          </Link>
-        </div>
-        <div className='flex flex-col gap-1'>
-          <li className='text-slate-400 text-sm'>Kalkulatory</li>
-          {
-            userProfile
-              ? null
-              : <>
-                <Link href='/login' passHref>
-                  <a>
-                    <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Logowanie</li>
-                  </a>
-                </Link>
-                <Link href='/signup' passHref>
-                  <a>
-                    <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Rejestracja</li>
-                  </a>
-                </Link>
-              </>
-          }
-        </div>
-        <div className='ml-auto flex flex-col items-end self-end'>
-          <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
-            Polityka prywatności
-          </p>
-          <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
-            Warunki korzystania z serwisu
-          </p>
+    <footer className='mt-auto h-fit w-full flex justify-center p-8 sm:p-12 pb-4 sm:pb-8 pt-2 sm:pt-6 bg-slate-800 ' >
+      <div className='w-full inline-flex gap-2 flex-col justify-between items-stretch'>
+        <LogoHeader noPadding noBackground border={false} textWhite />
+        <div className='flex gap-3 ml-2 flex-wrap w-full'>
+          <div className='flex flex-col gap-1'>
+            <Link href='/dashboard' passHref>
+              <a>
+                <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Strona startowa</li>
+              </a>
+            </Link>
+            <Link href='/forms/list/all/1' passHref>
+              <a>
+                <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Pisma</li>
+              </a>
+            </Link>
+            <Link href='/articles' passHref>
+              <a>
+                <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Artykuły</li>
+              </a>
+            </Link>
+          </div>
+          <div className='flex flex-col gap-1'>
+            <li className='text-slate-400 text-sm'>Kalkulatory</li>
+            {
+              userProfile
+                ? null
+                : <>
+                  <Link href='/login' passHref>
+                    <a>
+                      <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Logowanie</li>
+                    </a>
+                  </Link>
+                  <Link href='/signup' passHref>
+                    <a>
+                      <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Rejestracja</li>
+                    </a>
+                  </Link>
+                </>
+            }
+          </div>
+          <div className='ml-auto flex flex-col items-end self-end'>
+            <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
+              Polityka prywatności
+            </p>
+            <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
+              Warunki korzystania z serwisu
+            </p>
 
-          <p className='text-white mt-2 text-sm font-bold'>
-            Trustree sp.j. © 2022
-          </p>
+            <p className='text-white mt-2 text-sm font-bold'>
+              Trustree sp.j. © 2022
+            </p>
+          </div>
         </div>
       </div>
     </footer>
@@ -335,9 +342,11 @@ export const MostPopularProducts = ({
 }) => {
   const [category, setCategory] = React.useState('any');
 
-  return <div className='flex flex-col w-full'>
-    <pre className='px-8 sm:px-12 md:text-lg mb-4 text-right self-end'>Najpopularniejsze pisma</pre>
-    <div className='px-8 sm:px-12 w-full'>
+  return <div className='flex flex-col w-full overflow-x-visible' >
+    <div className='flex flex-col w-full self-center' style={{ maxWidth: 1000 }} >
+      <pre className='px-8 sm:px-12 md:text-lg mb-4 text-right self-end'>Najpopularniejsze pisma</pre>
+      <div className='px-8 sm:px-12 w-full'>
+      </div>
       <FormControl className='w-fit'>
         <InputLabel>kategoria</InputLabel>
         <Select size='small' value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
@@ -402,11 +411,11 @@ export const ProductCard = ({ product, first }: { product: any, first?: boolean 
         width: '20rem'
       }} >
 
-        <pre className='flex font-bold text-inherit whitespace-normal mb-4 text-lg'>
-          <Bookmark className='translate-y-1.5 mr-2 ' />
+        <h4 className='flex font-bold text-inherit whitespace-normal mb-4 text:xl sm:text-2xl'>
+          <Bookmark color='primary' className='translate-y-1.5 mr-2 ' />
           {
             product.title
-          }</pre>
+          }</h4>
         <pre className='mt-2 text-xs'>Opis</pre>
         <p className='text-sm mt-2'>
           {

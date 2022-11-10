@@ -49,7 +49,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
           <LogoHeader noWidth noPadding noBackgroundImportant social={false} border={false} />
           <pre className='mt-4 self-end text-end whitespace-normal'>Zamierzasz wykonać pismo</pre>
           <pre className='text-xs mt-4'>Tytuł pisma</pre>
-          <pre className='mt-1 font-bold text-2xl whitespace-normal text-black mb-4 flex'><Bookmark color='primary' className='mr-2 translate-y-1' />{form?.title}</pre>
+          <h1 className='mt-1 font-bold text-2xl whitespace-normal text-black mb-4 flex'><Bookmark color='primary' className='mr-2 translate-y-1' />{form?.title}</h1>
           <div className='inline-flex self-stretch gap-3 flex-wrap sm:gap-6  justify-between'>
             <div className='self-end flex flex-col mt-4'>
               <pre className='text-xs'>Stworzone przez</pre>
@@ -82,14 +82,14 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
               </div>
             </div>
             <div className='flex flex-col flex-1'>
-              <pre className='mt-2 text-sm bg-slate-700 px-2 sm:px-4 py-1 text-white rounded'>Opis</pre>
+              <pre className='text-sm 0 rounded'>Opis</pre>
               <p style={{ minHeight: 100 }} className='w-full  p-2 mt-2 sm:p-4 h-full bg-slate-50 rounded-lg'>{form?.description}</p>
             </div>
           </div>
           <div className='flex-1' />
           {width && width < 1024
             ? <div className=' h-full flex rounded-lg my-8 flex-col justify-center w-full bg-slate-200 bg-blend-multiply p-4 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light.svg)', }}>
-              <pre className='text-lg mb-2 self-end    text-right mt-auto'>Jak to działa?</pre>
+              <pre className='text-lg mb-2 self-end text-black text-right mt-auto'>Jak to działa?</pre>
               <ExplanationAnimation className='mx-auto max-w-xs mb-auto w-full' active />
             </div>
             : null
@@ -111,7 +111,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
       </div>
       {width && width >= 1024
         ? <div className=' h-full flex flex-col justify-center w-full bg-slate-200 bg-blend-multiply p-8 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light.svg)', }}>
-          <pre className='text-lg mb-2 self-end text-right mt-auto'>Jak to działa?</pre>
+          <pre className='text-lg mb-2 self-end text-right mt-auto text-black'>Jak to działa?</pre>
           <ExplanationAnimation className='mx-auto mb-auto w-full' active />
         </div>
         : null

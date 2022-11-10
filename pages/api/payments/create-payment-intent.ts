@@ -59,6 +59,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     let dataDoc: firebaseAdmin.firestore.WriteResult | null = null;
+    delete req.body?.data?.["§valuesValid"];
     try {
       dataDoc = await firebaseAdmin
         .firestore()
@@ -76,11 +77,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     let paymentIntent: Stripe.PaymentIntent | null = null;
 
     try {
+      console.log(formDoc.data()?.price * 100);
       paymentIntent = await stripe.paymentIntents.create({
         amount: formDoc.data()?.price * 100,
         currency: "pln",
-        customer: customer.id,
-        payment_method_types: ["blik", "p24"],
+        automatic_payment_methods: {
+          enabled: true,
+        },
+
         metadata: {
           formId: req.body.id,
           userId: user.uid,

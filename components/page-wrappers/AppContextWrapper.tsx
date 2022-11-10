@@ -8,6 +8,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers-pro';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import colors from "tailwindcss/colors";
 
+
 const AppContextWrapper = ({ children }: { children: React.ReactNode }) => {
   return <LocalizationProvider dateAdapter={AdapterDateFns}>
     <SidenavProvider>

@@ -217,14 +217,14 @@ const FormDisplay = () => {
       <div className='w-full h-full sm:px-8'>
         <Body className='w-full h-auto mx-auto bg-white min-h-full flex flex-col'>
           <Link href={`/forms/${router.query.id}`}>
-            <Button size='small' className='bg-red-400 text-white mb-4 border-none w-full flex items-center justify-between'>
+            <Button size='small' className='bg-red-200 text-red-500 mb-4 border-none w-full flex items-center justify-between'>
               <ArrowBack />
               Wróć do strony pisma
             </Button>
           </Link>
 
           <pre className='text-xs self-end whitespace-normal'>Wypełniasz formularz do pisma</pre>
-          <pre className='self-end mb-4 whitespace-normal text-right text-black'>{formDoc?.title}</pre>
+          <h1 className='self-end mb-4 text-xl sm:text-2xl whitespace-normal text-right text-black'>{formDoc?.title}</h1>
           <span className='flex flex-col'>
             <div className="flex justify-between mb-4 flex-wrap items-center">
               <span className='-ml-5 -mt-4'>
@@ -387,7 +387,7 @@ const FormDisplay = () => {
                         <div className={`${loading ? '' : 'mt-auto'} w-full flex`}>
                           <Button
                             disabled={!buttonActive}
-                            className={`p-2.5 w-full ${buttonActive ? 'bg-blue-500 text-white  hover:bg-blue-400' : 'bg-gray-300'}`}
+                            className={`p-2.5 w-full ${buttonActive ? 'bg-blue-400 text-white  hover:bg-blue-500' : 'bg-gray-300'}`}
                             onClick={() => {
                               if (!isValid) {
                                 submitForm();

@@ -56,6 +56,32 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       awaitingVerification: false,
     });
 
+    if (req.query.category) {
+      await firebaseAdmin
+        .firestore()
+        .collection("categories")
+        .doc(req.query.category as string)
+        .set({
+          count: 1,
+        });
+    } else {
+      const count =
+        ((
+          await firebaseAdmin
+            .firestore()
+            .collection("categories")
+            .doc(data.category as string)
+            .get()
+        ).data()?.count as number) + 1;
+      await firebaseAdmin
+        .firestore()
+        .collection("categories")
+        .doc(data.category as string)
+        .set({
+          count: count,
+        });
+    }
+
     await firebaseAdmin
       .firestore()
       .doc(`/products/${id}`)

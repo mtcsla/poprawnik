@@ -43,11 +43,20 @@ const normalizeText = (text: string) => {
   return newText;
 };
 
-const templateToHtmlFile = (
+export const templateToHtmlFile = (
   values: FormValues<RootFormValue>,
   template: TemplateDescription,
   form: FormDescription,
-  { exists, list, textFormatting }: Contexts
+  { exists, list, textFormatting }: Contexts = {
+    exists: [],
+    list: [],
+    textFormatting: {
+      textFormattingType: "effect",
+      align: "left",
+      effect: "normal",
+      element: "p",
+    },
+  }
 ) => {
   return `
       <style>

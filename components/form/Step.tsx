@@ -58,7 +58,7 @@ const UserStep = ({ element, context, nested, display, setEditingElement, listEl
                   <div className=' cursor-not-allowed'>
                     <UserStep listElementValues={value} nested={true} display formDescription={formDescription} key={index} element={element} />
                   </div>
-                  <div className='flex w-full p-4 sm:px-6 px-4 justify-end'>
+                  <div className='flex w-full mt-4 justify-end'>
                     <Button
                       onClick={() => setEditingElement?.(index)}
                       className='border-none'>
@@ -71,11 +71,6 @@ const UserStep = ({ element, context, nested, display, setEditingElement, listEl
                     </Button>
                   </div>
                 </div>
-                {
-                  index < arr.length - 1
-                    ? <div className='border-t border-slate-100 my-4' />
-                    : null
-                }
               </>
           ) :
           <div className='flex flex-col items-center justify-center w-full h-72 bg-slate-50 rounded-lg'>

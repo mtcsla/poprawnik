@@ -43,9 +43,9 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
   const { width } = useWindowSize();
 
   return <BodyScrollLock>
-    <div className={`inline-flex gap-12 fixed top-0 overflow-y-auto right-0 left-0 bottom-0 items-stretch bg-white `} style={{ zIndex: 201, backgroundSize: 'cover' }}>
-      <div className='h-full flex' style={{ flex: 1 }} >
-        <div style={{ maxWidth: 800 }} className='mx-auto flex h-fit min-h-full flex-col flex-1 px-8 py-8   sm:px-12 sm:py-12 pt-6 bg-white self-stretch'>
+    <div className={`inline-flex fixed top-0 overflow-y-auto right-0 left-0 bottom-0 items-stretch bg-white `} style={{ zIndex: 201, backgroundSize: 'cover' }}>
+      <div className='h-full flex w-full' style={{ flex: 1, }} >
+        <div style={{ maxWidth: width && width < 1700 ? 900 : 1100 }} className='mx-auto my-auto flex h-fit flex-col flex-1 px-8 py-8   sm:px-12 sm:py-12 pt-6 bg-white self-stretch'>
           <div className='flex items-center w-full justify-between flex-wrap'>
             <LogoHeader noWidth noPadding noBackgroundImportant social={false} border={false} />
             <div className='flex ml-auto flex-col items-right'>
@@ -111,7 +111,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
             </div>
             : null
           }
-          <p className='self-end text-lg'>
+          <p className='self-end text-lg mt-12'>
             <pre className='text-sm mr-1 inline'>Cena:</pre>
             <b>
               {(form?.price / 100).toFixed(2).toString().replace('.', ',')}zł

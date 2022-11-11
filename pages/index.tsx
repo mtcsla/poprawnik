@@ -208,7 +208,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
             <Subtitle className={`text-slate-500 text-sm sm:text-base float-left top-0 right-0 left-0 ${subtitleNumber === 0 || (subtitleNumber == 1 && secondSubtitleVisible) ? 'opacity-100' : 'opacity-0'} `}>
               {subtitleNumber >= 1 && secondSubtitleVisible ? 'My jesteśmy tak samo' : 'Czy w Twojej sprawie aby na pewno potrzebny jest'}
             </Subtitle>
-            <TitleContainer className={`${titleMoved ? '-mt-12' : 'mt-2'} mb-2 flex flex-wrap items-stretch`}>
+            <TitleContainer className={`${titleMoved ? '-mt-12' : 'mt-2'} mb-2 flex flex-wrap items-center`}>
               <Link passHref href='/dashboard'>
                 <a>
                   <Logo src='logo1.svg' className={`m-0 p-0 self-end ${logoVisible ? 'w-12 sm:w-16 h-12 sm:h-16 mr-2 -ml-1' : 'w-0 h-0 m-0'}`} />

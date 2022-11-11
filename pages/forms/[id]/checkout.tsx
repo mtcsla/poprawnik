@@ -1,6 +1,6 @@
 import { collection, doc, getDoc } from '@firebase/firestore';
-import { ArrowBack, ArrowForward, CompareArrows, Info } from '@mui/icons-material';
-import { Alert, Avatar, Button, Checkbox, CircularProgress, Snackbar } from '@mui/material';
+import { ArrowBack, ArrowForward, CompareArrows } from '@mui/icons-material';
+import { Alert, Avatar, Button, Checkbox, Skeleton, Snackbar } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -96,8 +96,8 @@ const FormFinalize = () => {
 
   return <BodyScrollLock>
     <div className="top-0 sm:px-8 overflow-y-auto bottom-0 flex flex-col left-0 right-0 fixed bg-white" style={{ /*backgroundImage: 'url(/bg-new-light.svg)',*/ backgroundSize: 'cover', zIndex: 201 }}>
-      <div className='w-full h-full justify-center'>
-        <div className='mx-auto p-8 min-h-full flex flex-col h-fit w-full bg-white justify-between ' style={{ maxWidth: 900 }}>
+      <div className='w-full h-full flex'>
+        <div className='mx-auto p-8 flex my-auto flex-col h-fit w-full bg-white' style={{ maxWidth: 900 }}>
           <div className='flex-col flex'>
             <Link href={`/forms/${router.query.id}/form`}>
               <Button color='error' className='w-full bg-red-200 text-red-500 self-start border-none'><ArrowBack className='mr-2' /> Wróć do formularza</Button>
@@ -130,38 +130,37 @@ const FormFinalize = () => {
             <p>Zamów pismo, a my wygenerujemy je i dodamy do Twojego konta.</p>
           </div>
 
-          {userProfile && clientSecret && formDoc ?
-            <>
-              <Elements stripe={stripePromise} options={{ clientSecret, locale: 'pl' }}>
-                <PaymentForm formDoc={formDoc} setError={setError} />
-              </Elements>
-            </>
-            : error
-              ? <p className='p-2 mt-8 sm:p-4 border-red-500 rounded-lg bg-red-50 text-red-500 border'>{error}</p>
-              : null
-          }
-          {userProfile && clientSecret && formDoc
-            ? null
-            : <CircularProgress className='text-xl h-full self-center m-12' />
-          }
           <div className='w-full flex flex-col'>
-            <div className='inline-flex w-full gap-1 mt-4 items-center'>
-              <Checkbox className='pl-0 py-0' />
-              <label className='text-sm text-slate-500'><b className='text-red-400'>*</b>Oświadczam, że zapoznałem/am się z polityką prywatności.</label>
-            </div>
-            <div className='inline-flex w-full gap-1  items-center mb-4'>
-              <Checkbox className='pl-0 py-0' />
-              <p className='text-sm text-slate-500'><b className='text-red-400'>*</b>Oświadczam, że zapoznałem/am się z warunkami świadczenia usług.</p>
-            </div>
+            {userProfile && clientSecret && formDoc ?
+              <>
+                <Elements stripe={stripePromise} options={{ clientSecret, locale: 'pl' }}>
+                  <PaymentForm formDoc={formDoc} setError={setError} />
+                </Elements>
+              </>
+              : error
+                ? <p className='p-2 mt-8 sm:p-4 border-red-500 rounded-lg bg-red-50 text-red-500 border'>{error}</p>
+                : null
+            }
+            {userProfile && clientSecret && formDoc
+              ? null
+              : <>
+                <Skeleton variant='rectangular' className='mt-6 rounded' height={110} />
+                <span className='flex items-center w-full mt-1'>
+                  <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
+                </span>
+                <Skeleton variant='rectangular' className='rounded' height={110} />
+                <span className='flex items-center w-full mt-1'>
+                  <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
+                </span>
+                <Skeleton variant='rectangular' className='rounded' height={110} />
+                <span className='flex items-center w-full mt-1'>
+                  <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
+                </span>
+              </>
+            }
           </div>
 
-          {false ?
-            <p className='bg-amber-50 text-amber-500 border-amber-500 p-2 rounded-lg mt-2 sm:mt-4 sm:p-4'>
-              <Info className='mr-2 -translate-y-0.5' />
-              Strona zbudowana w trybie testowym - płatności wyłączone.
-            </p>
-            : null
-          }
+
 
         </div>
       </div>
@@ -222,9 +221,17 @@ const PaymentForm = ({ formDoc, setError }: {
       <pre className='text-xs mt-8 mb-2'>Wybierz formę płatności </pre>
       <PaymentElement onChange={({ complete }) => setFormFilledOut(complete)} />
     </div>
-    <LoadingButton loading={submitting} color='primary' onClick={onSubmit} className={`w-full ${submitting ? 'bg-gray-100 text-transparent' : 'bg-blue-400 text-white'} sm:p-4 p-2 mt-4 self-start border-none`}>
+    <LoadingButton loading={submitting} color='primary' onClick={onSubmit} className={`w-full mt-8 ${submitting ? 'bg-gray-100 text-transparent' : 'bg-blue-400 text-white'} sm:p-4 p-2  self-start border-none`}>
       Zapłać {(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł<ArrowForward className='ml-2' />
     </LoadingButton>
+    <div className='inline-flex w-full gap-1 mt-4 items-center'>
+      <Checkbox className='pl-0 py-0' />
+      <label className='text-sm text-slate-500'><b className='text-red-400'>*</b>Oświadczam, że zapoznałem/am się z polityką prywatności.</label>
+    </div>
+    <div className='inline-flex w-full gap-1  items-center mb-4'>
+      <Checkbox className='pl-0 py-0' />
+      <p className='text-sm text-slate-500'><b className='text-red-400'>*</b>Oświadczam, że zapoznałem/am się z warunkami świadczenia usług.</p>
+    </div>
   </>
 }
 

@@ -47,16 +47,13 @@ const formikContext = React.createContext<FormikContextValue>(formikValue);
 export const useFormValue = () => React.useContext(formikContext);
 
 const Body = styled.div`
-    padding: 1rem !important;
+  padding: 1rem !important;
   @media (min-width: 400px) {
     padding: 2rem !important;
   }
-
-  @media (min-width: 800px) {
-    max-width: 900px;
-  }
+  max-width: 900px;
   @media (min-width: 1700px) {
-    max-width: 1200px;
+    max-width: 1100px;
   }
 `
 
@@ -192,7 +189,7 @@ const FormDisplay = () => {
     if (testing)
       router.push(`/account/lawyer/edit-document/template?id=${router.query.id}`)
     else
-      router.push(`/forms/${router.query.id}/finalize`);
+      router.push(`/forms/${router.query.id}/checkout`);
   }
 
 
@@ -214,8 +211,8 @@ const FormDisplay = () => {
 
   return <BodyScrollLock>
     <div id='fixed-parent' className="bg-white overflow-y-auto fixed top-0 bottom-0 right-0 left-0" style={{ zIndex: 201, /*backgroundImage: 'url(/bg-new-light.svg)',*/ backgroundSize: 'cover' }}>
-      <div className='w-full h-full sm:px-8'>
-        <Body className='w-full h-auto mx-auto bg-white min-h-full flex flex-col'>
+      <div className='w-full h-full flex sm:px-8 sm:py-8'>
+        <Body className='w-full h-auto my-auto mx-auto bg-white  flex flex-col'>
           <Link href={`/forms/${router.query.id}`}>
             <a className='text-sm text-slate-500 hover:text-black gap-1 inline-flex items-center'>
               <Article /> Do strony pisma
@@ -260,7 +257,7 @@ const FormDisplay = () => {
           </span>
           {
             loading
-              ? <> <div className=' flex items-center justify-center m-auto'>
+              ? <> <div className=' flex items-center justify-center my-24'>
                 <pre className='mr-8'>Pobieramy twój formularz</pre>
                 <CircularProgress />
               </div>
@@ -383,8 +380,8 @@ const FormDisplay = () => {
                         <Snackbar open={!buttonActive}>
                           <Alert severity='error'>Wypełnij wszystkie pola poprawnie.</Alert>
                         </Snackbar>
-                        <div className={loading ? '' : 'mt-8'} />
-                        <div className={`${loading ? '' : 'mt-auto'} w-full flex`}>
+                        <div className={loading ? '' : 'mt-12'} />
+                        <div className={`${loading ? '' : ''} w-full flex`}>
                           <Button
                             disabled={!buttonActive}
                             className={`p-2.5 w-full ${buttonActive ? 'bg-blue-400 text-white  hover:bg-blue-500' : 'bg-gray-300'}`}

@@ -94,7 +94,7 @@ const UserStep = ({ element, context, nested, display, setEditingElement, listEl
       {fragments}
     </div>
     : <>
-      <pre className='text-sm justify-end flex items-center'><List className='mr-2' color='primary' /> Ten krok jest listą</pre>
+      <pre className='text-sm justify-end flex items-center mb-4'><List className='mr-2' color='primary' /> Ten krok jest listą</pre>
       <p className='mb-8'>
         <ArrowForwardIos className='mr-1 -translate-y-0.5' color='primary' /> Dodaj wartości do listy.
       </p>

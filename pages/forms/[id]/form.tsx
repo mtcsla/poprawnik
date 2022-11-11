@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { collection, doc, getDoc } from '@firebase/firestore';
-import { ArrowBack, ArrowForward } from '@mui/icons-material';
+import { ArrowBack, ArrowForward, Article } from '@mui/icons-material';
 import { Alert, Button, CircularProgress, Dialog, DialogContent, DialogTitle, LinearProgress, Snackbar } from '@mui/material';
 import { Formik } from 'formik';
 import Link from 'next/link';
@@ -217,14 +217,14 @@ const FormDisplay = () => {
       <div className='w-full h-full sm:px-8'>
         <Body className='w-full h-auto mx-auto bg-white min-h-full flex flex-col'>
           <Link href={`/forms/${router.query.id}`}>
-            <Button size='small' className='bg-red-200 text-red-500 mb-4 border-none w-full flex items-center justify-between'>
-              <ArrowBack />
-              Wróć do strony pisma
-            </Button>
+            <a className='text-sm text-slate-500 hover:text-black gap-1 inline-flex items-center'>
+              <Article /> Do strony pisma
+            </a>
           </Link>
 
-          <pre className='text-xs self-end whitespace-normal'>Wypełniasz formularz do pisma</pre>
-          <h1 className='self-end mb-4 text-xl sm:text-2xl whitespace-normal text-right text-black'>{formDoc?.title}</h1>
+          <p className='text-sm self-end whitespace-normal text-right'>Wypełniasz formularz pisma:</p>
+          <h1 className='self-end text-xl sm:text-2xl mb-0 whitespace-normal text-right text-black'>{formDoc?.title}</h1>
+          <pre className='text-xs self-end text-right mb-6'>{formDoc?.newCategory || formDoc?.category}</pre>
           <span className='flex flex-col'>
             <div className="flex justify-between mb-4 flex-wrap items-center">
               <span className='-ml-5 -mt-4'>

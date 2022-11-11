@@ -67,7 +67,7 @@ const Subtitle = styled.p`
   padding-left: 0.25rem;
 `
 const Logo = styled.img`
-  transition: width 0.5s ease-in-out, margin 0.5s ease-in-out;
+  transition: width 0.5s ease-in-out, margin 0.5s ease-in-out, height 0.5s ease-in-out;
 `
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -211,7 +211,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
             <TitleContainer className={`${titleMoved ? '-mt-12' : 'mt-2'} mb-2 flex flex-wrap items-stretch`}>
               <Link passHref href='/dashboard'>
                 <a>
-                  <Logo src='logo1.svg' className={`m-0 p-0 h-12 sm:h-16 ${logoVisible ? 'w-12 sm:w-16 mr-2 -ml-1' : 'w-0  m-0'}`} />
+                  <Logo src='logo1.svg' className={`m-0 p-0 self-end ${logoVisible ? 'w-12 sm:w-16 h-12 sm:h-16 mr-2 -ml-1' : 'w-0 h-0 m-0'}`} />
                 </a>
               </Link>
               <h1 style={{ letterSpacing: 1.5 }} id="main-page-title" className={`font-mono  self-center m-0 text-4xl sm:text-5xl lg:text-6xl  text-slate-600 ${title.length ? '' : 'text-transparent w-0'}`}>

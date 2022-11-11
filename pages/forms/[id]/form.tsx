@@ -53,10 +53,10 @@ const Body = styled.div`
   }
 
   @media (min-width: 800px) {
-    max-width: 800px;
+    max-width: 900px;
   }
   @media (min-width: 1700px) {
-    max-width: 1000px;
+    max-width: 1200px;
   }
 `
 

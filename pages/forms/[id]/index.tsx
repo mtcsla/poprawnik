@@ -1,4 +1,4 @@
-import { ArrowRight, Bookmark } from '@mui/icons-material';
+import { ArrowRight, Bookmark, Home } from '@mui/icons-material';
 import { Avatar, Button } from '@mui/material';
 import { GetStaticPropsContext } from 'next';
 import Link from 'next/link';
@@ -44,12 +44,29 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
 
   return <BodyScrollLock>
     <div className={`inline-flex gap-12 fixed top-0 overflow-y-auto right-0 left-0 bottom-0 items-stretch bg-white `} style={{ zIndex: 201, backgroundSize: 'cover' }}>
-      <div className='h-full' style={{ flex: width != null && width < 1024 ? 1 : 0.7 }} >
+      <div className='h-full' style={{ flex: 1 }} >
         <div className='flex h-fit min-h-full flex-col flex-1 px-8 py-8   sm:px-12 sm:pb-12 pt-6 bg-white self-stretch'>
-          <LogoHeader noWidth noPadding noBackgroundImportant social={false} border={false} />
-          <pre className='mt-4 self-end text-end whitespace-normal'>Zamierzasz wykonać pismo</pre>
-          <pre className='text-xs mt-4'>Tytuł pisma</pre>
-          <h1 className='mt-1 font-bold text-2xl whitespace-normal text-black mb-4 flex'><Bookmark color='primary' className='mr-2 translate-y-1' />{form?.title}</h1>
+          <div className='flex items-center w-full justify-between flex-wrap'>
+            <LogoHeader noWidth noPadding noBackgroundImportant social={false} border={false} />
+            <div className='flex ml-auto flex-col items-right'>
+              <Link href='/' passHref>
+                <a className='text-slate-500 hover:text-blue-500 cursor-pointer inline-flex gap-3 text-sm  items-center'>
+                  <Home />
+                  Strona główna
+                </a>
+              </Link>
+              <Link href='/forms/list/all/1' passHref>
+                <a className='text-slate-500 hover:text-blue-500 cursor-pointer inline-flex gap-3 text-sm items-center'>
+                  <Bookmark />
+                  Lista pism
+                </a>
+              </Link>
+            </div>
+          </div>
+          <pre className='mt-4 self-end text-right whitespace-normal'>Zamierzasz wykonać pismo</pre>
+          <p className='text-sm text-slate-500 mt-4'>Tytuł pisma:</p>
+          <h1 className='mt-1 font-bold text-2xl whitespace-normal text-black mb-0 flex'><Bookmark color='primary' className='mr-2 translate-y-1' />{form?.title}</h1>
+          <pre className='whitespace-normal mb-4 text-xs'>{form?.category}</pre>
           <div className='inline-flex self-stretch gap-3 flex-wrap sm:gap-6  justify-between'>
             <div className='self-end flex flex-col mt-4'>
               <pre className='text-xs'>Stworzone przez</pre>

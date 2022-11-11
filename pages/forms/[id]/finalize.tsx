@@ -97,7 +97,7 @@ const FormFinalize = () => {
   return <BodyScrollLock>
     <div className="top-0 sm:px-8 overflow-y-auto bottom-0 flex flex-col left-0 right-0 fixed bg-white" style={{ /*backgroundImage: 'url(/bg-new-light.svg)',*/ backgroundSize: 'cover', zIndex: 201 }}>
       <div className='w-full h-full justify-center'>
-        <div className='mx-auto p-8 min-h-full flex flex-col h-fit w-full bg-white justify-between ' style={{ maxWidth: 800 }}>
+        <div className='mx-auto p-8 min-h-full flex flex-col h-fit w-full bg-white justify-between ' style={{ maxWidth: 900 }}>
           <div className='flex-col flex'>
             <Link href={`/forms/${router.query.id}/form`}>
               <Button color='error' className='w-full bg-red-200 text-red-500 self-start border-none'><ArrowBack className='mr-2' /> Wróć do formularza</Button>
@@ -132,7 +132,6 @@ const FormFinalize = () => {
 
           {userProfile && clientSecret && formDoc ?
             <>
-              <pre className='text-xs mt-8 mb-2'>Wybierz formę płatności </pre>
               <Elements stripe={stripePromise} options={{ clientSecret, locale: 'pl' }}>
                 <PaymentForm formDoc={formDoc} setError={setError} />
               </Elements>
@@ -218,7 +217,11 @@ const PaymentForm = ({ formDoc, setError }: {
     <Snackbar open={notFilledOutError}>
       <Alert severity='error' className='bg-red-100 text-red-500'>Wprowadź dane płatności.</Alert>
     </Snackbar>
-    <PaymentElement onChange={({ complete }) => setFormFilledOut(complete)} />
+
+    <div className='flex flex-col'>
+      <pre className='text-xs mt-8 mb-2'>Wybierz formę płatności </pre>
+      <PaymentElement onChange={({ complete }) => setFormFilledOut(complete)} />
+    </div>
     <LoadingButton loading={submitting} color='primary' onClick={onSubmit} className={`w-full ${submitting ? 'bg-gray-100 text-transparent' : 'bg-blue-400 text-white'} sm:p-4 p-2 mt-4 self-start border-none`}>
       Zapłać {(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł<ArrowForward className='ml-2' />
     </LoadingButton>

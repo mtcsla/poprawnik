@@ -44,8 +44,8 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
 
   return <BodyScrollLock>
     <div className={`inline-flex gap-12 fixed top-0 overflow-y-auto right-0 left-0 bottom-0 items-stretch bg-white `} style={{ zIndex: 201, backgroundSize: 'cover' }}>
-      <div className='h-full' style={{ flex: 1 }} >
-        <div className='flex h-fit min-h-full flex-col flex-1 px-8 py-8   sm:px-12 sm:pb-12 pt-6 bg-white self-stretch'>
+      <div className='h-full flex' style={{ flex: 1 }} >
+        <div style={{ maxWidth: 800 }} className='mx-auto flex h-fit min-h-full flex-col flex-1 px-8 py-8   sm:px-12 sm:py-12 pt-6 bg-white self-stretch'>
           <div className='flex items-center w-full justify-between flex-wrap'>
             <LogoHeader noWidth noPadding noBackgroundImportant social={false} border={false} />
             <div className='flex ml-auto flex-col items-right'>

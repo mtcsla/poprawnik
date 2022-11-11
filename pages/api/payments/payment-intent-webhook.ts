@@ -20,7 +20,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       ).data();
 
       const productDoc = (
-        await firebaseAdmin.firestore().collection("product").doc(formId).get()
+        await firebaseAdmin.firestore().collection("products").doc(formId).get()
       ).data();
 
       const data = (
@@ -45,6 +45,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           product_category: productDoc?.category,
           product_description: productDoc?.description,
           discount: 0,
+          paymentIntentId: req.body?.data?.object?.id,
           contents: templateToHtmlFile(
             data as FormValues<RootFormValue>,
             formDoc?.templateData,

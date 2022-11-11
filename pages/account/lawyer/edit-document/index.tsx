@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc } from '@firebase/firestore';
+import { collection, doc, getDoc, getDocs, updateDoc } from '@firebase/firestore';
 import { ArrowBack, Bookmark, CancelPresentation, DoneAll, Warning } from "@mui/icons-material";
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, MenuItem, Select, Skeleton, TextField } from '@mui/material';
@@ -13,6 +13,8 @@ const EditForm = () => {
   const [form, setForm] = React.useState<IFormData | null>(null);
   const { userProfile } = useAuth();
   const router = useRouter();
+
+  const [allCategories, setAllCategories] = React.useState<string[]>([]);
 
   const [title, setTitle] = React.useState<string>('');
   const [description, setDescription] = React.useState<string>('');
@@ -108,11 +110,22 @@ const EditForm = () => {
   React.useEffect(() => {
     if (userProfile && router.isReady) {
       setVerifying(router.query.verifying === 'true')
-      getDoc(doc(firestore, `forms/${router.query.id}`)).then(snapshot => {
+      getDoc(doc(firestore, `forms/${router.query.id}`)).then(async snapshot => {
         if (!snapshot.data()) {
           router.push('/account/lawyer');
         }
+        const categories = (await
+          getDocs(
+            collection(
+              firestore,
+              `categories`
+            )
+          )
+        ).docs.map(
+          doc => doc.id
+        ) ?? [];
 
+        setAllCategories(categories);
         setForm({ id: snapshot.id, ...snapshot.data() } as IFormData);
         setTitle(snapshot.data()?.title ?? '');
         setDescription(snapshot.data()?.description ?? '');
@@ -121,6 +134,7 @@ const EditForm = () => {
         setNewCategory(snapshot?.data()?.category === 'new' ? (snapshot.data()?.newCategory ?? '') : '');
 
       }).catch(err => {
+        console.log(err);
         router.push('/account/lawyer')
       });
     }
@@ -231,6 +245,9 @@ const EditForm = () => {
         : <FormControl className='w-full'>
           <Select defaultValue={category} value={category} onChange={(e) => setCategory(e.target.value)}>
             <MenuItem value='new'>nowa kategoria</MenuItem>
+            {
+              allCategories.map((category) => <MenuItem value={category}>{category}</MenuItem>)
+            }
           </Select>
         </FormControl>
       }

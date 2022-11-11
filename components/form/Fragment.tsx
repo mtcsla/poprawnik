@@ -24,7 +24,7 @@ const UserFragment = ({ element, index, context, valueDisplay, listElementValues
     ).condition()
   }, [topData.values])
 
-  return <div className={`flex ${(topData.currentListIndex == null || topData.currentListIndex == -1) ? 'sm:bg-slate-50 sm:rounded sm:p-6' : ''} relative flex-col w-full`}>
+  return <div className={`flex ${(topData.currentListIndex == null || topData.currentListIndex == -1) || valueDisplay ? 'sm:bg-slate-50 sm:rounded sm:p-6' : ''} relative flex-col w-full`}>
     {
       !active ?
         <div className=' absolute top-0 left-0 right-0 bottom-0 z-50 bg-slate-100 bg-opacity-50 cursor-not-allowed rounded-lg flex items-center justify-center p-4' >

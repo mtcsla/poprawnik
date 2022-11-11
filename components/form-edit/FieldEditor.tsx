@@ -16,7 +16,7 @@ import ConditionCalculationEditor, { Condition, OperatorCondition } from "./cond
 import { useFormEditorLocation } from './FormEditor';
 
 const FieldEditor = () => {
-  const { modifyDescription, description, names } = useFormDescription();
+  const { modifyDescription, description, tempNames } = useFormDescription();
   const templateDescriptionObject = useFormTemplateDescription();
 
   const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);
@@ -260,7 +260,7 @@ const FieldEditor = () => {
                         return 'To pole jest wymagane.'
                       if (!value.match(/^[a-z_0-9]*$/))
                         return 'Dozwolone są tylko małe litery alfabetu łacińskiego, liczby oraz znak "_".'
-                      return names.map(obj => obj.name).includes(value) ? 'Ta nazwa jest już w użyciu w tym formularzu.' : null;
+                      return tempNames.map(obj => obj.name).includes(value) ? 'Ta nazwa jest już w użyciu w tym formularzu.' : null;
                     }
                 }
                 name='name' label='nazwa pola' className="w-full bg-white" />

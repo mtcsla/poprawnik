@@ -113,8 +113,9 @@ const formDescriptionContext = React.createContext<{
   description: FormDescription, modifyDescription: React.Dispatch<FormAction>,
   currentDescription: FormDescription, modifyCurrentDescription: React.Dispatch<FormAction>,
   names: NameType[],
+  tempNames: NameType[],
   updateFirestoreDoc: (description: FormDescription, template?: TemplateDescription) => Promise<void>
-}>({ description: [], modifyDescription: () => { }, currentDescription: [], modifyCurrentDescription: () => { }, updateFirestoreDoc: async () => { }, names: [] });
+}>({ description: [], modifyDescription: () => { }, currentDescription: [], modifyCurrentDescription: () => { }, updateFirestoreDoc: async () => { }, names: [], tempNames: [] });
 export const useFormDescription = () => React.useContext(formDescriptionContext);
 export type FormDescriptionProviderProps = {
   initValue: FormDescription | null;
@@ -138,6 +139,7 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
     await updateDoc(doc(firestore, `forms/${id}`), template ? { formData: description, templateData: template } : { formData: description });
   }
   const [names, setNames] = React.useState<NameType[]>([])
+  const [tempNames, setTempNames] = React.useState<NameType[]>([])
 
   React.useEffect(() => {
     if (router.isReady) {
@@ -248,10 +250,12 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
     return newState;
   }
 
-  const value = { description, names, modifyDescription, currentDescription, modifyCurrentDescription, updateFirestoreDoc }
+  const value = { description, names, tempNames, modifyDescription, currentDescription, modifyCurrentDescription, updateFirestoreDoc }
 
   React.useEffect(() => {
     const newNames: NameType[] = []
+    const newTempNames: NameType[] = []
+
     currentDescription.forEach(
       (step, stepIndex) => {
         step.children.forEach((fragment, fragmentIndex) => {
@@ -273,8 +277,30 @@ const FormDescriptionProvider = ({ children, initValue, id }: FormDescriptionPro
         })
       }
     )
+    description.forEach(
+      (step, stepIndex) => {
+        step.children.forEach((fragment, fragmentIndex) => {
+          fragment.children.forEach((field, fieldIndex) => {
+            newTempNames.push({
+              name: field.name,
+              step: stepIndex,
+              fragment: fragmentIndex,
+              field: fieldIndex,
+              required: field.required,
+              list: step.type === 'list' ? stepIndex : null,
+              type: field.type,
+              options: field.options,
+              valueType: getActualValueType(field),
+              fragmentConditional: !!fragment?.condition?.components?.length,
+              condition: field.condition as Expression<Condition, OperatorCondition>
+            })
+          })
+        })
+      }
+    )
     setNames(newNames as NameType[]);
-  }, [currentDescription])
+    setTempNames(newTempNames as NameType[]);
+  }, [currentDescription, description])
 
   return <formDescriptionContext.Provider {...{ value }}>
     {children}

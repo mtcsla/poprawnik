@@ -242,9 +242,14 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       </div>
     </div>
     {width && width < 1024 ?
-      <div className='w-full bg-blue-100  justify-center inline-flex lg:hidden  p-8 sm:p-12'>
-        <div style={{ maxWidth: 1000 }} className='inline-flex w-full gap-12 items-center justify-center  '>
-          <div className='w-full bg-blue-200 rounded-lg hidden  sm:block' />
+      <div className='w-full  justify-center inline-flex lg:hidden  '>
+        <div className='inline-flex w-full gap-12 items-center justify-center  p-8 sm:p-12'
+          style={{
+            maxWidth: '60rem',
+            background: 'linear-gradient(180deg, rgba(191,219,254,1) 0%, rgba(226,232,240,1) 100%)'
+          }}
+        >
+          <div className='w-full rounded-lg hidden  sm:block' />
           <div className='inline-flex gap-3 min-w-fit initial flex-col'>
             <pre className='text-lg'>Jak to działa?</pre>
             <ExplanationAnimation
@@ -255,8 +260,10 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       </div>
       : null
     }
-    <div className='w-full inline-flex justify-center items-center pb-3 p-8 sm:p-12 bg-slate-100 ' >
-      <div className='inline-flex flex-wrap-reverse sm:gap-12 sm:flex-nowrap' style={{ maxWidth: 1000 }}>
+    <div className='w-full inline-flex justify-center items-center pb-3 p-8 sm:p-12  ' style={{
+      background: 'linear-gradient(180deg, rgba(226,232,240,1) 0%, rgba(255,255,255,1) 100%)'
+    }} >
+      <div className='inline-flex flex-wrap-reverse sm:gap-12 sm:flex-nowrap' style={{ maxWidth: '60rem' }}>
         <img src='/court.svg' className='flex-1' style={{ minWidth: 250, maxWidth: '26rem' }} />
 
         <div style={{ maxWidth: '60rem', minWidth: 250 }} className='inline-flex  flex-col'>
@@ -345,7 +352,7 @@ export const MostPopularProducts = ({
 
   return <div className='flex flex-col w-full overflow-x-visible' >
     <div className='flex flex-col w-full items-center px-8 sm:px-12 self-center'  >
-      <div className='flex flex-col w-full' style={{ maxWidth: 1000 }}>
+      <div className='flex flex-col w-full' style={{ maxWidth: '60rem' }}>
         <pre className='md:text-lg w-full mb-4 text-right self-end whitespace-normal'>Najpopularniejsze pisma</pre>
         <FormControl className='w-fit'>
           <InputLabel>kategoria</InputLabel>

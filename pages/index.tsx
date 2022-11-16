@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { ArrowForward, Bookmark, Search } from '@mui/icons-material';
+import { ArrowForward, Search } from '@mui/icons-material';
 import { Avatar, Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { GetStaticPropsContext } from 'next';
 import Link from 'next/link';
@@ -88,9 +88,9 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 
 
   const titles: (React.ReactNode[])[] = [
-    ['P', 'r', 'a', 'w', 'n', 'i', <span className='text-blue-500 font-mono  uppercase'>k</span>, <span className='text-inherit font-mono'>?</span>],
-    ['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <b className='text-blue-500 font-mono uppercase'>.</b>],
-    ['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <span className='text-blue-500 font-mono uppercase'>k</span>],
+    ['P', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-500 inline font-mono font-semibold  uppercase'>k</pre>, <pre className='text-inherit inline font-mono'>?</pre>],
+    ['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-500 font-mono inline font-semibold uppercase'>.</pre>],
+    ['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-500 font-mono inline font-semibold uppercase'>k</pre>],
   ];
 
   const { width } = useWindowSize();
@@ -259,8 +259,9 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       <div className='inline-flex flex-wrap-reverse sm:gap-12 sm:flex-nowrap' style={{ maxWidth: 1000 }}>
         <img src='/court.svg' className='flex-1' style={{ minWidth: 250, maxWidth: '26rem' }} />
 
-        <div style={{ maxWidth: '60rem', minWidth: 250 }} className='inline-flex  flex-col gap-2'>
-          <h2 className='text-2xl lg:text-4xl'><i>Prosta sprawa sądowa</i><b className='text-blue-500'>?</b></h2>
+        <div style={{ maxWidth: '60rem', minWidth: 250 }} className='inline-flex  flex-col'>
+          <h2 className='text-2xl lg:text-4xl'>Prosta sprawa sądowa<b className='text-blue-500'>?</b></h2>
+          <pre className='text-base mb-8'>Zajmiemy się tym</pre>
           <p className='text-base lg:text-lg whitespace-normal'>
             Nie w każdej sprawie potrzebna jest <b>kompleksowa obsługa prawna</b>. Dzięki naszym łatwym w obsłudze interfejsom stworzymy dla Ciebie <b>profesjonalne pismo</b>, które możesz złożyć w sądzie, wygenerowane w przeciągu chwili. Wybierz pismo, które Cię interesuje, wypełnij formularz i skorzystaj z naszej usługi.
 
@@ -411,11 +412,12 @@ export const ProductCard = ({ product, first }: { product: any, first?: boolean 
         width: '20rem'
       }} >
 
-        <h4 className='flex font-bold text-inherit whitespace-normal mb-4 text:xl sm:text-2xl'>
-          <Bookmark color='primary' className='translate-y-1.5 mr-2 ' />
+        <h2 className='flex text-inherit whitespace-normal mb-1 text-lg sm:text-xl'>
           {
             product.title
-          }</h4>
+          }</h2>
+        <pre className='mb-4 text-xs whitespace-normal text-right'>{product.category}</pre>
+
         <pre className='mt-2 text-xs'>Opis</pre>
         <p className='text-sm mt-2'>
           {

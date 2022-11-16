@@ -217,7 +217,7 @@ const FormDisplay = () => {
       <div className='w-full h-full flex sm:px-8 sm:py-8'>
         <Body className='w-full h-auto my-auto mx-auto bg-white  flex flex-col'>
           <Link href={`/forms/${router.query.id}`}>
-            <a className='text-sm text-slate-500 hover:text-black gap-1 inline-flex items-center'>
+            <a className='text-sm self-start text-slate-500 hover:text-black gap-1 inline-flex items-center'>
               <Article /> Do strony pisma
             </a>
           </Link>
@@ -228,8 +228,8 @@ const FormDisplay = () => {
             </Alert>
           </Snackbar>
 
-          <p className='text-sm self-end whitespace-normal text-right'>Wypełniasz formularz pisma:</p>
-          <h1 className='self-end text-xl sm:text-2xl mb-0 whitespace-normal text-right text-black'>{formDoc?.title}</h1>
+          <p className='text-sm self-end whitespace-normal text-slate-500 text-right'>Wypełniasz formularz pisma:</p>
+          <h1 className='self-end text-xl sm:text-2xl mb-2 mt-2 whitespace-normal text-right text-black'>{formDoc?.title}</h1>
           <pre className='text-xs self-end text-right mb-6'>{formDoc?.newCategory || formDoc?.category}</pre>
           <span className='flex flex-col'>
             <div className="flex justify-between mb-4 flex-wrap items-center">
@@ -251,7 +251,7 @@ const FormDisplay = () => {
 
                     <p className='text-slate-700'>
                       <pre className='inline mr-1 text-slate-500'>
-                        krok {currentStep + 1} <span className='normal-case'>z</span> {description.length}{description[currentStep]?.subtitle ? ': ' : ''}
+                        krok {currentStep + 1}/{description.length}{description[currentStep]?.subtitle ? ': ' : ''}
                       </pre>
                       {description[currentStep]?.subtitle}
                     </p>
@@ -372,8 +372,8 @@ export const Fragment = ({ fragment, listIndex, formDescription, index }: { frag
       obscured
     }
     <pre className='text-xs'>fragment {index + 1}</pre>
-    <h2 className='my-1'>{fragment.title}</h2>
-    <p className='mb-4'>{fragment.subtitle}</p>
+    <h2 className='my-1 mb-4 lg:text-2xl text-xl'>{fragment.title}</h2>
+    <p className='mb-8 lg:text-base text-sm'>{fragment.subtitle}</p>
     <div style={{ gap: '2%' }} className='inline-flex flex-wrap'>
       {
         fields

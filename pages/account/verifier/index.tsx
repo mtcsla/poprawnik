@@ -35,7 +35,7 @@ const VerifierPage = () => {
         return <Link href={'/account/lawyer/edit-document?id=' + doc.id + '&verifying=true'}>
           <a>
             <div className='hover:bg-blue-50 hover:border-blue-500 cursor-pointer mb-8 p-4 border rounded-lg flex flex-col h-36 justify-between ' key={doc.id}>
-              <h4 className='mb-4 font-bold'>{doc.title}</h4>
+              <h4 className='mb-4'>{doc.title}</h4>
               <span className='flex w-full justify-between items-center'>
                 <p>{doc.authorName}</p>
                 <Avatar src={doc.authorPictureURL} />

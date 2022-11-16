@@ -92,8 +92,9 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          border: `1px solid ${colors.slate[200]}`,
           width: 'auto',
+          fontFamily: `'Lato', 'sans-serif'`,
+          fontWeight: 700,
           minWidth: 0,
           padding: '0.3rem',
           paddingLeft: '0.6rem',

@@ -64,8 +64,8 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
             </div>
           </div>
           <pre className='mt-4 self-end text-right whitespace-normal'>Zamierzasz wykonać pismo</pre>
-          <p className='text-sm text-slate-500 mt-4'>Tytuł pisma:</p>
-          <h1 className='mt-1 font-bold text-2xl whitespace-normal text-black mb-0 flex'><Bookmark color='primary' className='mr-2 translate-y-1' />{form?.title}</h1>
+          <p className='text-sm text-slate-500 mt-4 mb-1'>Tytuł pisma:</p>
+          <h1 className='mt-1 text-2xl whitespace-normal  text-black mb-2 flex'><Bookmark color='primary' className='mr-2 translate-y-1' />{form?.title}</h1>
           <pre className='whitespace-normal mb-4 text-xs'>{form?.category}</pre>
           <div className='inline-flex self-stretch gap-3 flex-wrap sm:gap-6  justify-between'>
             <div className='self-end flex flex-col mt-4'>

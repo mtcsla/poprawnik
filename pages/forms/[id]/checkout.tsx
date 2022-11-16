@@ -109,7 +109,7 @@ const FormFinalize = () => {
 
           <div className='flex flex-col'>
             <p className='text-sm text-slate-500 mt-6'>Zamawiasz pismo:</p>
-            <h2 className='font-bold text-black mb-0'>{formDoc?.title}</h2>
+            <h2 className='text-black mb-2 mt-1'>{formDoc?.title}</h2>
             <pre className='text-xs mb-4 '>{formDoc?.category}</pre>
 
             <pre className='text-sm self-end'>Jesteś zalogowany jako</pre>

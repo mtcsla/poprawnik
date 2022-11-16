@@ -502,7 +502,7 @@ function ListElement({ movingDown, index, movingUp, arr, heights, step, swap, fo
         : '0px'})`
   }} className={`w-full flex-col ${((movingDown === index || movingUp === index + 1) && index != arr.length - 1) || ((movingUp === index || movingDown === index - 1) && index != 0) ? 'transition_transform' : ''}`}>
     <div className={'inline-flex w-full items-center gap-4 h-4'}>
-      <pre className='whitespace-normal'>{step.listItemName || 'Element'} {index + 1}</pre>
+      <pre className='ml-3 whitespace-normal text-sm'>{step.listItemName || 'Element'} {index + 1}</pre>
       <div className='flex-1 border-t border-slate-100' />
       <ButtonGroup disabled={movingDown != -1 || movingUp != -1} variant='text'>
         <Tooltip title='zamień z elementem powyżej'>

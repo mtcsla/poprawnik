@@ -149,7 +149,7 @@ const FormsIndex = ({ products, category, page, categories, pagesNumber }: { pro
                   <a>
                     <div key={product.id} style={{ minHeight: 120 }} className="flex hover:text-blue-500 hover:bg-blue-50  flex-col justify-between p-4 my-4 bg-white rounded-lg">
                       <div className='w-full inline-flex items-center gap-3 flex-wrap'>
-                        <pre>{product.title}</pre>
+                        <h4>{product.title}</h4>
                         <pre className='ml-auto text-xs'>{product.category}</pre>
                       </div>
                       <span className='inline-flex gap-4 justify-between w-full items-center'>

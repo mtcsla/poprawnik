@@ -5,7 +5,7 @@ import React from 'react';
 import BodyScrollLock from '../../../providers/BodyScrollLock';
 import { FieldType, FieldValueType, NameType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { useTemplateDescription } from '../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
-import { useTemplateEditorContextForConditionsAndCalculations } from '../../template-edit/TemplateEditor';
+import { useListSteps } from '../../template-edit/TemplateEditor';
 import { Evaluate } from '../../utility/Evaluate';
 import { useFormEditorLocation } from '../FormEditor';
 import { ConditionCalculationDisplay } from './ConditionCalculationDisplay';
@@ -31,17 +31,17 @@ export const EditCondition = ({ path, add, cancel, initValue }: { path: number[]
     else return { description: formDescription.description, names: formDescription.names }
   }, [formDescription, templateDescription])
 
-  const listIndex = useTemplateEditorContextForConditionsAndCalculations();
+  const listSteps = useListSteps();
 
   const [valueEditorOpen, setValueEditorOpen] = React.useState(false);
 
   const globalVariableNames = React.useMemo(() => names.filter(item =>
-    (isInTemplate)
+    (isInTemplate
       ? true
-      : (item.step < step || (item.step === step && item.fragment < fragment)
-      )
-      && item.list == null
-      && !item.name.endsWith('~')
+      : (item.step < step || (item.step === step && item.fragment < fragment))
+    )
+    && item.list == null
+    && !item.name.endsWith('~')
   ).map((item) => <MenuItem value={item.name} className='flex items-center justify-between'>
     <Chip color='info' label={item.name} /> {valueTypeToPolish(item.valueType)}
   </MenuItem>), [names, step, fragment]);
@@ -49,7 +49,7 @@ export const EditCondition = ({ path, add, cancel, initValue }: { path: number[]
   const listVariableNames = React.useMemo(() =>
     names.filter(
       isInTemplate
-        ? item => item.list === listIndex
+        ? item => listSteps.includes(item.list != null ? item.list : -1)
         : item => item.list === step && item.fragment < fragment
     ).map((item) => <MenuItem value={item.name} className='flex items-center justify-between'>
       <Chip color='error' label={item.name} /> {valueTypeToPolish(item.valueType)}
@@ -72,7 +72,6 @@ export const EditCondition = ({ path, add, cancel, initValue }: { path: number[]
     <DialogTitle>
       <pre className='text-sm'>{!add ? 'Edytujesz' : 'Dodajesz'} warunek</pre>
       <p className='text-sm'>Edytuj ten prosty warunek...</p>
-      {listIndex}
     </DialogTitle>
 
     <Formik initialValues={initValue ?? getEmptyCondition()} onSubmit={() => { }}>
@@ -107,7 +106,7 @@ export const EditCondition = ({ path, add, cancel, initValue }: { path: number[]
           return names.find(name => values.variable === name.name)?.valueType ?? 'number' as FieldValueType;
         }, [values.variable]);
         const variableRequired = React.useMemo((): boolean => {
-          if (values.variable?.endsWith('Length~'))
+          if (values.variable?.endsWith('~'))
             return true;
           return names.find(name => values.variable === name.name)?.required ?? false as boolean;
         }, [values.variable]);

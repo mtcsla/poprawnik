@@ -123,7 +123,6 @@ export namespace ValidatorsObject {
 
       if (error) errors = { ...errors, [key]: error };
     });
-
     return errors;
   }
 }

@@ -38,10 +38,10 @@ const templateParenthesesEditorContext = React.createContext<{
 )
 export const useTemplateParenthesesEditor = () => React.useContext(templateParenthesesEditorContext);
 
-export const templateEditorContextForConditionsAndCalculations = React.createContext<number | null>(
-  null
+export const listStepsContext = React.createContext<number[]>(
+  []
 );
-export const useTemplateEditorContextForConditionsAndCalculations = () => React.useContext(templateEditorContextForConditionsAndCalculations);
+export const useListSteps = () => React.useContext(listStepsContext);
 
 export default function TemplateEditor({ display }: { display?: boolean }) {
   const { description, modifyDescription, form } = useTemplateDescription();
@@ -51,15 +51,16 @@ export default function TemplateEditor({ display }: { display?: boolean }) {
   const [editing, setEditing] = React.useState<boolean>(false);
 
 
+
   const parenthesesEditorContextValue = { parentheses, setParentheses, path, setPath, editing, setEditing };
 
-  return <templateEditorContextForConditionsAndCalculations.Provider value={-1}>
+  return <listStepsContext.Provider value={[]}>
     <templateParenthesesEditorContext.Provider value={parenthesesEditorContextValue}>
       <FormDescriptionProvider initValue={form} id={''}>
-        <EditTemplateDescription noHeadline={display} path={(!editing ? path : null) ?? []} />
+        <EditTemplateDescription noHeadline={display} path={[]} />
       </FormDescriptionProvider>
     </templateParenthesesEditorContext.Provider>
-  </templateEditorContextForConditionsAndCalculations.Provider>
+  </listStepsContext.Provider>
 }
 
 

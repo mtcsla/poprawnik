@@ -132,6 +132,16 @@ h6 {
   background: #0070f3;
 }
 
+.transition_transform {
+  transition: transform 0.5s ease-in-out;
+}
+.move_down {
+  transform: translateY(100%);
+}
+.move_up {
+  transform: translateY(-100%);
+}
+
 .p-04-rem {
   padding: 0.4rem !important;
 }

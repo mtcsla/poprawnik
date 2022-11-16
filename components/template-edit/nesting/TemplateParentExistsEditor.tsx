@@ -6,14 +6,14 @@ import { useFormDescription } from '../../../providers/FormDescriptionProvider/F
 import { ExistsElement, useTemplateDescription } from '../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
 import { useTemplateChangesDisplay } from '../../form-edit/Changes';
 import { Evaluate } from '../../utility/Evaluate';
-import { ParentElementPropsType, useTemplateEditorContextForConditionsAndCalculations } from '../TemplateEditor';
+import { ParentElementPropsType, useListSteps } from '../TemplateEditor';
 
 
 
 
 export const TemplateParentExistsEditor = ({ path, element, onChange, }: ParentElementPropsType<ExistsElement>) => {
   const { form } = useTemplateDescription();
-  const listIndex = useTemplateEditorContextForConditionsAndCalculations();
+  const listSteps = useListSteps();
 
   const [variables, setVariables] = React.useState<string[]>(element?.variables ?? []);
   const [selectOpen, setSelectOpen] = React.useState(false);
@@ -23,7 +23,7 @@ export const TemplateParentExistsEditor = ({ path, element, onChange, }: ParentE
   }, [variables]);
 
   const globals = React.useMemo(() => Evaluate.getNames(form).filter(name => name.list == null && !name.name?.endsWith('~')), [form]);
-  const listVars = React.useMemo(() => listIndex == -1 ? [] : Evaluate.getNames(form).filter(name => name.list === listIndex! && !name.name?.endsWith('~')), [form]);
+  const listVars = React.useMemo(() => !listSteps.length ? [] : Evaluate.getNames(form).filter(name => listSteps.includes(name.list != null ? name.list : -1) === !name.name?.endsWith('~')), [form]);
 
   const GlobalsElement = React.useMemo(() => globals.map((name) => {
     return <MenuItem className='flex w-full items-center justify-between' value={name.name!}>

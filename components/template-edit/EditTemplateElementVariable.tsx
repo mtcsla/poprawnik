@@ -2,16 +2,16 @@ import { Chip, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import React from 'react';
 import { TemplatePath, useTemplateDescription, VariableElement } from '../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
 import { Evaluate } from '../utility/Evaluate';
-import { useTemplateEditorContextForConditionsAndCalculations } from './TemplateEditor';
+import { useListSteps } from './TemplateEditor';
 
 export const EditTemplateElementVariable = ({ path, index, onChange, element }: { path: TemplatePath; index: number | null; onChange: (value: VariableElement) => void; element: VariableElement | null; }
 ) => {
   const { description, modifyDescription, form } = useTemplateDescription();
-  const listIndex = useTemplateEditorContextForConditionsAndCalculations();
+  const listSteps = useListSteps();
 
 
   const globals = React.useMemo(() => Evaluate.getNames(form).filter(name => name.list == null && name.valueType !== 'number' && name.required && !name.fragmentConditional && !name?.condition?.components?.length && !name.name?.endsWith('~')), [form]);
-  const listVars = React.useMemo(() => listIndex == -1 ? [] : Evaluate.getNames(form).filter(name => name.list === listIndex! && name.valueType !== 'number' && name.required && !name.fragmentConditional && !name?.condition?.components?.length && !name.name?.endsWith('~')), [form]);
+  const listVars = React.useMemo(() => !listSteps.length ? [] : Evaluate.getNames(form).filter(name => listSteps.includes(name.list != null ? name.list : -1) && name.valueType !== 'number' && name.required && !name.fragmentConditional && !name?.condition?.components?.length && !name.name?.endsWith('~')), [form]);
 
   const GlobalsElement = React.useMemo(() => globals.map((name) => {
     return <MenuItem className='flex w-full items-center justify-between' value={name.name!}>
@@ -36,12 +36,16 @@ export const EditTemplateElementVariable = ({ path, index, onChange, element }: 
 
 
   return <>
-    <FormControl size='small'>
+    <p className='text-sm'>Zmienna musi być typu innego niż liczba i nie być ani opcjonalna ani warunkowa.</p>
+    <FormControl className='mt-4'>
       <InputLabel>zmienna</InputLabel>
-      <Select onChange={(e, value) => setSelectedVariable(e.target.value as VariableElement['variable'])} value={selectedVariable} label='zmienna'>
-        <MenuItem disabled><pre className='text-white text-sm'>zmienne globalne</pre></MenuItem>
+      <Select disabled={!globals.length && !listVars.length} onChange={(e, value) => setSelectedVariable(e.target.value as VariableElement['variable'])} value={selectedVariable} label='zmienna'>
+        {GlobalsElement.length ?
+          <MenuItem disabled><pre className='text-white text-sm'>zmienne globalne</pre></MenuItem>
+          : null
+        }
         {GlobalsElement}
-        {listVars.length ?
+        {ListVariablesElement.length ?
           <MenuItem disabled><pre className='text-white text-sm'>zmienne listowe</pre></MenuItem>
           : null}
         {ListVariablesElement}

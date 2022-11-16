@@ -7,7 +7,7 @@ import { Expression, ListElement, TemplatePath, useTemplateDescription } from '.
 import { useTemplateChangesDisplay } from '../../form-edit/Changes';
 import { ConditionCalculationDisplay } from '../../form-edit/condition-calculation-editor/ConditionCalculationDisplay';
 import ConditionCalculationEditor, { Condition, OperatorCondition } from '../../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
-import { ParentElementPropsType, templateEditorContextForConditionsAndCalculations } from '../TemplateEditor';
+import { listStepsContext, ParentElementPropsType, useListSteps } from '../TemplateEditor';
 
 
 
@@ -76,6 +76,8 @@ export const TemplateParentListEditor = ({ path, element, onChange }: ParentElem
 export const TemplateParentListDisplay = ({ element, children, edit, path, index }: { element: ListElement, children: React.ReactNode, edit: () => void, path: TemplatePath, index: number }) => {
   const { form } = useTemplateDescription();
   const { changedConditions, deletionPaths } = useTemplateChangesDisplay();
+  const listSteps = useListSteps();
+  const lists = React.useContext(listContext);
   const changedCondition = React.useMemo(() => {
     const changed = changedConditions.find(condition => _.isEqual(condition[0], path.concat([index])));
     return changed ? changed[1] : null;
@@ -128,10 +130,10 @@ export const TemplateParentListDisplay = ({ element, children, edit, path, index
 
     <div className='bg-yellow-100 min-w-full pt-4 pb-4 sm:pb-6 sm:px-6 px-4 rounded-lg w-fit'>
       <div className='bg-white sm:p-4 p-2 rounded-lg'>
-        <listContext.Provider value={element?.list ?? ''}>
-          <templateEditorContextForConditionsAndCalculations.Provider value={form.findIndex(item => item.name === element?.list)}>
+        <listContext.Provider value={element?.list != null ? lists.concat(element.list) : lists}>
+          <listStepsContext.Provider value={lists.concat(element?.list).map((item) => form.findIndex((step) => step.type === 'list' && step.name === item))}>
             {children}
-          </templateEditorContextForConditionsAndCalculations.Provider>
+          </listStepsContext.Provider>
         </listContext.Provider>
       </div>
     </div>

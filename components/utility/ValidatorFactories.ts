@@ -13,6 +13,7 @@ export namespace Validators {
   const textFieldValidatorFactory = (field: FieldDescription) =>
     field.valueType === "number"
       ? (value: string) => {
+          console.log(`running for ${field.name} number`);
           if (field.required && !value) return "To pole jest wymagane.";
 
           const parser = field.numberType === "real" ? parseFloat : parseInt;
@@ -43,11 +44,13 @@ export namespace Validators {
 
   const selectFieldValidatorFactory =
     (field: FieldDescription) => (value: string) => {
+      console.log(`running for ${field.name} text/select`);
       if (field.required) if (!value) return "To pole jest wymagane.";
       return null;
     };
   const dateFieldValidatorFactory =
     (field: FieldDescription) => (date: Date) => {
+      console.log(`running for ${field.name} date`);
       if (typeof date === "string") date = new Date(date);
 
       const min = new Date(field.min as string);

@@ -19,18 +19,14 @@ const TemplateParentElementDisplay = ({
 }) => {
   const { description } = useTemplateDescription();
   const { setEditing, setPath, setParentheses } = useTemplateParenthesesEditor();
-
   const { changedConditions, deletionPaths } = useTemplateChangesDisplay();
+
   const toBeDeleted = React.useMemo(() => deletionPaths.findIndex(delpath => _.isEqual(path.concat([index]), delpath)) >= 0, [deletionPaths, path]);
 
   const element = React.useMemo(
     () => ModifyTemplate.getElementFromPath(
       description, path, index
     ), [description, path, index]
-  )
-  const children = React.useMemo(
-    () => ModifyTemplate.getDescriptionFromPath(description, path),
-    [description, path]
   )
   const edit = React.useCallback(() => {
     setEditing(
@@ -40,42 +36,38 @@ const TemplateParentElementDisplay = ({
     setParentheses([index, index]);
   }, [])
 
-  const Wrapper = React.useMemo(
-    () => {
+  const Wrapper = React.useCallback(
+    ({ type, children }: { type: TemplateElementType['parent'], children: React.ReactNode }) => {
       switch (type) {
         case 'ifElse':
-          return ({ children }: { children: React.ReactNode }) =>
-            <TemplateParentIfElseDisplay {...{ element: element as IfElseElement, edit, path, index }}>
-              {children}
-            </TemplateParentIfElseDisplay>
+          return <TemplateParentIfElseDisplay {...{ element: element as IfElseElement, edit, path, index }}>
+            {children}
+          </TemplateParentIfElseDisplay>
         case 'exists':
-          return ({ children }: { children: React.ReactNode }) =>
-            <TemplateParentExistsDisplay {...{ element: element as ExistsElement, edit }}>
-              {children}
-            </TemplateParentExistsDisplay>
+          return <TemplateParentExistsDisplay {...{ element: element as ExistsElement, edit }}>
+            {children}
+          </TemplateParentExistsDisplay>
         case 'list':
-          return ({ children }: { children: React.ReactNode }) =>
-            <TemplateParentListDisplay {...{ element: element as ListElement, edit, path, index }}>
-              {children}
-            </TemplateParentListDisplay>
+          return <TemplateParentListDisplay {...{ element: element as ListElement, edit, path, index }}>
+            {children}
+          </TemplateParentListDisplay>
         case 'textFormatting':
-          return ({ children }: { children: React.ReactNode }) =>
-            <TemplateParentTextFormattingDisplay {...{ element: element as TextFormattingElement, edit }}>
-              {children}
-            </TemplateParentTextFormattingDisplay>
+          return <TemplateParentTextFormattingDisplay {...{ element: element as TextFormattingElement, edit }}>
+            {children}
+          </TemplateParentTextFormattingDisplay>
         default:
-          return ({ children }: { children: React.ReactNode }) => <>{children}</>
+          return <>{children}</>
       }
-    },
-    [type]
+    }, []
   )
+
 
   return <div className='relative' >
     {((deletionPaths.length || changedConditions.length) && toBeDeleted)
       ? <div className='absolute rounded-lg bg-red-500 bg-opacity-50 z-50 top-0 bottom-0 left-0 right-0' />
       : null
     }
-    <Wrapper>
+    <Wrapper type={type}>
       <EditTemplateDescription path={path.concat([index])} />
     </Wrapper>
   </div>

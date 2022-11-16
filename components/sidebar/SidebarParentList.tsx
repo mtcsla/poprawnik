@@ -15,7 +15,7 @@ export const NavigationMenu = () => {
   return <div className={'flex flex-col w-full pl-1'}>
     <Link passHref href='/forms/list/all/1'>
       <a>
-        <MenuAccordion linkFragment={'forms'} icon={<Article {...{ sx }} color={'primary'} className={'mr-4'} />}
+        <MenuAccordion linkFragment={'forms/list'} icon={<Article {...{ sx }} color={'primary'} className={'mr-4'} />}
           title={'Pisma'} onChange={() => setExpanded(0)} expanded={expanded == 0} />
       </a>
     </Link>

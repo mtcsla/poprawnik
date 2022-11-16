@@ -398,7 +398,7 @@ const FieldEditor = () => {
                           name='min'
                           disabled={verifying}
                           value={values.min ? new Date(values.min) : null}
-                          onChange={(date: Date) => setFieldValue('min', date.toString())}
+                          onChange={(date: Date) => setFieldValue('min', date?.toString())}
                           renderInput={(params: any) =>
                             <TextField
                               size='small'
@@ -414,7 +414,7 @@ const FieldEditor = () => {
                         name='max'
                         disabled={verifying}
                         value={values.max ? new Date(values.max) : null}
-                        onChange={(date: Date) => setFieldValue('max', date.toString())}
+                        onChange={(date: Date) => setFieldValue('max', date?.toString())}
                         validate={(date: string) => {
                           if (!date || !values.min)
                             return null;

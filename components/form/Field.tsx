@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material';
+import { Help, InputOutlined, SelectAll } from '@mui/icons-material';
+import { FormControl, InputAdornment, InputLabel, MenuItem, Select, TextField, Tooltip } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
-import { ErrorMessage, Field } from 'formik';
+import { ErrorMessage, FastField as Field, getIn } from 'formik';
 import React from 'react';
 import { FormikContextValue, FormValues, NestedFormValue, useFormValue, useTopLevelFormData } from '../../pages/forms/[id]/form';
 import { FieldDescription, FormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
@@ -21,16 +22,18 @@ export type FieldProps<Type> = {
   listElementValues?: FormValues<NestedFormValue>
   listIndex?: number,
 
-
   element: Type,
-  formDescription: FormDescription
+
+  disabled?: boolean,
+  formDescription: FormDescription,
+
   fragmentCondition?: Expression<Condition, OperatorCondition>
 }
 
 /**
  * Make sure the field is a child to formik!
 */
-const UserField = ({ element, fullWidth, display, valueDisplay, context, listElementValues, formDescription, fragmentCondition }: FieldProps<FieldDescription>): JSX.Element => {
+const UserField = ({ element, fullWidth, display, context, formDescription, listIndex, fragmentCondition }: FieldProps<FieldDescription>): JSX.Element => {
   const FieldWrapper = styled.span`
     ${element.fullWidth ? 'flex: 1; min-width: 100%;' : 'width: 49%; max-width: 49%;'}
     @media (max-width: 700px) {
@@ -40,47 +43,19 @@ const UserField = ({ element, fullWidth, display, valueDisplay, context, listEle
     ${fullWidth ? 'min-width: 100%;' : ''}
   `
 
-
-  const TypedField = React.useMemo(() => {
-    if (element.type === 'date')
-      return <UserDateField {...{ element, display, context, formDescription, fragmentCondition }} />
-    else if (element.type === 'select')
-      return <UserSelectField {...{ element, display, context, formDescription, fragmentCondition }} />
-    else return <UserTextField {...{ element, display, context, formDescription, fragmentCondition }} />
-  }, []
-  )
-
-  return <FieldWrapper className='flex w-full flex-col items-start  mb-4'>
-    {
-      valueDisplay
-        ? <div className='border rounded px-2 py-2 w-full flex flex-col'>
-          <p className='text-sm bg-slate-50 px-1 -mt-5  text-slate-500 self-start'>{element.label}</p>
-          <p className='px-1 py-0 my-0 truncate'>
-            {
-              (listElementValues?.[element.name as string] as string)?.length === 0 || listElementValues?.[element.name as string] == null
-                ? <pre className='pl-0.5 inline text-sm'>Brak</pre>
-                : (
-                  element.type === 'date'
-                    ? (listElementValues?.[element.name] as Date)?.toLocaleDateString('pl-PL') ?? ''
-                    : listElementValues?.[element.name as string] as any
-                )
-            }</p>
-        </div>
-        : <>
-          {TypedField}
-          <ErrorMessage name={element.name}>{ErrorMessageCallback}</ErrorMessage>
-        </>
-    }
-  </FieldWrapper>
-}
-
-
-
-const UserDateField = ({ element, display, context, formDescription, fragmentCondition }: FieldProps<FieldDescription>) => {
-  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = context ? React.useContext(context) : useFormValue();
-
   const topData = useTopLevelFormData();
+  const { values, setFieldTouched } = useFormValue();
   const [disabled, setDisabled] = React.useState<boolean>(false);
+
+  const variable = React.useMemo(() => Evaluate.getNames(formDescription).find(item => item.name === element.name), [element.name]);
+  const name = React.useMemo(() =>
+    (listIndex != null && variable?.list != null) ? `${formDescription[variable.list].name}[${listIndex}].${element.name}` : element.name,
+    [listIndex]
+  );
+
+  React.useEffect(() => {
+    setFieldTouched(name, false);
+  }, [disabled])
 
   React.useEffect(() => {
     setDisabled(
@@ -91,59 +66,78 @@ const UserDateField = ({ element, display, context, formDescription, fragmentCon
             fragmentCondition?.components?.length ? fragmentCondition : { variable: null, comparator: null, value: { type: null, value: null }, simpleValue: true }
           ]
           , operators: ['&']
-        }, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition()
+        }, values, formDescription ?? [], listIndex ?? undefined).condition()
         : false
     )
-  }, [topData.values, formDescription, topData.currentListIndex]);
+  }, [values, formDescription, listIndex]);
 
-  const validatorFunction = React.useMemo(() => Validators.factory(element).date(), [element]);
+
+  const TypedField = (disabled: boolean) => {
+    if (element.type === 'date')
+      return <UserDateField {...{ element, display, context, formDescription, fragmentCondition, disabled, listIndex }} />
+    else if (element.type === 'select')
+      return <UserSelectField {...{ element, display, context, formDescription, fragmentCondition, disabled, listIndex }} />
+    else return <UserTextField {...{ element, display, context, formDescription, fragmentCondition, disabled, listIndex }} />
+  }
+
+  return React.useMemo(() => <FieldWrapper className='flex w-full flex-col items-start  mb-4'>
+    {TypedField(disabled)}
+    {!disabled
+      ? <ErrorMessage name={name}>{ErrorMessageCallback}</ErrorMessage>
+      : null
+    }
+  </FieldWrapper>, [disabled])
+}
+
+
+
+const UserDateField = ({ element, display, formDescription, fragmentCondition, disabled, listIndex }: FieldProps<FieldDescription>) => {
+  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = useFormValue();
+
+  const validatorFunction = React.useCallback(Validators.factory(element).date(), [element, disabled]);
+  const variable = React.useMemo(() => Evaluate.getNames(formDescription).find(item => item.name === element.name), [element.name]);
+  const name = React.useMemo(() =>
+    (listIndex != null && variable?.list != null) ? `${formDescription[variable.list].name}[${listIndex}].${element.name}` : element.name,
+    [listIndex]
+  );
+
 
   return <FormControl className='w-full' size={element.fullWidth ? 'medium' : 'small'}>
     <Field as={DatePicker}
-      name={element.name}
+      name={name}
+      id={name}
       disabled={disabled}
       maxDate={element.max ? new Date(element.max) : undefined}
       minDate={element.min ? new Date(element.min) : undefined}
-      value={display ? null : values[element.name]}
+      defaultValue={!display ? null : values[element.name]}
       onChange={(date: Date) => {
-        setFieldValue(element.name, date);
+        setFieldValue(name, date);
       }}
-      validate={display ? validatorFunction : undefined}
+      validate={!display && !disabled ? validatorFunction : undefined}
+      InputAdornmentProps={{
+        position: "start",
+        className: 'pl-0.5'
+      }}
       renderInput={(params: any) =>
         <TextField
           onBlur={() => setFieldTouched(element.name, true)}
-          size={element.fullWidth ? 'medium' : 'small'} {...Object.assign(params, { error: !!(touched[element.name] && errors[element.name]) })} />}
-      className='w-full' label={element.label} />
+          size={element.fullWidth ? 'medium' : 'small'} {...Object.assign(params, { error: !!(getIn(touched, name) && getIn(errors, name) && !disabled) })} />}
+      className='w-full flex flex-row-reverse' label={element.label} />
   </FormControl>
 
 }
-const UserSelectField = ({ element, context, display, formDescription, fragmentCondition }: FieldProps<FieldDescription>) => {
-  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = context ? React.useContext(context) : useFormValue();
+const UserSelectField = ({ element, display, formDescription, fragmentCondition, disabled, listIndex }: FieldProps<FieldDescription>) => {
+  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = useFormValue();
 
-  const validatorFunction = React.useMemo(() => Validators.factory(element).select(), [element]);
-
-  const topData = useTopLevelFormData();
-  const [disabled, setDisabled] = React.useState<boolean>(false);
-
-
-  React.useEffect(() => {
-    setDisabled(
-      formDescription ?
-        !Evaluate.sequence(
-          {
-            components: [
-              element.condition,
-              fragmentCondition?.components?.length ? fragmentCondition : { variable: null, comparator: null, value: { type: null, value: null }, simpleValue: true }
-            ]
-            , operators: ['&']
-          }, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition()
-        : false
-    )
-  }, [topData.values, formDescription, topData.currentListIndex]);
-
+  const validatorFunction = React.useCallback(Validators.factory(element).select(), [element, disabled]);
+  const variable = React.useMemo(() => Evaluate.getNames(formDescription).find(item => item.name === element.name), [element.name]);
+  const name = React.useMemo(() =>
+    (listIndex != null && variable?.list != null) ? `${formDescription[variable.list].name}[${listIndex}].${element.name}` : element.name,
+    [listIndex]
+  );
 
   return <FormControl className='w-full'
-    error={!!(touched[element.name] && errors[element.name]) as boolean}
+    error={!!(getIn(touched, name) && getIn(errors, name) && !disabled) as boolean}
     disabled={disabled}
     size={element.fullWidth ? 'medium' : 'small'}>
 
@@ -152,44 +146,52 @@ const UserSelectField = ({ element, context, display, formDescription, fragmentC
       className='w-full'
       as={Select}
       disabled={disabled}
-      onChange={(e: SelectChangeEvent) => setFieldValue(element.name, e.target.value)}
-      validate={display ? validatorFunction : undefined}
+      validate={!display && !disabled ? validatorFunction : undefined}
       label={element.label}
-      name={element.name}>
+      name={name}
+      startAdornment={
+        <InputAdornment position='start'>
+          {element.hint
+            ? <Tooltip title={element.hint}><Help color={!!(getIn(touched, name) && getIn(errors, name) && !disabled) ? 'error' : 'inherit'} /></Tooltip>
+            : <SelectAll color={!!(getIn(touched, name) && getIn(errors, name) && !disabled) ? 'error' : 'inherit'} />
+          }
+        </InputAdornment>
+      }
+
+      id={name}
+
+    >
       {element.options.map(option => <MenuItem value={option}>{option}</MenuItem>)}
       <MenuItem value={''}><pre>wyczyść</pre></MenuItem>
     </Field>
   </FormControl>
 }
-const UserTextField = ({ element, context, display, formDescription, fragmentCondition }: FieldProps<FieldDescription>) => {
-  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = context ? React.useContext(context) : useFormValue();
+const UserTextField = ({ element, display, formDescription, fragmentCondition, disabled, listIndex }: FieldProps<FieldDescription>) => {
+  const { values, errors, touched, setFieldValue, setFieldTouched, setFieldError } = useFormValue();
 
-  const validatorFunction = React.useMemo(() => Validators.factory(element).text(), [element])
-
-  const topData = useTopLevelFormData();
-  const [disabled, setDisabled] = React.useState<boolean>(false);
-
-  React.useEffect(() => {
-    setDisabled(
-      formDescription
-        ? !Evaluate.sequence({
-          components: [
-            element.condition,
-            fragmentCondition?.components?.length ? fragmentCondition : { variable: null, comparator: null, value: { type: null, value: null }, simpleValue: true }
-          ]
-          , operators: ['&']
-        }, topData.values, formDescription ?? [], topData.currentListIndex ? topData.currentListIndex : undefined).condition()
-        : false
-    );
-  }, [topData.values, formDescription, topData.currentListIndex]);
+  const validatorFunction = React.useCallback(Validators.factory(element).text(), [element, disabled])
+  const variable = React.useMemo(() => Evaluate.getNames(formDescription).find(item => item.name === element.name), [element.name]);
+  const name = React.useMemo(() =>
+    (listIndex != null && variable?.list != null) ? `${formDescription[variable.list].name}[${listIndex}].${element.name}` : element.name,
+    [listIndex]
+  );
 
 
   return <>
-    <Field validate={display ? validatorFunction : undefined} disabled={disabled}
+    <Field validate={!display && !disabled ? validatorFunction : undefined} disabled={disabled}
       size={element.fullWidth ? 'medium' : 'small'}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFieldValue(element.name, e.target.value)}
-      label={element.label} placeholder={element.placeholder} helperText={element.hint}
-      className='w-full' as={TextField} name={element.name} error={!!(touched[element.name] && errors[element.name]) as boolean} />
+      InputProps={{
+        startAdornment:
+          <InputAdornment position='start'>
+            {element.hint
+              ? <Tooltip title={element.hint}><Help color={!!(getIn(touched, name) && getIn(errors, name) && !disabled) ? 'error' : 'inherit'} /></Tooltip>
+              : <InputOutlined color={!!(getIn(touched, name) && getIn(errors, name) && !disabled) ? 'error' : 'inherit'} />
+            }
+          </InputAdornment>
+      }}
+      id={name}
+      label={element.label} placeholder={element.placeholder}
+      className='w-full' as={TextField} name={name} error={!!(getIn(touched, name) && getIn(errors, name) && !disabled) as boolean} />
   </>
 }
 

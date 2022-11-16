@@ -13,7 +13,7 @@ import { FieldDescription, FormDescription, StepDescription } from '../../../../
 import TemplateDescriptionProvider, { TextFormattingElement } from '../../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
 import { FormValues, NestedFormValue, RootFormValue } from '../../../forms/[id]/form';
 
-export const listContext = React.createContext<string>('');
+export const listContext = React.createContext<string[]>([]);
 export const existsContext = React.createContext<string[]>([]);
 export const textFormattingContext = React.createContext<{
   textFormattingType: 'effect' | 'element',
@@ -92,7 +92,7 @@ const EditDocumentTemplate = () => {
       Wróć do pisma
     </Button>
     {formDescription && id
-      ? <listContext.Provider value={''}>
+      ? <listContext.Provider value={[]}>
         <existsContext.Provider value={[]}>
           <textFormattingContext.Provider value={{ textFormattingType: 'effect', effect: 'normal', element: 'p', align: 'left' }}>
             {templateDescription ?

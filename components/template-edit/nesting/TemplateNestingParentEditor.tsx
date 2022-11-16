@@ -320,10 +320,7 @@ export const TemplateNestingParentEditor = ({ editing, adding, editorPath }: { e
             <Tab value={'textFormatting'} label='Formatowanie tekstu' onClick={() => parentType !== 'textFormatting' ? setNewType('textFormatting') : {}} />
           </Tabs>
 
-          {editing
-            ? <Button className='border-none self-end ml-auto mb-8' size='small' color='error' onClick={() => setDeleting(true)}>usuń element</Button>
-            : null
-          }
+          <Button disabled={!editing} className={`border-none self-end ml-auto mb-8`} size='small' color='error' onClick={() => setDeleting(true)}>usuń element</Button>
 
           {parentType === 'ifElse'
             ? <TemplateParentIfElseEditor onChange={(element) => setParent(element)} path={path!} element={editing ? parent! as IfElseElement : undefined} />

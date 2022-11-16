@@ -33,6 +33,7 @@ export type FragmentDescription = {
   children: FieldDescription[]
 };
 export type FieldDescription = {
+  disabled?: boolean,
   fullWidth: boolean;
   required: boolean;
   label: string;

@@ -3,10 +3,13 @@ import { Button } from '@mui/material';
 import { Formik } from 'formik';
 import { cloneDeep } from 'lodash';
 import { useRouter } from 'next/router';
-import { FieldDescription, FragmentDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
+import { FieldDescription, FragmentDescription, useFormDescription } from '../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import UserField, { FieldProps } from './Field';
 const EditorFragment = ({ fragment, editor, }: { editor: boolean, fragment: FragmentDescription }) => {
   const router = useRouter();
+
+  const { description, currentDescription } = useFormDescription();
+  const rightDescription = editor ? description : currentDescription;
 
   return <div className='w-full'>
     <pre className='font-normal hidden whitespace-pre-wrap'>{JSON.stringify(fragment, undefined, 2)}</pre>
@@ -37,7 +40,7 @@ const EditorFragment = ({ fragment, editor, }: { editor: boolean, fragment: Frag
               }}
                 className='font-normal normal-case  p-1 pb-0 hover:bg-transparent h-auto border-transparent mb-1' style={element.fullWidth ? { width: '100%' } : { width: '49%' }}>
                 <span className='pointer-events-none w-full'>
-                  <UserField display fullWidth  {...{ element } as FieldProps<FieldDescription>} />
+                  <UserField display fullWidth  {...{ element, formDescription: description } as FieldProps<FieldDescription>} />
                 </span>
               </Button>
             )}

@@ -4,10 +4,11 @@ import _ from 'lodash';
 import React from 'react';
 import { textFormattingContext } from '../../pages/account/lawyer/edit-document/template';
 import { ModifyTemplate } from '../../providers/TemplateDescriptionProvider/ModifyTemplate';
-import { TemplatePath, TextFormattingElement, useTemplateDescription } from '../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
+import { TemplateElementType, TemplatePath, TextFormattingElement, useTemplateDescription } from '../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
 import { useTemplateChangesDisplay } from '../form-edit/Changes';
 import { ConditionCalculationDisplay } from '../form-edit/condition-calculation-editor/ConditionCalculationDisplay';
 import TemplateParentElementDisplay from './nesting/TemplateParentElementDisplay';
+import { useTemplateParenthesesEditor } from './TemplateEditor';
 
 export const EditTemplateElement = ({ disabled, path, index, openMenu, menuTarget }: {
   path: TemplatePath;
@@ -22,6 +23,10 @@ export const EditTemplateElement = ({ disabled, path, index, openMenu, menuTarge
     () => ModifyTemplate.getElementFromPath(description, path, index),
     [description, path, index]
   );
+  const parentElement = React.useMemo(
+    () => <TemplateParentElementDisplay {...{ path, index, type: element.type as TemplateElementType['parent'] }} />
+    , [path, index, element.type]);
+
   const RenderElement = React.useMemo(
     () => ({ hovered }: { hovered: boolean; }) => {
 
@@ -64,13 +69,15 @@ export const EditTemplateElement = ({ disabled, path, index, openMenu, menuTarge
           spacja
         </pre>;
       if (['ifElse', 'exists', 'list', 'textFormatting'].includes(element.type))
-        return <TemplateParentElementDisplay {...{ path, index, type: element.type }} />
+        return parentElement;
       return <></>;
     },
     [element]
   );
   const ref = React.useRef<HTMLElement>();
   const menuOpen = React.useMemo(() => menuTarget === ref.current, [menuTarget, ref.current]);
+
+  const parentheses = useTemplateParenthesesEditor();
 
   const [hovered, setHovered] = React.useState(false);
   React.useEffect(() => {
@@ -90,7 +97,7 @@ export const EditTemplateElement = ({ disabled, path, index, openMenu, menuTarge
         setHovered(false);
     }}
     className={
-      `${(!disabled && !['ifElse', 'exists', 'list', 'textFormatting'].includes(element.type) && (hovered || menuOpen)) ? 'cursor-pointer' : ''} ${disabled ? 'cursor-not-allowed' : ''} max-w-none relative w-auto transition-transform `
+      `${(!disabled && !['ifElse', 'exists', 'list', 'textFormatting'].includes(element.type) && (hovered || menuOpen)) ? 'cursor-pointer' : ''} ${disabled ? 'cursor-not-allowed' : ''} ${(parentheses.path != null && path.length < parentheses.path!.length && !parentheses.path?.toString().startsWith(path.concat(index).toString())) ? 'opacity-20 pointer-events-none' : 'opacity-100'} max-w-none relative w-auto transition-transform `
     }>
 
     {((deletionPaths.length || changedConditions.length) && toBeDeleted)

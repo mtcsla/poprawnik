@@ -335,12 +335,28 @@ export namespace Evaluate {
       (n) => n.name === condition.variable
     ) as Partial<NameType>;
 
-    const conditionVariable = getValue(
+    let conditionVariable = getValue(
       condition.variable as string,
       values,
       description,
       listIndex
     );
+
+    if (
+      names.find((name) => name.name == condition.variable)?.valueType ===
+        "number" &&
+      typeof conditionVariable === "string"
+    ) {
+      if ((conditionVariable as string)?.includes("."))
+        conditionVariable = parseFloat((conditionVariable as string)!);
+      else conditionVariable = parseInt((conditionVariable as string)!);
+    }
+    if (
+      names.find((name) => name.name == condition.variable)?.type === "date" &&
+      typeof conditionVariable === "string"
+    )
+      conditionVariable = new Date(conditionVariable as string);
+
     const comparator = condition.comparator;
     const conditionValue =
       condition.value.type === "constant"
@@ -373,10 +389,10 @@ export namespace Evaluate {
     if (conditionVariable === null || conditionVariable === "") return false;
 
     switch (comparator) {
-      case "=":
-        return conditionVariable === conditionValue;
+      case "==":
+        return conditionVariable == conditionValue;
       case "!=":
-        return conditionVariable !== conditionValue;
+        return conditionVariable != conditionValue;
 
       case ">":
         return conditionVariable > conditionValue;

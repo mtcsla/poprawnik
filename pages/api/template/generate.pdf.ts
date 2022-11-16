@@ -201,11 +201,21 @@ const elementToHtmlFunctions = {
       0;
       i++
     ) {
-      html += `${elementToHtmlFunctions.template(values, element.child, form, {
-        exists,
-        list: [...list, [element.list, i]],
-        textFormatting,
-      })}`;
+      if (
+        element?.filter?.components?.length
+          ? Evaluate.sequence(element.filter, values, form, list).condition()
+          : true
+      )
+        html += `${elementToHtmlFunctions.template(
+          values,
+          element.child,
+          form,
+          {
+            exists,
+            list: [...list, [element.list, i]],
+            textFormatting,
+          }
+        )}`;
     }
     return html;
   },

@@ -17,7 +17,6 @@ export const TemplateParentIfElseEditor = ({ path, element, onChange }: ParentEl
   React.useEffect(() => {
     if (element) {
       setCondition(element.condition ?? { operators: [], components: [] });
-      console.log(element.condition)
     }
   }, [element]);
   React.useEffect(() => {

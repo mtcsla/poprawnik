@@ -5,7 +5,7 @@ import React from 'react';
 import { existsContext } from '../../../pages/account/lawyer/edit-document/template';
 import { FieldType, FieldValueType, NameType, useFormDescription, valueTypeToPolish } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { useTemplateDescription } from '../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
-import { useTemplateEditorContextForConditionsAndCalculations } from '../../template-edit/TemplateEditor';
+import { useListSteps } from '../../template-edit/TemplateEditor';
 import { Evaluate } from '../../utility/Evaluate';
 import { useFormEditorLocation } from '../FormEditor';
 import { ConditionCalculationDisplay } from './ConditionCalculationDisplay';
@@ -28,7 +28,7 @@ export const EditNumberValue = ({ type, inputType, save, cancel, initValue, nest
 
 
   const isInTemplate = React.useMemo(() => !!templateDescription.description.length, [templateDescription, formDescription])
-  const listIndex = useTemplateEditorContextForConditionsAndCalculations();
+  const listSteps = useListSteps();
   const allowedNotRequired = React.useContext(existsContext);
 
   const { description, names } = React.useMemo(() => {
@@ -56,7 +56,7 @@ export const EditNumberValue = ({ type, inputType, save, cancel, initValue, nest
   </MenuItem>), [names, step, fragment, isInTemplate]);
 
   const listVariableNames = React.useMemo(() => names.filter(item =>
-    (item.list === (listIndex ?? step) && (isInTemplate ? true : item.fragment < fragment)) && item.valueType === type && ((item.required && !item.fragmentConditional && !item?.condition?.components?.length) || allowedNotRequired.includes(item.name))
+    ((!listSteps.length ? item.list === step : listSteps.includes(item.list != null ? item.list : -1)) && (isInTemplate ? true : item.fragment < fragment)) && item.valueType === type && ((item.required && !item.fragmentConditional && !item?.condition?.components?.length) || allowedNotRequired.includes(item.name))
   ).map((item) => <MenuItem value={item.name} className='flex items-center justify-between'>
     <Chip color='error' label={item.name} /> {valueTypeToPolish(item.valueType)}
   </MenuItem>), [names, step, fragment, isInTemplate]);
@@ -112,7 +112,7 @@ export const EditNumberValue = ({ type, inputType, save, cancel, initValue, nest
                     : null}
                   <MenuItem disabled className='opacity-100'>Zmienne globalne</MenuItem>
                   {globalVariableNames.length ? globalVariableNames : emptyList}
-                  {(!isInTemplate ? description[step].type === 'list' : listIndex != null && listIndex >= 0)
+                  {(!isInTemplate ? description[step].type === 'list' : !!listSteps.length)
                     ?
                     [
                       <MenuItem disabled className='opacity-100'>Zmienne listowe</MenuItem>

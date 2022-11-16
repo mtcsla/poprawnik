@@ -15,15 +15,42 @@ import { EditTemplateElementVariable } from './EditTemplateElementVariable';
 import { TemplateNestingParentEditor } from './nesting/TemplateNestingParentEditor';
 import { isValidElement, useTemplateParenthesesEditor } from './TemplateEditor';
 
+
+const comparePaths = (path1: TemplatePath, path2: TemplatePath) => {
+  if (path1.length !== path2.length)
+    return false;
+  for (let i = 0; i < path1.length; i++) {
+    if (path1[i] !== path2[i])
+      return false;
+  }
+  return true;
+}
+
+
+
+const childrenContext = React.createContext<NestedDescriptionChildContext>({
+  path: [], openMenu: (e, index) => { }, menuTarget: null, localParentheses: [null, null], addParenthesis: (index) => { }, removeParenthesis: (index) => { }
+})
+
 export const EditTemplateDescription = (
   { path, bordered, noHeadline }: { path: TemplatePath; bordered?: boolean, noHeadline?: boolean }
 ) => {
   const { description, modifyDescription, updateFirebaseDoc } = useTemplateDescription();
-  const nestedDescription = React.useMemo(() => ModifyTemplate.getDescriptionFromPath(description, path), [description, path]);
+  const nestedDescription = React.useMemo(() => ModifyTemplate.getDescriptionFromPath(description, path), []);
+
 
   const parentheses = useTemplateParenthesesEditor();
   const [localParentheses, setLocalParentheses] = React.useState<[number | null, number | null]>([null, null]);
 
+  React.useEffect(() => {
+    if (
+      parentheses.path
+      && comparePaths(parentheses.path!, path)
+      && (parentheses.parentheses[0] != null || parentheses.parentheses[1] != null)
+    ) {
+      setLocalParentheses(parentheses.parentheses);
+    }
+  }, [parentheses.path, parentheses.parentheses, path]);
   React.useEffect(() => {
     if (!parentheses.path)
       setLocalParentheses([null, null]);
@@ -86,15 +113,16 @@ export const EditTemplateDescription = (
     setEditingElement(null);
   };
 
-  const comparePaths = (path1: TemplatePath, path2: TemplatePath) => {
-    if (path1.length !== path2.length)
-      return false;
-    for (let i = 0; i < path1.length; i++) {
-      if (path1[i] !== path2[i])
-        return false;
-    }
-    return true;
+  const contextValue: NestedDescriptionChildContext = {
+    path, openMenu: setMenuTargetAndIndex, menuTarget, localParentheses, addParenthesis, removeParenthesis
   }
+
+  const descriptionChildren = React.useMemo(() => {
+    return nestedDescription.map(
+      (item, index) =>
+        <NestedDescriptionChild {...{ index }} />
+    )
+  }, [nestedDescription])
 
 
   async function setDescriptionElement(element: TemplateElement, index: number | null) {
@@ -275,35 +303,10 @@ export const EditTemplateDescription = (
         : null
       }
       {nestedDescription?.length
-        ? nestedDescription.map(
-          (item, index) =>
-            !!parentheses.path
-              ? <span className='flex items-stretch justify-between w-full'>
+        ? <childrenContext.Provider value={contextValue}>
+          {descriptionChildren}
+        </childrenContext.Provider>
 
-                {parentheses.path && comparePaths(parentheses.path, path) && !parentheses.editing
-                  ? <div className={`flex items-end mr-2 ${localParentheses.includes(index)
-                    || (localParentheses[0] !== null && localParentheses[1] !== null && localParentheses[0] < index && index < localParentheses[1])
-                    ?
-                    'bg-blue-200' : ''} rounded`}>
-                    <Checkbox size='small' className='z-50' checked={
-                      localParentheses.includes(index)
-                      || (localParentheses[0] !== null && localParentheses[1] !== null && localParentheses[0] < index && index < localParentheses[1])
-
-                    } disabled={!localParentheses.includes(index) && localParentheses[0] !== null && localParentheses[1] !== null} onChange={(e, checked) => {
-                      const changeFn = checked ? addParenthesis : removeParenthesis;
-                      changeFn(index);
-                    }
-                    } />
-                  </div>
-                  : null
-                }
-                <div className={`flex-1 `}>
-                  <EditTemplateElement {...{ path, index, openMenu: setMenuTargetAndIndex, menuTarget }} disabled={!!parentheses.path} />
-                </div>
-              </span>
-              : <EditTemplateElement {...{ path, index, openMenu: setMenuTargetAndIndex, menuTarget }} />
-
-        )
         : <div className='w-full bg-slate-50 flex mb-4 items-center justify-center rounded-lg border p-3 sm:p-6'>
           <pre className='text-sm'>Brak elementów</pre>
         </div>}
@@ -343,3 +346,47 @@ export const EditTemplateDescription = (
     </div>
   </div>;
 };
+
+type NestedDescriptionChildContext = {
+  path: TemplatePath,
+  openMenu: (event: React.MouseEvent<HTMLElement>, index: number) => void,
+  menuTarget: any,
+  localParentheses: [number | null, number | null],
+  addParenthesis: (index: number) => void,
+  removeParenthesis: (index: number) => void,
+}
+
+
+const NestedDescriptionChild = (
+  { index }: { index: number }
+) => {
+  const { path, openMenu, menuTarget, localParentheses, addParenthesis, removeParenthesis } = React.useContext(childrenContext);
+  const parentheses = useTemplateParenthesesEditor();
+
+  return !!parentheses.path
+    ? <span className='flex items-stretch justify-between w-full'>
+
+      {parentheses.path && comparePaths(parentheses.path, path) && !parentheses.editing
+        ? <div className={`flex items-end mr-2 ${localParentheses.includes(index)
+          || (localParentheses[0] !== null && localParentheses[1] !== null && localParentheses[0] < index && index < localParentheses[1])
+          ?
+          'bg-blue-200' : ''} rounded`}>
+          <Checkbox size='small' className='z-50' checked={
+            localParentheses.includes(index)
+            || (localParentheses[0] !== null && localParentheses[1] !== null && localParentheses[0] < index && index < localParentheses[1])
+
+          } disabled={!localParentheses.includes(index) && localParentheses[0] !== null && localParentheses[1] !== null} onChange={(e, checked) => {
+            const changeFn = checked ? addParenthesis : removeParenthesis;
+            changeFn(index);
+          }
+          } />
+        </div>
+        : null
+      }
+      <div className={`flex-1 `}>
+        <EditTemplateElement {...{ path, index, openMenu, menuTarget }} disabled={!!parentheses.path} />
+      </div>
+    </span>
+    : <EditTemplateElement {...{ path, index, openMenu, menuTarget }} />
+}
+

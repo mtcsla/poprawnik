@@ -66,6 +66,17 @@ const theme = createTheme({
     },
     MuiOutlinedInput: {
       styleOverrides: {
+        inputAdornedStart: {
+          background: 'white'
+        },
+
+        root: {
+          transition: 'background-color 0.3s ease-in-out',
+          '&.Mui-disabled': {
+            backgroundColor: colors.transparent
+          },
+          backgroundColor: colors.white
+        },
         input: {
           transition: 'background-color 0.3s ease-in-out',
           '&.Mui-disabled': {

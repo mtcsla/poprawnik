@@ -1,9 +1,8 @@
 import { Button } from '@mui/material';
 import React from 'react';
-import { CalculationElement, Expression, TemplatePath, useTemplateDescription } from '../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
+import { CalculationElement, Expression, TemplatePath } from '../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
 import { ConditionCalculationDisplay } from '../form-edit/condition-calculation-editor/ConditionCalculationDisplay';
 import ConditionCalculationEditor, { Calculation, OperatorCalculation } from '../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
-import { useTemplateEditorContextForConditionsAndCalculations } from './TemplateEditor';
 
 export const EditTemplateElementCalculation = ({ path, index, onChange, element }: {
   path: TemplatePath; index: number | null; onChange: (element: CalculationElement) => void; element: CalculationElement | null;
@@ -12,8 +11,6 @@ export const EditTemplateElementCalculation = ({ path, index, onChange, element 
   const [calculation, setCalculation] = React.useState<Expression<Calculation, OperatorCalculation>>(element?.calculation || { components: [], operators: [] });
   const [editingCalculation, setEditingCalculation] = React.useState<boolean>(false);
 
-  const { form } = useTemplateDescription();
-  const listIndex = useTemplateEditorContextForConditionsAndCalculations();
 
   React.useEffect(() => {
     onChange({

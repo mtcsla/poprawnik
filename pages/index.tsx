@@ -69,7 +69,7 @@ const Subtitle = styled.p`
 const Logo = styled.img`
   transition: width 0.5s ease-in-out, margin 0.5s ease-in-out, height 0.5s ease-in-out;
 `
-function sleep(ms: number) {
+export function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 

@@ -69,7 +69,7 @@ const FormFinalize = () => {
   React.useEffect(
     () => {
       if (!userProfile)
-        router.replace(`/login?redirect=${`/forms/${router.query.id}/finalize`}`)
+        router.replace(`/login?redirect=${`/forms/${router.query.id}/checkout`}`)
       if (data?.['§valuesValid'] && userProfile && router.isReady) {
         fetch('/api/payments/create-payment-intent', {
           method: 'POST',

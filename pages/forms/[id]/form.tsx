@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { collection, doc, getDoc } from '@firebase/firestore';
 import { Add, ArrowBack, ArrowForward, Article, Delete, List as ListIcon, MoveDown, MoveUp } from '@mui/icons-material';
-import { Alert, Button, ButtonGroup, CircularProgress, DialogContent, LinearProgress, Snackbar, Tooltip } from '@mui/material';
+import { Alert, Button, ButtonGroup, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Snackbar, Tooltip } from '@mui/material';
 import { Formik } from 'formik';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -392,6 +392,11 @@ export const List = ({ step, formDescription }: { step: StepDescription, formDes
     setMovingDown(how === 'down' ? index1 : -1);
     setMovingUp(how === 'up' ? index1 : -1);
   }
+  const deleteItem = (index: number) => {
+    const list = values[step.name] as any[];
+    list.splice(index, 1);
+    setFieldValue(step.name, list);
+  }
 
   React.useEffect(
     () => validateForm(values),
@@ -458,7 +463,7 @@ export const List = ({ step, formDescription }: { step: StepDescription, formDes
         (values[step.name] as FormValues<NestedFormValue>[]).map(
           (value, index, arr) =>
 
-            <ListElement {...{ setHeights, movingDown, index, movingUp, arr, heights, step, swap, formDescription }} />
+            <ListElement {...{ setHeights, deleteSelf: () => deleteItem(index), movingDown, index, movingUp, arr, heights, step, swap, formDescription }} />
 
         )
         : <div className='flex flex-col items-center bg-slate-100 p-8 sm:p-16 rounded-lg'>
@@ -468,7 +473,7 @@ export const List = ({ step, formDescription }: { step: StepDescription, formDes
           <p className='text-sm'>Dodaj elementy do listy.</p>
         </div>
     }
-    <Button className='bg-blue-100 text-blue-500 mt-4 py-2' onClick={() => setFieldValue(
+    <Button className='text-blue-500  self-end' onClick={() => setFieldValue(
       step.name,
       [...(values[step.name] ?? []), InitialValues.fromStep(step)]
     )}>dodaj element <Add className='ml-2' /></Button>
@@ -480,12 +485,13 @@ export const List = ({ step, formDescription }: { step: StepDescription, formDes
 
 export default FormDisplay;
 
-function ListElement({ movingDown, index, movingUp, arr, heights, step, swap, formDescription, setHeights }:
+function ListElement({ movingDown, index, movingUp, arr, heights, step, swap, deleteSelf, formDescription, setHeights }:
   {
-    movingDown: number, index: number, movingUp: number, arr: FormValues<NestedFormValue>[], heights: { [key: number]: number; }, step: StepDescription, swap: (index1: number, index2: number, how: 'down' | 'up') => Promise<void>, formDescription: FormDescription, setHeights: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>
+    movingDown: number, index: number, deleteSelf: () => void, movingUp: number, arr: FormValues<NestedFormValue>[], heights: { [key: number]: number; }, step: StepDescription, swap: (index1: number, index2: number, how: 'down' | 'up') => Promise<void>, formDescription: FormDescription, setHeights: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>
   }): JSX.Element {
 
   const [ref, { height }] = useElementSize();
+  const [deleting, setDeleting] = React.useState<boolean>(false);
 
   React.useEffect(
     () => {
@@ -502,6 +508,23 @@ function ListElement({ movingDown, index, movingUp, arr, heights, step, swap, fo
         : '0px'})`
   }} className={`w-full flex-col ${((movingDown === index || movingUp === index + 1) && index != arr.length - 1) || ((movingUp === index || movingDown === index - 1) && index != 0) ? 'transition_transform' : ''}`}>
     <div className={'inline-flex w-full items-center gap-4 h-4'}>
+      <Dialog open={deleting}>
+        <DialogTitle className='text-red-500'><pre>Usuwasz element listy</pre></DialogTitle>
+        <DialogContent>
+          <p className='mb-4'>Czy na pewno chcesz usunąć ten element?</p>
+          <div className='py-2 rounded-lg bg-red-50 pointer-events-none'>
+            <ListElement {...{ setHeights, movingDown, index, movingUp, arr, heights, step, swap, deleteSelf, formDescription }} />
+          </div>
+          <p className='mt-4 font-bold text-red-500'>Ta operaja jest nieodwracalna.</p>
+        </DialogContent>
+        <DialogActions>
+          <Button color='error' onClick={() => setDeleting(false)}>Anuluj</Button>
+          <Button onClick={() => {
+            deleteSelf();
+            setDeleting(false);
+          }}>Usuń</Button>
+        </DialogActions>
+      </Dialog>
       <pre className='ml-3 whitespace-normal text-sm'>{step.listItemName || 'Element'} {index + 1}</pre>
       <div className='flex-1 border-t border-slate-100' />
       <ButtonGroup disabled={movingDown != -1 || movingUp != -1} variant='text'>
@@ -512,7 +535,7 @@ function ListElement({ movingDown, index, movingUp, arr, heights, step, swap, fo
           <Button disabled={index == arr.length - 1} onClick={() => { swap(index, index + 1, 'down'); }} size='small' className='border-none'><MoveDown /></Button>
         </Tooltip>
         <Tooltip title='usuń'>
-          <Button onClick={() => { }} size='small' color='error' className='border-none'><Delete /></Button>
+          <Button onClick={() => setDeleting(true)} size='small' color='error' className='border-none'><Delete /></Button>
         </Tooltip>
       </ButtonGroup>
     </div>

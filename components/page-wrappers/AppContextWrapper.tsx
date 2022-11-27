@@ -99,7 +99,6 @@ const theme = createTheme({
           padding: '0.3rem',
           paddingLeft: '0.6rem',
           paddingRight: '0.6rem',
-          borderRadius: 10,
         },
       },
     },

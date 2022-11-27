@@ -96,7 +96,7 @@ export function LoggedInUserDisplay() {
           <div
             className={'w-full  p-2 hover:border-blue-500 border-none hover:bg-blue-50 cursor-pointer rounded-xl self-center  flex items-center justify-start pl-2  ml-2 pr-4 mb-2'}>
             {userProfile ?
-              <Avatar src={userProfile.photoURL} variant="circular" />
+              <Avatar src={userProfile.photoURL} variant="rounded" />
               :
               <Box sx={{
                 borderWidth: 1,

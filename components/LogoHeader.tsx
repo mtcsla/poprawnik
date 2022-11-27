@@ -81,7 +81,7 @@ const LogoHeader = ({
           <div className={'flex items-center'}>
             <div style={{ height: "2rem" }} className="border-l-2 ml-3 mr-3"></div>
             <div className="flex flex-col">
-              <pre className={`p-0 pt-0 pb-0 text-sm font-bold font-mono ${textWhite ? 'text-white' : ''}`}>
+              <pre className={`p-0 pt-0 pb-0 text-sm font-bold ${textWhite ? 'text-white' : ''}`}>
                 POPRAWNI<b className="text-blue-500">K</b>
               </pre>
               {captionLink ?

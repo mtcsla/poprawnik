@@ -150,7 +150,7 @@ const FormFinalize = () => {
                 </span>
                 <Skeleton variant='rectangular' className='mb-6 rounded' height={50} />
                 <Skeleton variant='rectangular' className='mb-6 rounded' height={50} />
-                <LoadingButton disabled color='primary' className={`bg-gray-100 w-full sm:p-4 p-2  self-start border-none`}>
+                <LoadingButton disabled color='primary' className={`bg-gray-100 w-full sm:p-4 p-2 mt-4  self-start border-none`}>
                   Zapłać {formDoc ? `${(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł` : <Skeleton className='ml-2' height={'2rem'} width={"4rem"} />}<ArrowForward className='ml-2' />
 
                 </LoadingButton>

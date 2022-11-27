@@ -172,7 +172,7 @@ const FormsIndex = ({ products, category, page, categories, pagesNumber }: { pro
                 }
               </span>
           )}
-          <Pagination color={'primary'} renderItem={(props) =>
+          <Pagination shape="rounded" color={'primary'} renderItem={(props) =>
 
             props.page && (props.page > pagesNumber || props.page < 1) || !props.page
               ? <PaginationItem {...props} />

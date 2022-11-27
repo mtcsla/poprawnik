@@ -127,9 +127,11 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
         </div>
       </div>
       {width && width >= 1024
-        ? <div className=' h-full flex flex-col justify-center w-full bg-slate-200 bg-blend-multiply p-8 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light.svg)', }}>
+        ? <div className=' h-full flex flex-col justify-center w-full bg-slate-200 p-8 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light.svg)', }}>
           <pre className='text-lg mb-2 self-end text-right mt-auto text-black'>Jak to działa?</pre>
-          <ExplanationAnimation className='mx-auto mb-auto w-full' active />
+          <div className='bg-slate-100 backdrop-blur bg-opacity-50 rounded-lg mb-auto p-6'>
+            <ExplanationAnimation className='mx-auto mb-auto w-full' active />
+          </div>
         </div>
         : null
       }

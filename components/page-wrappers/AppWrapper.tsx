@@ -106,11 +106,11 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
               {
                 width && width > 430
-                  ? <div
+                  ? <div role='button'
                     className={
-                      "mr-3  bg-slate-50 hover:bg-slate-100 cursor-text transition-colors flex items-center p-2"
+                      "mr-3  bg-slate-50 rounded hover:bg-slate-100 cursor-text transition-colors flex items-center p-2"
                     }
-                    style={{ height: 35, width: 200, borderRadius: 10 }}
+                    style={{ height: 35, width: 200 }}
                   >
                     <Search
                       color={"primary"}
@@ -140,7 +140,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                     aria-haspopup="true"
                     aria-expanded={anchorEl ? "true" : undefined}
                   >
-                    <Avatar variant="square" className="rounded-xl m-0 p-0" style={{ height: '2rem', width: '2rem' }} src={userProfile.photoURL as string} />
+                    <Avatar variant="rounded" className="m-0 p-0" style={{ height: '2rem', width: '2rem' }} src={userProfile.photoURL as string} />
                   </div>
                   :
                   <Button

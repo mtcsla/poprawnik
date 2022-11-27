@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { ArrowForward, Search } from '@mui/icons-material';
+import { Article, Bookmark, People, Search } from '@mui/icons-material';
 import { Avatar, Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { GetStaticPropsContext } from 'next';
 import Link from 'next/link';
@@ -51,6 +51,12 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
 const TitleContainer = styled.div`
   transition: margin-top .5s ease-in-out;
 `
+const TitleAndSearch = styled.span`
+  min-height: 8rem;
+  @media (min-width: 728px) {
+    min-width: 22rem;
+  }
+`
 
 const Caret = styled.span`
   animation: blink-caret .75s step-end infinite;
@@ -68,6 +74,11 @@ const Subtitle = styled.p`
 `
 const Logo = styled.img`
   transition: width 0.5s ease-in-out, margin 0.5s ease-in-out, height 0.5s ease-in-out;
+`
+const Top = styled.div`
+  @media (min-width: 728px) {
+    min-height: 50rem;
+  }
 `
 export function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -88,9 +99,9 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 
 
   const titles: (React.ReactNode[])[] = [
-    ['P', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-500 inline font-mono font-semibold  uppercase'>k</pre>, <pre className='text-inherit inline font-mono'>?</pre>],
-    ['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-500 font-mono inline font-semibold uppercase'>.</pre>],
-    ['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-500 font-mono inline font-semibold uppercase'>k</pre>],
+    ['P', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-500 inline font-semibold  uppercase'>k</pre>, <pre className='text-inherit inline'>?</pre>],
+    ['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-500 inline font-semibold uppercase'>.</pre>],
+    ['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-500 inline font-semibold uppercase'>k</pre>],
   ];
 
   const { width } = useWindowSize();
@@ -113,7 +124,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
         while (!done) {
           if (lastTitle.length > commonPart) {
             setTitle(lastTitle.slice(0, -1).map(
-              letter => typeof letter === 'string' ? <pre className={`${letter == 'n' ? 'pl-1' : ''} text-inherit inline pr-1 font-mono`} >{letter}</pre> : letter
+              letter => typeof letter === 'string' ? <pre className={`text-inherit inline pr-1`} >{letter}</pre> : letter
             ));
             lastTitle = lastTitle.slice(0, -1);
           }
@@ -128,7 +139,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
               }
             }
             setTitle(currentTitle.slice(0, currentLetter).map(
-              letter => typeof letter === 'string' ? <pre className={`${letter == 'n' ? 'pl-1' : ''} text-inherit inline pr-1 font-mono`}>{letter}</pre> : letter
+              letter => typeof letter === 'string' ? <pre className={`text-inherit inline pr-1`}>{letter}</pre> : letter
             ));
             currentLetter++;
           }
@@ -162,179 +173,174 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
   }, []);
 
   return <div
-    className='fixed bg-white bg-blend-darken flex-1 lg:flex-auto flex flex-col items-stretch left-0 right-0 bottom-0 top-0 overflow-y-auto'>
-    <div style={{ maxHeight: '40rem', height: '40rem', backgroundImage: 'url(/bg-new-light.svg)', backdropFilter: 'grayscale(20%)', backgroundSize: 'cover' }} className='flex-col flex'>
-      <div className='w-full pb-4 sm:pb-8 pt-8 sm:pt-12 md:pt-16 px-8 sm:px-12 md:px-16 inline-flex items-center flex-wrap gap-4'>
-        <div className='inline-flex gap-4 items-center'>
-          <Avatar className='bg-slate-400' src={
-            userProfile?.photoURL
-          } />
-          <div className='inline-flex items-end flex-col gap-1'>
-            {userProfile
-              ? <>
-                <p className='text-sm'>{userProfile.displayName}</p>
-                <Link href='/account' passHref>
-                  <a>
-                    <pre className='text-xs hover:text-black'>konto</pre>
-                  </a>
-                </Link>
-              </>
-              : <>
-                <Link href='/signup' passHref>
-                  <a>
-                    <pre className='text-xs hover:text-black'>rejestracja</pre>
-                  </a>
-                </Link>
-                <Link href='/login' passHref>
-                  <a>
-                    <pre className='text-xs hover:text-black'>logowanie</pre>
-                  </a>
-                </Link>
-
-              </>
+    className='bg-white bg-blend-darken relative flex-1 lg:flex-auto flex flex-col items-stretch left-0 right-0 bottom-0 top-0 overflow-y-scroll'>
+    <header className='fixed bg-white bg-opacity-50 backdrop-blur top-0 px-8 sm:px-12 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
+      <div style={{ maxWidth: '60rem' }} className='h-full w-full flex items-center justify-between m-auto'>
+        <div className='inline-flex items-center'>
+          <Logo src='logo1.svg' className={'h-8 mr-3 w-8'} />
+          <p className='flex items-center text-sm p-1 px-3   hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
+            <People className={width && width > 900 ? 'mr-1' : ''} />
+            {width && width > 900 ?
+              "Nasza misja"
+              : null
             }
-          </div>
-        </div>
-        <Link href='/dashboard' passHref>
-          <a className='ml-auto'>
-            <Button className='border-none bg-transparent ' size='small'>Do serwisu <ArrowForward className='ml-2' /></Button>
-          </a>
-        </Link>
-
-      </div>
-      <div className='inline-flex gap-20 px-8  pb-8 bg-opacity-50 sm:pb-12 md:pb-16  sm:px-12 md:px-16 pt-0 justify-between items-center'>
-        <span style={{ minHeight: '20rem' }} className='flex-col pt-8 flex-1 md:flex-initial h-full justify-between relative flex'>
-          <span className='flex flex-col'>
-            <Subtitle className={`text-slate-500 text-sm sm:text-base float-left top-0 right-0 left-0 ${subtitleNumber === 0 || (subtitleNumber == 1 && secondSubtitleVisible) ? 'opacity-100' : 'opacity-0'} `}>
-              {subtitleNumber >= 1 && secondSubtitleVisible ? 'My jesteśmy tak samo' : 'Czy w Twojej sprawie aby na pewno potrzebny jest'}
-            </Subtitle>
-            <TitleContainer className={`${titleMoved ? '-mt-12' : 'mt-2'} mb-2 flex flex-wrap items-center`}>
-              <Link passHref href='/dashboard'>
-                <a>
-                  <Logo src='logo1.svg' className={`m-0 p-0 self-end ${logoVisible ? 'w-12 sm:w-16 h-12 sm:h-16 mr-2 -ml-1' : 'w-0 h-0 m-0'}`} />
-                </a>
-              </Link>
-              <h1 style={{ letterSpacing: 1.5 }} id="main-page-title" className={`font-mono  self-center m-0 text-4xl sm:text-5xl lg:text-6xl  text-slate-600 ${title.length ? '' : 'text-transparent w-0'}`}>
-                {title.length ? title : '|'}
-              </h1>
-              <Caret className={`${title.length ? 'ml-1 sm:ml-2' : ''} ${logoVisible ? 'hidden' : ''}`} />
-            </TitleContainer>
-            <Subtitle className={`float-right text-sm sm:text-base bottom-0 right-0 left-0 text-slate-500 ${lastSubtitleVisible ? 'opacity-100' : 'opacity-0'} `}>
-              Wykonamy dla Ciebie pismo sądowe tak samo dobrze, jak dowolny prawnik.
-            </Subtitle>
-          </span>
-          <Button style={{ minWidth: 250, }} className='bg-slate-50 border-none text-slate-500 shadow hover:bg-blue-50 hover:text-blue-500 w-full mt-8 self-start p-3 flex justify-between'>
-            <Search />
-            Wyszukaj pismo
-          </Button>
-        </span>
-
-        {width && width >= 1024
-          ?
-          <ExplanationAnimation
-            style={{
-              minWidth: '16rem'
-            }}
-            active
-          />
-          : null
-        }
-      </div>
-    </div>
-    {width && width < 1024 ?
-      <div className='w-full  justify-center inline-flex lg:hidden  '>
-        <div className='inline-flex w-full gap-12 items-center justify-center  p-8 sm:p-12'
-          style={{
-            maxWidth: '60rem',
-            background: 'linear-gradient(180deg, rgba(191,219,254,1) 0%, rgba(226,232,240,1) 100%)'
-          }}
-        >
-          <div className='w-full rounded-lg hidden  sm:block' />
-          <div className='inline-flex gap-3 min-w-fit initial flex-col'>
-            <pre className='text-lg'>Jak to działa?</pre>
-            <ExplanationAnimation
-              active
-            />
-          </div>
-        </div>
-      </div>
-      : null
-    }
-    <div className='w-full inline-flex justify-center items-center pb-3 p-8 sm:p-12  ' style={{
-      background: 'linear-gradient(180deg, rgba(226,232,240,1) 0%, rgba(255,255,255,1) 100%)'
-    }} >
-      <div className='inline-flex flex-wrap-reverse sm:gap-12 sm:flex-nowrap' style={{ maxWidth: '60rem' }}>
-        <img src='/court.svg' className='flex-1' style={{ minWidth: 250, maxWidth: '26rem' }} />
-
-        <div style={{ maxWidth: '60rem', minWidth: 250 }} className='inline-flex  flex-col'>
-          <h2 className='text-2xl lg:text-4xl'>Prosta sprawa sądowa<b className='text-blue-500'>?</b></h2>
-          <pre className='text-base mb-8'>Zajmiemy się tym</pre>
-          <p className='text-base lg:text-lg whitespace-normal'>
-            Nie w każdej sprawie potrzebna jest <b>kompleksowa obsługa prawna</b>. Dzięki naszym łatwym w obsłudze interfejsom stworzymy dla Ciebie <b>profesjonalne pismo</b>, które możesz złożyć w sądzie, wygenerowane w przeciągu chwili. Wybierz pismo, które Cię interesuje, wypełnij formularz i skorzystaj z naszej usługi.
-
+          </p>
+          <p className='flex items-center text-sm p-1 px-3  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
+            <Article className={width && width > 900 ? 'mr-1' : ''} />
+            {width && width > 900 ?
+              "Jak to działa"
+              : null
+            }
+          </p>
+          <p className='flex items-center text-sm p-1 px-3  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
+            <Bookmark className={width && width > 900 ? 'mr-1' : ''} />
+            {width && width > 900 ?
+              "Pisma"
+              : null
+            }
           </p>
         </div>
-      </div>
-    </div>
-    <div className='w-full pt-8 pb-4  sm:pt-12 sm:pb-8 overflow-x-clip'>
-      <MostPopularProducts {...{ mostPopularProducts, categories }} />
-    </div>
-    <footer className='mt-auto h-fit w-full flex justify-center p-8 sm:p-12 pb-4 sm:pb-8 pt-2 sm:pt-6 bg-slate-800 ' >
-      <div className='w-full inline-flex gap-2 flex-col justify-between items-stretch'>
-        <LogoHeader noPadding noBackground border={false} textWhite />
-        <div className='flex gap-3 ml-2 flex-wrap w-full'>
-          <div className='flex flex-col gap-1'>
-            <Link href='/dashboard' passHref>
-              <a>
-                <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Strona startowa</li>
-              </a>
-            </Link>
-            <Link href='/forms/list/all/1' passHref>
-              <a>
-                <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Pisma</li>
-              </a>
-            </Link>
-            <Link href='/articles' passHref>
-              <a>
-                <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Artykuły</li>
-              </a>
-            </Link>
-          </div>
-          <div className='flex flex-col gap-1'>
-            <li className='text-slate-400 text-sm'>Kalkulatory</li>
-            {
-              userProfile
-                ? null
-                : <>
-                  <Link href='/login' passHref>
-                    <a>
-                      <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Logowanie</li>
-                    </a>
-                  </Link>
-                  <Link href='/signup' passHref>
-                    <a>
-                      <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Rejestracja</li>
-                    </a>
-                  </Link>
-                </>
-            }
-          </div>
-          <div className='ml-auto flex flex-col items-end self-end'>
-            <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
-              Polityka prywatności
-            </p>
-            <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
-              Warunki korzystania z serwisu
-            </p>
 
-            <p className='text-white mt-2 text-sm font-bold'>
-              Trustree sp.j. © 2022
+        <span className='flex items-center'>
+          {
+            width && width > 720
+              ? <div
+                className={
+                  "mr-3  bg-slate-50 hover:bg-blue-100 rounded cursor-text transition-colors flex items-center p-2"
+                }
+                style={{ height: '2rem', width: 200 }}
+              >
+                <Search
+                  color={"primary"}
+                  sx={{ fontSize: "1.2rem !important" }}
+                />
+                <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
+              </div>
+              : <Button className="mr-3 bg-slate-50 " sx={{ padding: "0.4rem", height: '2rem' }}>
+                <Search sx={{ fontSize: "20px !important" }} />
+              </Button>
+
+          }
+          <Avatar role="button" variant='rounded' src={userProfile?.photoURL} className='w-8 h-8 hover:bg-blue-100 cursor-pointer text-blue-400 bg-slate-50' />
+        </span>
+
+      </div>
+    </header>
+    <Top style={{ backdropFilter: 'grayscale(20%)', backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light.svg)', zIndex: 0, }} className='w-screen pt-32 px-8 sm:px-12 flex-col flex'>
+      <div className='flex flex-col my-auto w-full mx-auto ' style={{ maxWidth: '60rem' }}>
+        <div className='inline-flex sm:gap-10 md:gap-20 lg:gap-40  pb-8 bg-opacity-50 sm:pb-12 md:pb-16 pt-0 justify-between items-center'>
+          <span style={{ minHeight: '20rem' }} className='flex-col flex-1 md:flex-initial h-full justify-between relative flex'>
+            <TitleAndSearch className='flex flex-col'>
+
+              <Subtitle className={`text-slate-500 text-lg sm:text-xl float-left top-0 right-0 left-0 ${subtitleNumber === 0 || (subtitleNumber == 1 && secondSubtitleVisible) ? 'opacity-100' : 'opacity-0'} `}>
+                {subtitleNumber >= 1 && secondSubtitleVisible ? 'My jesteśmy tak samo' : 'Czy w Twojej sprawie aby na pewno potrzebny jest'}
+              </Subtitle>
+              <TitleContainer className={`${titleMoved ? '-mt-12' : 'mt-2'} mb-2 flex items-center`}>
+                <h1 style={{ letterSpacing: 1.5 }} id="main-page-title" className={`  self-center m-0 text-4xl sm:text-5xl  text-slate-600 ${title.length ? '' : 'text-transparent w-0'}`}>
+                  {title.length ? title : '|'}
+                </h1>
+                <Caret className={`${title.length ? 'ml-1 sm:ml-2' : ''} ${logoVisible ? 'hidden' : ''}`} />
+              </TitleContainer>
+              <Subtitle className={`float-right text-lg sm:text-xl bottom-0 right-0 left-0 text-slate-500 ${lastSubtitleVisible ? 'opacity-100' : 'opacity-0'} `}>
+                Wykonamy dla Ciebie pismo sądowe tak samo dobrze, jak dowolny prawnik.
+              </Subtitle>
+            </TitleAndSearch>
+            <Button style={{ minWidth: 250, }} className='bg-slate-50 border-none text-slate-500 hover:bg-blue-50 text-lg hover:text-blue-500 w-full mt-8 self-start p-3 sm:p-5 flex justify-between'>
+              <Search className='text-2xl' />
+              Wyszukaj pismo
+            </Button>
+          </span>
+
+          {width && width >= 728
+            ?
+            <ExplanationAnimation
+              style={{
+                minWidth: '16rem'
+              }}
+              className="self-end"
+              active
+            />
+            : null
+          }
+        </div>
+      </div>
+      <img src='top-waves.svg' className='z-50 w-screen -ml-8 sm:-ml-12' style={{ maxWidth: 'none' }} />
+    </Top>
+    <div className='z-50' >
+      <div className='w-full inline-flex justify-center items-center px-8 sm:px-12 py-12 sm:py-16  bg-white'  >
+        <div className='inline-flex flex-wrap-reverse gap-12 items-center sm:gap-32 sm:flex-nowrap' style={{ maxWidth: '60rem' }}>
+          <img src='/court.svg' className='flex-1 mx-auto h-full' style={{ minWidth: 250, maxWidth: 350 }} />
+          <div style={{ maxWidth: '60rem', minWidth: 200 }} className='inline-flex flex-col'>
+            <h2 className='text-2xl lg:text-4xl'><b className='text-blue-500'>Prosta</b> sprawa sądowa?</h2>
+            <pre className='text-base mb-8'>Zajmiemy się tym</pre>
+            <p className='text-base lg:text-lg whitespace-normal'>
+              Nie w każdej sprawie potrzebna jest <b>kompleksowa obsługa prawna</b>. Dzięki naszym łatwym w obsłudze interfejsom stworzymy dla Ciebie <b>profesjonalne pismo</b>, które możesz złożyć w sądzie, wygenerowane w przeciągu chwili. {/*Wybierz pismo, które Cię interesuje, wypełnij formularz i skorzystaj z naszej usługi.*/}
+
             </p>
           </div>
         </div>
       </div>
-    </footer>
+      <div className='w-full pt-8 pb-4 bg-white  sm:pt-12 sm:pb-8 overflow-x-clip'>
+        <MostPopularProducts {...{ mostPopularProducts, categories }} />
+      </div>
+      <img src='/footer-waves.svg' className='w-full -mb-2' />
+      <footer className='mt-auto h-fit w-full flex justify-center px-8 sm:px-12 py-12 sm:py-16 bg-slate-800 ' >
+        <div className='w-full inline-flex gap-2 flex-col justify-between items-stretch' style={{ maxWidth: '60rem' }}>
+          <LogoHeader noPadding noBackground border={false} textWhite />
+          <div className='flex gap-3 ml-2 flex-wrap w-full'>
+            <div className='flex flex-col gap-1'>
+              <Link href='/dashboard' passHref>
+                <a>
+                  <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Strona startowa</li>
+                </a>
+              </Link>
+              <Link href='/forms/list/all/1' passHref>
+                <a>
+                  <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Pisma</li>
+                </a>
+              </Link>
+              <Link href='/articles' passHref>
+                <a>
+                  <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Artykuły</li>
+                </a>
+              </Link>
+            </div>
+            <div className='flex flex-col gap-1'>
+              <li className='text-slate-400 text-sm'>Kalkulatory</li>
+              {
+                userProfile
+                  ? null
+                  : <>
+                    <Link href='/login' passHref>
+                      <a>
+                        <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Logowanie</li>
+                      </a>
+                    </Link>
+                    <Link href='/signup' passHref>
+                      <a>
+                        <li className='text-slate-300 text-sm hover:text-white cursor-pointer'>Rejestracja</li>
+                      </a>
+                    </Link>
+                  </>
+              }
+            </div>
+            <div className='ml-auto flex flex-col items-end self-end'>
+              <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
+                Polityka prywatności
+              </p>
+              <p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
+                Warunki korzystania z serwisu
+              </p>
 
+              <p className='text-white mt-2 text-sm font-bold'>
+                Trustree sp.j. © 2022
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </div>
   </div >
 }
 
@@ -349,75 +355,137 @@ export const MostPopularProducts = ({
   mostPopularProducts: { [category: string]: any[] }
 }) => {
   const [category, setCategory] = React.useState('any');
+  const { width } = useWindowSize();
 
-  return <div className='flex flex-col w-full overflow-x-visible' >
-    <div className='flex flex-col w-full items-center px-8 sm:px-12 self-center'  >
-      <div className='flex flex-col w-full' style={{ maxWidth: '60rem' }}>
-        <pre className='md:text-lg w-full mb-4 text-right self-end whitespace-normal'>Najpopularniejsze pisma</pre>
-        <FormControl className='w-fit'>
-          <InputLabel>kategoria</InputLabel>
-          <Select size='small' value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
-            <MenuItem value='any'>
-              wszystkie pisma
-            </MenuItem>
-            {
-              categories.map(category => <MenuItem value={category}>
-                {category}
-              </MenuItem>)
+  return <div className='flex relative flex-col w-screen pr-8 sm:pr-12 ' style={{ minHeight: '30rem', }}>
+    <div className='mx-auto flex flex-col w-full box-content items-center self-center'  >
+      <div className='w-full'>
+        <div className='inline-flex justify-between gap-4 xl:gap-8 w-full' style={{ minWidth: 0, maxWidth: 'calc(100vw - var(--margin))' }}>
+          {width && width >= 720
+            ? <div className='flex xl:flex-shrink min-w-fit xl:flex-grow'>
+              <div className='xl:flex-1 w-12 xl:w-full h-full ' />
+              <div className='flex  flex-col bg-slate-100  p-8 rounded' >
+                <FormControl className='w-full'>
+                  <InputLabel>kategoria</InputLabel>
+                  <Select value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
+                    <MenuItem value='any'>
+                      wszystkie pisma
+                    </MenuItem>
+                    {
+                      categories.map(category => <MenuItem value={category}>
+                        {category}
+                      </MenuItem>)
+                    }
+                  </Select>
+                </FormControl>
+                <div className='relative min-w-fit'>
+                  <div className='absolute top-0 left-0 right-0 bottom-0 z-50 pointer-events-none' style={{ background: 'linear-gradient(0deg, rgba(241,245,249,1) 0%, rgba(241,245,249,0) 10%, rgba(241,245,249,0) 90%, rgba(241,245,249,1) 100%)' }} />
+                  <div className='relative w-fit overflow-y-scroll' style={{ maxHeight: '30rem' }}>
+                    <div className='gap-2 min-w-fit grid grid-cols-1 xl:grid-cols-2' >
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                      {
+                        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            : <div />
+          }
+          <div className={`flex flex-col ${width && width < 720 ? '-ml-8 sm:-ml-12 -mr-8 sm:-mr-12' : ''} my-auto`}>
+            <div className={`flex flex-col self-end flex-shrink justify-center ${width && width < 720 ? 'pr-8 sm:pr-12' : ''} w-fit`} style={{ maxWidth: '25rem', minWidth: 0 }}>
+              <h2 className='font-bold text-3xl text-right'>Mamy <b className='text-blue-500'>wszystko</b>, czego potrzebujesz.</h2>
+
+              <pre className='text-right mb-8'>Sprawdź naszą ofertę!</pre>
+              <p className='text-right'>
+                Oferujemy wiele pism dotyczących różnych gałęzi prawa. Oto nasze najpopularniejsze produkty. Jeśli nie widzisz tego, czego szukasz, najłatwiej jest skorzystać z <b className='inline font-bold text-blue-500'> <Search className='ml-0.5 text-xl' /> wyszukiwarki</b>.
+              </p>
+            </div>
+            {width && width < 720
+              ? <div className='flex mt-12 items-start w-screen overflow-x-scroll'>
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} first inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+                {
+                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                }
+              </div>
+              : null
             }
-          </Select>
-        </FormControl>
+          </div>
+        </div>
       </div>
     </div>
-    <div className='w-screen items-stretch mt-8 flex overflow-x-auto' >
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} first />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      {
-        mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
-      }
-      <div className='flex-1 self-stretch h-full sm:ml-8 ml-12 bg-slate-50 rounded-lg' />
-    </div>
-  </div>
+  </div >
 }
 
-export const ProductCard = ({ product, first }: { product: any, first?: boolean }) => {
+export const ProductCard = ({ product, first, inRow }: { product: any, first?: boolean, inRow?: boolean }) => {
   return <Link href={`/forms/${product.id}`} passHref>
     <a>
-      <div className={`my-1 flex mb-6 p-4 sm:p-8 flex-col ${first ? 'ml-8 sm:ml-12' : 'ml-4 sm:ml-8'}  h-fit hover:bg-blue-50 text-black hover:text-blue-500 shadow cursor-pointer bg-slate-50 rounded-lg mx-4 `} style={{
-        minHeight: '24rem',
-        width: '20rem'
-      }} >
+      <div style={{ minHeight: '24rem', width: '20rem', minWidth: '20rem' }} className={`flex p-4 sm:p-8 flex-col ${first ? 'ml-8 sm:ml-12' : inRow ? 'ml-4' : ''}  h-fit hover:bg-blue-50 text-black hover:text-blue-500 shadow cursor-pointer bg-slate-50 rounded-lg `}>
 
         <h2 className='flex text-inherit whitespace-normal mb-1 text-lg sm:text-xl'>
           {
@@ -432,15 +500,15 @@ export const ProductCard = ({ product, first }: { product: any, first?: boolean 
           }
         </p>
         <div className='flex-1' />
-        <pre className='text-xs mb-1'>Autor</pre>
-        <div className='inline-flex bg-white p-2 sm:p-4 rounded-lg gap-4 w-full mb-8 justify-between'>
-          <Avatar src={product.authorPictureURL} />
+        <pre className='text-xs mb-2'>Autor</pre>
+        <div className='inline-flex rounded-lg gap-4 w-full mb-8 justify-between'>
+          <Avatar variant='rounded' src={product.authorPictureURL} />
           <div className='flex flex-col items-end justify-between'>
             <p>{product.authorName}</p>
             <pre className='text-sm'>deweloper</pre>
           </div>
         </div>
-        <pre className='self-end text-sm text-inherit'><i className='not-italic font-mono text-slate-500'>Cena:</i> <b className='text-lg font-bold normal-case text-inherit'>{(product.price / 100).toFixed(2).replace('.', ',')}zł</b></pre>
+        <pre className='self-end text-sm text-inherit'><i className='not-italic  text-slate-500'>Cena:</i> <b className='text-lg font-bold normal-case text-inherit'>{(product.price / 100).toFixed(2).replace('.', ',')}zł</b></pre>
       </div>
     </a>
   </Link>
@@ -489,21 +557,21 @@ export const ExplanationAnimation = ({ className, style, active, textWhite }: { 
       : null
     }
 
-    <div className='w-full relative text-lg'>
+    <div className='w-full relative text-lg pb-6'>
       <span className={`${textWhite ? 'text-slate-200' : ''} absolute top-0 ${subtitleStage === 0 ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
-        <pre className={`${textWhite ? 'text-slate-600' : ''} font-bold inline mr-2`}>Krok 1:</pre>
+        <pre className={`${textWhite ? 'text-slate-900' : ''} font-bold inline mr-2`}>Krok 1:</pre>
         <p className='inline'>Wypełnij formularz danymi swojej sprawy.</p>
       </span>
       <span className={`${textWhite ? 'text-slate-200' : ''} absolute top-0 ${subtitleStage === 1 ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
-        <pre className={`${textWhite ? 'text-slate-600' : ''} font-bold inline mr-2`}>Krok 2:</pre>
-        <p className='inline'>Zakup i opłać pismo.</p>
+        <pre className={`${textWhite ? 'text-slate-900' : ''} font-bold inline mr-2`}>Krok 2:</pre>
+        <p className='inline'>Zamów i opłać pismo.</p>
       </span>
       <span className={`${textWhite ? 'text-slate-200' : ''} absolute top-0 ${subtitleStage === 2 ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
-        <pre className={`${textWhite ? 'text-slate-600' : ''} font-bold inline mr-2`}>Krok 3:</pre>
+        <pre className={`${textWhite ? 'text-slate-900' : ''} font-bold inline mr-2`}>Krok 3:</pre>
         <p className='inline'>Wydrukuj zakupiony dokument.</p>
       </span>
       <span className={`${textWhite ? 'text-slate-200' : ''} ${subtitleStage === 3 ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
-        <pre className={`${textWhite ? 'text-slate-600' : ''} font-bold inline mr-2`}>Krok 4:</pre>
+        <pre className={`${textWhite ? 'text-slate-900' : ''} font-bold inline mr-2`}>Krok 4:</pre>
         <p className='inline'>Podpisz się i złóż swoje pismo do sądu.</p>
       </span>
     </div>

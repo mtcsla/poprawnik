@@ -1,6 +1,6 @@
 import { collection, doc, getDoc } from '@firebase/firestore';
 import { ArrowBack, ArrowForward, CompareArrows } from '@mui/icons-material';
-import { Alert, Avatar, Button, Checkbox, Skeleton, Snackbar } from '@mui/material';
+import { Alert, Avatar, Button, Skeleton, Snackbar } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -144,18 +144,16 @@ const FormFinalize = () => {
             {userProfile && clientSecret && formDoc
               ? null
               : <>
-                <Skeleton variant='rectangular' className='mt-6 rounded' height={110} />
-                <span className='flex items-center w-full mt-1'>
-                  <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
+                <span className='inline-flex items-center w-full mt-1 mt-4 gap-4'>
+                  <Skeleton height={100} style={{ flex: 1 / 3 }} /> <Skeleton height={100} style={{ flex: 1 / 3 }} /> <Skeleton height={100} style={{ flex: 1 / 3 }} />
+
                 </span>
-                <Skeleton variant='rectangular' className='rounded' height={110} />
-                <span className='flex items-center w-full mt-1'>
-                  <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
-                </span>
-                <Skeleton variant='rectangular' className='rounded' height={110} />
-                <span className='flex items-center w-full mt-1'>
-                  <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
-                </span>
+                <Skeleton variant='rectangular' className='mb-6 rounded' height={50} />
+                <Skeleton variant='rectangular' className='mb-6 rounded' height={50} />
+                <LoadingButton disabled color='primary' className={`bg-gray-100 w-full sm:p-4 p-2  self-start border-none`}>
+                  Zapłać {formDoc ? `${(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł` : <Skeleton className='ml-2' height={'2rem'} width={"4rem"} />}<ArrowForward className='ml-2' />
+
+                </LoadingButton>
               </>
             }
           </div>
@@ -224,15 +222,18 @@ const PaymentForm = ({ formDoc, setError }: {
     <LoadingButton loading={submitting} color='primary' onClick={onSubmit} className={`w-full mt-8 ${submitting ? 'bg-gray-100 text-transparent' : 'bg-blue-400 text-white'} sm:p-4 p-2  self-start border-none`}>
       Zapłać {(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł<ArrowForward className='ml-2' />
     </LoadingButton>
-    <div className='inline-flex w-full gap-1 mt-4 items-center'>
-      <Checkbox className='pl-0 py-0' />
-      <label className='text-sm text-slate-500'><b className='text-red-400'>*</b>Oświadczam, że zapoznałem/am się z polityką prywatności.</label>
-    </div>
-    <div className='inline-flex w-full gap-1  items-center mb-4'>
-      <Checkbox className='pl-0 py-0' />
-      <p className='text-sm text-slate-500'><b className='text-red-400'>*</b>Oświadczam, że zapoznałem/am się z warunkami świadczenia usług.</p>
-    </div>
+    {/*<>
+            <div className='inline-flex w-full gap-1 mt-4 items-center'>
+                <Checkbox className='pl-0 py-0' />
+                <label className='text-sm text-slate-500'><b className='text-red-400'>*</b>Oświadczam, że zapoznałem/am się z polityką prywatności.</label>
+            </div>
+            <div className='inline-flex w-full gap-1  items-center mb-4'>
+                <Checkbox className='pl-0 py-0' />
+                <p className='text-sm text-slate-500'><b className='text-red-400'>*</b>Oświadczam, że zapoznałem/am się z warunkami świadczenia usług.</p>
+            </div>
+</>*/}
   </>
+
 }
 
 

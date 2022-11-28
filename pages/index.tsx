@@ -72,9 +72,6 @@ const Subtitle = styled.p`
   transition: opacity 0.25s ease-in-out;
   padding-left: 0.25rem;
 `
-const Logo = styled.img`
-  transition: width 0.5s ease-in-out, margin 0.5s ease-in-out, height 0.5s ease-in-out;
-`
 const Top = styled.div`
   @media (min-width: 728px) {
     min-height: 50rem;
@@ -177,7 +174,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
     <header className='fixed bg-white bg-opacity-50 backdrop-blur top-0 px-8 sm:px-12 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
       <div style={{ maxWidth: '60rem' }} className='h-full w-full flex items-center justify-between m-auto'>
         <div className='inline-flex items-center'>
-          <Logo src='logo1.svg' className={'h-8 mr-3 w-8'} />
+          <LogoHeader small noText noBackground noPadding noWidth png />
           <p className='flex items-center text-sm p-1 px-3 whitespace-nowrap   hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
             <People className={width && width > 900 ? 'mr-1' : ''} />
             {width && width > 900 ?
@@ -426,7 +423,7 @@ export const MostPopularProducts = ({
             : <div />
           }
           <div className={`flex flex-col ${width && width < 720 ? '-ml-8 sm:-ml-12 -mr-8 sm:-mr-12' : ''} my-auto`}>
-            <div className={`flex flex-col self-end flex-shrink justify-center ${width && width < 720 ? 'pr-8 sm:pr-12' : ''} w-fit`} style={{ maxWidth: '25rem', minWidth: 0 }}>
+            <div className={`flex flex-col self-end flex-shrink justify-center ${width && width < 720 ? 'px-8 sm:px-12' : ''} w-fit`} style={{ maxWidth: '25rem', minWidth: 0 }}>
               <h2 className='font-bold text-3xl text-right'>Mamy <b className='text-blue-500'>wszystko</b>, czego potrzebujesz.</h2>
 
               <pre className='text-right mb-8'>Sprawdź naszą ofertę!</pre>
@@ -435,43 +432,58 @@ export const MostPopularProducts = ({
               </p>
             </div>
             {width && width < 720
-              ? <div className='flex mt-12 items-start w-screen overflow-x-scroll'>
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} first inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
-                {
-                  mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
-                }
+              ? <div className='flex flex-col w-screen bg-slate-100 pt-8 mt-12'>
+                <FormControl className='w-full pr-16 sm:pr-24 ml-8 sm:ml-12'>
+                  <InputLabel>kategoria</InputLabel>
+                  <Select value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
+                    <MenuItem value='any'>
+                      wszystkie pisma
+                    </MenuItem>
+                    {
+                      categories.map(category => <MenuItem value={category}>
+                        {category}
+                      </MenuItem>)
+                    }
+                  </Select>
+                </FormControl>
+                <div className='flex items-start py-8 bg-slate-100 w-screen overflow-x-scroll'>
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} first inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                  {
+                    mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
+                  }
+                </div>
               </div>
               : null
             }

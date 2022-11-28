@@ -1,10 +1,13 @@
 import styled from "@emotion/styled";
 import { DragHandle, Facebook, Instagram } from "@mui/icons-material";
 import { Button, Paper, useTheme } from "@mui/material";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import useWindowSize from '../hooks/WindowSize';
+import LogoSVG from '../public/logo1.svg';
+
 
 const LogoHeader = ({
   border,
@@ -13,16 +16,19 @@ const LogoHeader = ({
   caption,
   captionLink,
   social,
+  png,
   noPadding,
   noBackground,
   noBackgroundImportant,
   inAccountPage,
   textWhite,
-  noWidth
+  noWidth,
+  small
 }: {
   border?: boolean;
   textWhite?: boolean;
   openSidebar?: () => void;
+  png?: boolean;
   noText?: boolean;
   caption?: string;
   noPadding?: boolean;
@@ -32,10 +38,18 @@ const LogoHeader = ({
   social?: boolean;
   inAccountPage?: true;
   noWidth?: boolean;
+  small?: boolean;
 }) => {
   const theme = useTheme()
   const { width } = useWindowSize();
   const router = useRouter();
+
+  const [rem, setRem] = React.useState(0);
+  React.useEffect(
+    () => {
+      setRem(parseInt(document.getElementById("__next")?.style.fontSize || "16px"));
+    }
+  )
 
   const TopComponent = styled(Paper) <{ noWidth: boolean | undefined }>`
   ${props => props.noWidth ? 'width: auto;' : 'width: 18rem;'}
@@ -65,12 +79,13 @@ const LogoHeader = ({
       ) : null}
 
     <Link passHref href={router.pathname === '/' ? '/dashboard' : '/'}>
-      <a>
+      <a className="mt-1">
         <Logo
-          style={{ height: "3rem", width: "3rem" }}
+          style={{}}
+          png={true}
           color={theme.palette.primary.dark}
-          height={100}
-          width={100}
+          height={rem * (small ? 2 : 3)}
+          width={rem * (small ? 2 : 3)}
         />
       </a>
     </Link>
@@ -107,9 +122,9 @@ const LogoHeader = ({
 }
 
 
-export const Logo = ({ color, width, height, style, className }:
-  { color: string, width: number, height: number, style: React.CSSProperties, className?: string }) => {
-  return <img src='/logo1.svg' style={style} className={className} />
+export const Logo = ({ color, width, height, style, png, className }:
+  { color: string, width: number | string, height: number | string, png?: boolean, style: React.CSSProperties, className?: string }) => {
+  return <Image src={png ? '/logo1.png' : LogoSVG} style={style} height={height} width={width} className={className} />
   /*<svg {...{ width, height, style, className }} viewBox="0 0 281 281" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="15" y="15" width="250" height="250" rx="40" fill="white" />
     <g filter="url(#filter0_d_1_2)">

@@ -178,21 +178,21 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       <div style={{ maxWidth: '60rem' }} className='h-full w-full flex items-center justify-between m-auto'>
         <div className='inline-flex items-center'>
           <Logo src='logo1.svg' className={'h-8 mr-3 w-8'} />
-          <p className='flex items-center text-sm p-1 px-3   hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
+          <p className='flex items-center text-sm p-1 px-3 whitespace-nowrap   hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
             <People className={width && width > 900 ? 'mr-1' : ''} />
             {width && width > 900 ?
               "Nasza misja"
               : null
             }
           </p>
-          <p className='flex items-center text-sm p-1 px-3  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
+          <p className='flex items-center text-sm p-1 px-3 whitespace-nowrap  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
             <Article className={width && width > 900 ? 'mr-1' : ''} />
             {width && width > 900 ?
               "Jak to działa"
               : null
             }
           </p>
-          <p className='flex items-center text-sm p-1 px-3  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
+          <p className='flex items-center text-sm p-1 px-3 whitespace-nowrap  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
             <Bookmark className={width && width > 900 ? 'mr-1' : ''} />
             {width && width > 900 ?
               "Pisma"
@@ -264,7 +264,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
           }
         </div>
       </div>
-      <img src='top-waves.svg' className='z-50 w-screen -ml-8 sm:-ml-12' style={{ maxWidth: 'none' }} />
+      <img src='top-waves.svg' className='z-50 w-screen ' style={{ maxWidth: 'none', marginBottom: -1 }} />
     </Top>
     <div className='z-50' >
       <div className='w-full inline-flex justify-center items-center px-8 sm:px-12 py-12 sm:py-16  bg-white'  >
@@ -283,7 +283,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       <div className='w-full pt-8 pb-4 bg-white  sm:pt-12 sm:pb-8 overflow-x-clip'>
         <MostPopularProducts {...{ mostPopularProducts, categories }} />
       </div>
-      <img src='/footer-waves.svg' className='w-full -mb-2' />
+      <img src='/footer-waves.svg' style={{ marginBottom: -1 }} className='w-full' />
       <footer className='mt-auto h-fit w-full flex justify-center px-8 sm:px-12 py-12 sm:py-16 bg-slate-800 ' >
         <div className='w-full inline-flex gap-2 flex-col justify-between items-stretch' style={{ maxWidth: '60rem' }}>
           <LogoHeader noPadding noBackground border={false} textWhite />

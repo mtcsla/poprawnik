@@ -173,7 +173,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
   }, []);
 
   return <div
-    className='bg-white bg-blend-darken relative flex-1 lg:flex-auto flex flex-col items-stretch left-0 right-0 bottom-0 top-0 overflow-y-scroll'>
+    className='bg-white bg-blend-darken relative flex-1 lg:flex-auto flex flex-col overflow-x-hidden items-stretch left-0 right-0 bottom-0 top-0 overflow-y-scroll'>
     <header className='fixed bg-white bg-opacity-50 backdrop-blur top-0 px-8 sm:px-12 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
       <div style={{ maxWidth: '60rem' }} className='h-full w-full flex items-center justify-between m-auto'>
         <div className='inline-flex items-center'>
@@ -264,7 +264,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
           }
         </div>
       </div>
-      <img src='top-waves.svg' className='z-50 w-screen ' style={{ maxWidth: 'none', marginBottom: -1 }} />
+      <img src='top-waves.svg' className='z-50 w-screen ' style={{ maxWidth: 'none' }} />
     </Top>
     <div className='z-50' >
       <div className='w-full inline-flex justify-center items-center px-8 sm:px-12 py-12 sm:py-16  bg-white'  >

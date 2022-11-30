@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { Article, Bookmark, People, Search } from '@mui/icons-material';
-import { Avatar, Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Article, Bookmark, DataUsage, Gavel, People, Save, Search, ShoppingCart } from '@mui/icons-material';
+import { Avatar, Button, FormControl, InputLabel, MenuItem, Pagination, Select } from '@mui/material';
 import { GetStaticPropsContext } from 'next';
 import Link from 'next/link';
 import React, { HTMLAttributes } from 'react';
@@ -9,6 +9,23 @@ import { ExplanationAnimationSvg } from '../components/ExplanationAnimationSvg';
 import LogoHeader from '../components/LogoHeader';
 import useWindowSize from '../hooks/WindowSize';
 import { useAuth } from '../providers/AuthProvider';
+
+const SelectAnimation = styled.div`
+  color: rgb(0, 0, 0);
+  .icon {
+    color: rgb(100, 116, 139);
+  }
+
+  &:hover {
+    color: rgb(59, 130, 246);
+  }
+  &:hover .icon {
+    color: rgb(59, 130, 246);   
+  }
+  .icon-selected {
+    color: rgb(96, 165, 250);   
+  }
+`;
 
 export const getStaticProps = async (ctx: GetStaticPropsContext) => {
   let categories: string[] = [];
@@ -171,11 +188,11 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 
   return <div
     className='bg-white bg-blend-darken relative flex-1 lg:flex-auto flex flex-col overflow-x-hidden items-stretch left-0 right-0 bottom-0 top-0 overflow-y-scroll'>
-    <header className='fixed bg-white bg-opacity-50 backdrop-blur top-0 px-8 sm:px-12 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
+    <header className='fixed bg-white backdrop-blur bg-opacity-50 top-0 px-8 sm:px-12 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
       <div style={{ maxWidth: '60rem' }} className='h-full w-full flex items-center justify-between m-auto'>
         <div className='inline-flex items-center'>
           <LogoHeader small noText noBackground noPadding noWidth png />
-          <p className='flex items-center text-sm p-1 px-3 whitespace-nowrap   hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
+          <p className='flex ml-2 items-center text-sm p-1 px-3 whitespace-nowrap hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
             <People className={width && width > 900 ? 'mr-1' : ''} />
             {width && width > 900 ?
               "Nasza misja"
@@ -228,7 +245,6 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
         <div className='inline-flex sm:gap-10 md:gap-20 lg:gap-40  pb-8 bg-opacity-50 sm:pb-12 md:pb-16 pt-0 justify-between items-center'>
           <span style={{ minHeight: '20rem' }} className='flex-col flex-1 md:flex-initial h-full justify-between relative flex'>
             <TitleAndSearch className='flex flex-col'>
-
               <Subtitle className={`text-slate-500 text-lg sm:text-xl float-left top-0 right-0 left-0 ${subtitleNumber === 0 || (subtitleNumber == 1 && secondSubtitleVisible) ? 'opacity-100' : 'opacity-0'} `}>
                 {subtitleNumber >= 1 && secondSubtitleVisible ? 'My jesteśmy tak samo' : 'Czy w Twojej sprawie aby na pewno potrzebny jest'}
               </Subtitle>
@@ -248,13 +264,14 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
             </Button>
           </span>
 
-          {width && width >= 728
+          {width && width >= 848
             ?
             <ExplanationAnimation
               style={{
-                minWidth: '16rem'
+                minWidth: '20rem',
+                maxWidth: '30rem'
               }}
-              className="self-end"
+              className="self-end w-full py-4 px-8 bg-slate-50 rounded"
               active
             />
             : null
@@ -266,16 +283,18 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
     <div className='z-50' >
       <div className='w-full inline-flex justify-center items-center px-8 sm:px-12 py-12 sm:py-16  bg-white'  >
         <div className='inline-flex flex-wrap-reverse gap-12 items-center sm:gap-32 sm:flex-nowrap' style={{ maxWidth: '60rem' }}>
-          <img src='/court.svg' className='flex-1 mx-auto h-full' style={{ minWidth: 250, maxWidth: 350 }} />
+          <img src='/judge.svg' className='mx-auto h-full' style={{ minWidth: 250 }} />
           <div style={{ maxWidth: '60rem', minWidth: 200 }} className='inline-flex flex-col'>
             <h2 className='text-2xl lg:text-4xl'><b className='text-blue-500'>Prosta</b> sprawa sądowa?</h2>
             <pre className='text-base mb-8'>Zajmiemy się tym</pre>
             <p className='text-base lg:text-lg whitespace-normal'>
               Nie w każdej sprawie potrzebna jest <b>kompleksowa obsługa prawna</b>. Dzięki naszym łatwym w obsłudze interfejsom stworzymy dla Ciebie <b>profesjonalne pismo</b>, które możesz złożyć w sądzie, wygenerowane w przeciągu chwili. {/*Wybierz pismo, które Cię interesuje, wypełnij formularz i skorzystaj z naszej usługi.*/}
-
             </p>
           </div>
         </div>
+      </div>
+      <div className='sm:w-screen py-12 flex flex-col pl-8 sm:pl-12 pr-8 sm:pr-0'>
+        <Explanation />
       </div>
       <div className='w-full pt-8 pb-4 bg-white  sm:pt-12 sm:pb-8 overflow-x-clip'>
         <MostPopularProducts {...{ mostPopularProducts, categories }} />
@@ -337,7 +356,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
         </div>
       </footer>
 
-    </div>
+    </div >
   </div >
 }
 
@@ -361,7 +380,7 @@ export const MostPopularProducts = ({
           {width && width >= 720
             ? <div className='flex xl:flex-shrink min-w-fit xl:flex-grow'>
               <div className='xl:flex-1 w-12 xl:w-full h-full ' />
-              <div className='flex  flex-col bg-slate-100  p-8 rounded' >
+              <div className='flex  flex-col bg-slate-50  p-8 rounded' >
                 <FormControl className='w-full'>
                   <InputLabel>kategoria</InputLabel>
                   <Select value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
@@ -376,9 +395,10 @@ export const MostPopularProducts = ({
                   </Select>
                 </FormControl>
                 <div className='relative min-w-fit'>
-                  <div className='absolute top-0 left-0 right-0 bottom-0 z-50 pointer-events-none' style={{ background: 'linear-gradient(0deg, rgba(241,245,249,1) 0%, rgba(241,245,249,0) 10%, rgba(241,245,249,0) 90%, rgba(241,245,249,1) 100%)' }} />
-                  <div className='relative w-fit overflow-y-scroll' style={{ maxHeight: '30rem' }}>
-                    <div className='gap-2 min-w-fit grid grid-cols-1 xl:grid-cols-2' >
+                  <div className='absolute top-4 left-0 right-0 bottom-0 z-50 pointer-events-none' style={{ background: 'linear-gradient(0deg, rgba(248,250,252,1) 0%, rgba(248,250,252,0) 10%, rgba(248,250,252,0) 90%, rgba(248,250,252,1) 100%)' }} />
+
+                  <div className='relative mt-4 w-fit overflow-y-scroll' style={{ maxHeight: '30rem' }}>
+                    <div className='gap-4 my-4 min-w-fit grid grid-cols-1 xl:grid-cols-2' >
                       {
                         mostPopularProducts[category].map(product => <ProductCard {...{ product }} />)
                       }
@@ -422,7 +442,7 @@ export const MostPopularProducts = ({
             </div>
             : <div />
           }
-          <div className={`flex flex-col ${width && width < 720 ? '-ml-8 sm:-ml-12 -mr-8 sm:-mr-12' : ''} my-auto`}>
+          <div className={`flex flex-col ${width && width < 720 ? '-ml-8 sm:-ml-12 -mr-8 sm:-mr-12 bg-slate-50 pt-12' : ''} my-auto`}>
             <div className={`flex flex-col self-end flex-shrink justify-center ${width && width < 720 ? 'px-8 sm:px-12' : ''} w-fit`} style={{ maxWidth: '25rem', minWidth: 0 }}>
               <h2 className='font-bold text-3xl text-right'>Mamy <b className='text-blue-500'>wszystko</b>, czego potrzebujesz.</h2>
 
@@ -432,7 +452,7 @@ export const MostPopularProducts = ({
               </p>
             </div>
             {width && width < 720
-              ? <div className='flex flex-col w-screen bg-slate-100 pt-8 mt-12'>
+              ? <div className='flex flex-col w-screen bg-slate-50 pt-12'>
                 <FormControl className='w-full pr-16 sm:pr-24 ml-8 sm:ml-12'>
                   <InputLabel>kategoria</InputLabel>
                   <Select value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
@@ -446,7 +466,7 @@ export const MostPopularProducts = ({
                     }
                   </Select>
                 </FormControl>
-                <div className='flex items-start py-8 bg-slate-100 w-screen overflow-x-scroll'>
+                <div className='flex items-start py-4 bg-slate-50 w-screen overflow-x-scroll'>
                   {
                     mostPopularProducts[category].map(product => <ProductCard {...{ product }} first inRow />)
                   }
@@ -497,7 +517,7 @@ export const MostPopularProducts = ({
 export const ProductCard = ({ product, first, inRow }: { product: any, first?: boolean, inRow?: boolean }) => {
   return <Link href={`/forms/${product.id}`} passHref>
     <a>
-      <div style={{ minHeight: '24rem', width: '20rem', minWidth: '20rem' }} className={`flex p-4 sm:p-8 flex-col ${first ? 'ml-8 sm:ml-12' : inRow ? 'ml-4' : ''}  h-fit hover:bg-blue-50 text-black hover:text-blue-500 shadow cursor-pointer bg-slate-50 rounded-lg `}>
+      <div style={{ minHeight: '24rem', width: '20rem', minWidth: '20rem' }} className={`flex p-4 sm:p-8 flex-col ${first ? 'ml-8 sm:ml-12' : inRow ? 'ml-4' : ''}  h-fit hover:bg-slate-200 text-black shadow cursor-pointer bg-slate-100 rounded-lg `}>
 
         <h2 className='flex text-inherit whitespace-normal mb-1 text-lg sm:text-xl'>
           {
@@ -526,7 +546,48 @@ export const ProductCard = ({ product, first, inRow }: { product: any, first?: b
   </Link>
 }
 
-export const ExplanationAnimation = ({ className, style, active, textWhite }: { className?: string, style?: HTMLAttributes<HTMLImageElement>['style'], active: boolean, textWhite?: boolean }) => {
+export const PhasedExplanationAnimation = ({ className, style, active, textWhite, phase }: { className?: string, style?: HTMLAttributes<HTMLImageElement>['style'], active: boolean, textWhite?: boolean, phase: number }) => {
+  const phaseTimings = [6000, 9000, 9000, 0];
+  const [reset, setReset] = React.useState<boolean>(true)
+
+  const ref = React.useRef<NodeJS.Timeout | null>(null);
+
+  const runAnimation = async () => {
+    if (ref.current != null)
+      clearTimeout(ref.current);
+    ref.current = setTimeout(async () => {
+      setReset(false);
+    }, phaseTimings[phase]);
+    await sleep(phaseTimings[phase]);
+  }
+  React.useEffect(() => () => (ref.current != null ? clearTimeout(ref.current) : void 0), [])
+
+  React.useEffect(() => {
+    if (reset === false)
+      setReset(true);
+    else
+      runAnimation();
+  }, [reset])
+
+  React.useEffect(
+    () => {
+      setReset(false);
+    },
+    [phase]
+  )
+
+  return <div className={'relative inline-flex flex-col items-center justify-center gap-4 ' + className ?? ''} style={{
+    ...style, height: style?.width != null ? (0.67514843087 * (style.width as number)) : undefined
+  }}>
+    {active && reset ?
+      <ExplanationAnimationSvg className='self-start' phase={phase} />
+      : null
+    }
+  </div>
+}
+
+export const ExplanationAnimation = ({ className, style, active, textWhite, }: { className?: string, style?: HTMLAttributes<HTMLImageElement>['style'], active: boolean, textWhite?: boolean }) => {
+
 
   const [reset, setReset] = React.useState<boolean>(true)
   const [subtitleStage, setSubtitleStage] = React.useState<number>(0);
@@ -561,15 +622,16 @@ export const ExplanationAnimation = ({ className, style, active, textWhite }: { 
 
 
 
-  return <div className={'relative inline-flex flex-col gap-4 ' + className ?? ''} style={{
+  return <div className={'relative inline-flex self-center flex-col gap-4 ' + className ?? ''} style={{
     ...style, height: style?.width != null ? (0.67514843087 * (style.width as number)) : undefined
   }}>
     {active && reset ?
-      <ExplanationAnimationSvg className='self-start' />
+      <ExplanationAnimationSvg className='self-center' />
       : null
     }
 
-    <div className='w-full relative text-lg pb-6'>
+
+    <div className='w-full hidden relative text-lg pb-6'>
       <span className={`${textWhite ? 'text-slate-200' : ''} absolute top-0 ${subtitleStage === 0 ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
         <pre className={`${textWhite ? 'text-slate-900' : ''} font-bold inline mr-2`}>Krok 1:</pre>
         <p className='inline'>Wypełnij formularz danymi swojej sprawy.</p>
@@ -600,5 +662,132 @@ const longestCommonPrefix = (str1: React.ReactNode[], str2: React.ReactNode[]): 
     i++;
   }
   return i;
+}
+
+const Explanation = () => {
+  const [turnedOffCurrent, setTurnedOffCurrent] = React.useState<boolean>(false);
+  const [turnedOffPrevious, setTurnedOffPrevious] = React.useState<boolean>(false);
+
+  const [step, setStep] = React.useState<number>(0);
+  const [previousStep, setPreviousStep] = React.useState<number>(-1);
+
+  enum Directions {
+    left,
+    right
+  }
+
+  const { width } = useWindowSize();
+
+  const [inDirection, setInDirection] = React.useState<Directions>(Directions.left);
+  const [outDirection, setOutDirection] = React.useState<Directions>(Directions.right);
+
+  const modifyStep = (newStep: number) => {
+    setTurnedOffCurrent(true);
+    setTurnedOffPrevious(false)
+
+    if (newStep > step) {
+      setInDirection(Directions.right);
+      setOutDirection(Directions.left);
+    } else {
+      setInDirection(Directions.left);
+      setOutDirection(Directions.right);
+    }
+
+    setPreviousStep(step);
+    setStep(newStep);
+
+    setTurnedOffPrevious(true);
+    setTimeout(() => {
+      setTurnedOffCurrent(false);
+    }, 250)
+  }
+
+  return <div className='flex flex-col-reverse sm:flex-row justify-start' style={{ paddingLeft: 'calc(var(--margin) - var(--xpadding))' }}>
+    <div className='flex flex-col mr-8 sm:mr-12' style={{ maxWidth: '40rem' }} >
+      <div className='relative flex items-center'>
+        <div className={`flex flex-col transition-all z-0 ${(step === 0 && !turnedOffCurrent) || (previousStep === 0 && !turnedOffPrevious) ? 'opacity-1' : `opacity-0 ${(previousStep === 0 ? outDirection : inDirection) ? 'translate-x-1/3' : '-translate-x-1/3'}`} top-0  absolute  left-0 right-0`} >
+          <pre>Krok 1</pre>
+          <h1>
+            Wypełnij <b className='text-blue-500'>formularz</b>
+          </h1>
+          <p>
+            Zapytamy cię o wszystko, co jest istotne do wykonania pisma. Nie obawiaj się - wszystkie dane, które nam podasz są u nas bezpieczne i możesz je zawsze usunąć.
+          </p>
+        </div>
+        <div className={`flex flex-col transition-all z-0 ${(step === 1 && !turnedOffCurrent) || (previousStep == 1 && !turnedOffPrevious) ? 'opacity-1' : `opacity-0 ${(previousStep === 1 ? outDirection : inDirection) ? 'translate-x-1/3' : '-translate-x-1/3'}`} top-0 a  absolute  left-0 right-0`} >
+          <pre>Krok 2</pre>
+          <h1>
+            <b className='text-blue-500'>Zamów</b> pismo
+          </h1>
+          <p>
+            Kiedy zamówisz i opłacisz pismo, w ciągu kilku chwil po sfinalizowaniu płatności dodamy je do twojego konta. Wtedy możesz je pobrać w formacie <b>PDF</b>.
+          </p>
+        </div>
+        <div className={`flex flex-col transition-all z-0 ${(step === 2 && !turnedOffCurrent) || (previousStep == 2 && !turnedOffPrevious) ? 'opacity-1' : `opacity-0 ${(previousStep == 2 ? outDirection : inDirection) ? 'translate-x-1/3' : '-translate-x-1/3'}`} top-0   absolute  left-0 right-0`} >
+          <pre>Krok 3</pre>
+          <h1>
+            Wydrukuj <b className='text-blue-500'>pismo</b>
+          </h1>
+          <p>
+            Jedyna rzecz, której potrzebujesz to drukarka. Wszystkie nasze pisma można pobrać w formacie <b>PDF</b>, który jest idealny do druku.
+          </p>
+        </div>
+        <div className={`flex flex-col transition-all z-0 ${(step === 3 && !turnedOffCurrent) || (previousStep == 3 && !turnedOffPrevious) ? 'opacity-1' : `opacity-0 ${(previousStep == 3 ? outDirection : inDirection) ? 'translate-x-1/3' : '-translate-x-1/3'}`}`}>
+          <pre>Krok 4</pre>
+          <h1>
+            <b className='text-blue-500'>Podpisz się</b>
+          </h1>
+          <p>
+            Na każdym piśmie znajdziesz miejsce do podpisu, w którym musi podpisać się wnioskodawca. Po tym jedyne co musisz zrobić, to złożyć pismo do sądu, wraz z wymaganymi załącznikami, np. aktem urodzenia.
+          </p>
+        </div>
+      </div>
+
+      {width && width < 720 ?
+        <Pagination shape='rounded' page={step + 1} onChange={(e, step) => modifyStep(step - 1)} className='self-center mt-8' count={4} color='primary' />
+        : null
+      }
+      <PhasedExplanationAnimation active phase={step} className='bg-slate-50 h-52 mt-8 px-8 rounded py-2' />
+    </div>
+    {width && width >= 720 ?
+      <div className='inline-flex flex-row pr-8 sm:pr-12 sm:flex-col flex-wrap w-full justify-evenly sm:w-auto bg-white sm:mb-0 mb-8 my-auto sm:rx-12 gap-6 z-50 flex-1 whitespace-nowrap sm:min-w-fit' style={{ maxWidth: '28rem' }}>
+        <div className='flex-1 gap-6 flex sm:flex-col'>
+          <SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 0 && modifyStep(0)} className={`rounded cursor-pointer ${step === 0 ? 'bg-slate-800 text-white' : ' hover:bg-blue-50'} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
+            <div className='flex flex-col text-inherit'>
+              <pre className='text-inherit'>Krok 1</pre>
+              <p className='sm:inline-flex gap-3 items-center hidden '>Wprowadzanie danych</p>
+            </div>
+            <DataUsage className={`text-2xl sm:text-4xl  ${step === 0 ? 'icon-selected' : 'icon'} transition-colors`} />
+          </SelectAnimation>
+          <SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 1 && modifyStep(1)} className={`rounded cursor-pointer ${step === 1 ? 'bg-slate-800 text-white' : ' hover:bg-blue-50'} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
+            <div className='flex flex-col text-inherit'>
+              <pre className='text-inherit'>Krok 2</pre>
+              <p className='sm:inline-flex gap-3 items-center hidden '>Zamawianie pisma</p>
+            </div>
+            <ShoppingCart className={`text-2xl sm:text-4xl  ${step === 1 ? 'icon-selected' : 'icon'} transition-colors`} />
+          </SelectAnimation>
+        </div>
+        <div className='flex-1 gap-6 flex sm:flex-col'>
+          <SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 2 && modifyStep(2)} className={`rounded cursor-pointer ${step === 2 ? 'bg-slate-800 text-white' : ' hover:bg-blue-50'} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
+
+            <div className='flex flex-col text-inherit'>
+              <pre className='text-inherit'>Krok 3</pre>
+              <p className='sm:inline-flex gap-3 items-center hidden '>Pobieranie i drukowanie</p>
+            </div>
+            <Save className={`text-2xl sm:text-4xl  ${step === 2 ? 'icon-selected' : 'icon'} transition-colors`} />
+          </SelectAnimation>
+          <SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 3 && modifyStep(3)} className={`rounded cursor-pointer ${step === 3 ? 'bg-slate-800 text-white' : ' hover:bg-blue-50'} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
+            <div className='flex flex-col text-inherit'>
+              <pre className='text-inherit'>Krok 4</pre>
+              <p className='sm:inline-flex gap-3 items-center hidden '>Składanie do sądu</p>
+            </div>
+            <Gavel className={`text-2xl sm:text-4xl  ${step === 3 ? 'icon-selected' : 'icon'} transition-colors`} />
+          </SelectAnimation>
+        </div>
+
+      </div>
+      : null
+    }
+  </div>;
 }
 

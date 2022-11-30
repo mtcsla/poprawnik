@@ -1,12 +1,14 @@
-import { ArrowRight, Bookmark, Home } from '@mui/icons-material';
+import { ArrowRight, Search } from '@mui/icons-material';
 import { Avatar, Button } from '@mui/material';
 import { GetStaticPropsContext } from 'next';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ExplanationAnimation } from '../..';
+import { ExplanationAnimation, PhasedExplanationAnimation } from '../..';
 import { firebaseAdmin } from '../../../buildtime-deps/firebaseAdmin';
 import LogoHeader from '../../../components/LogoHeader';
 import useWindowSize from '../../../hooks/WindowSize';
+import { useAuth } from '../../../providers/AuthProvider';
 import BodyScrollLock from '../../../providers/BodyScrollLock';
 
 export const getStaticPaths = async () => {
@@ -41,37 +43,84 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
   const router = useRouter();
 
   const { width } = useWindowSize();
+  const { userProfile } = useAuth();
 
   return <BodyScrollLock>
-    <div className={`inline-flex fixed top-0 overflow-y-auto right-0 left-0 bottom-0 items-stretch bg-white `} style={{ zIndex: 201, backgroundSize: 'cover' }}>
-      <div className='h-full flex w-full' style={{ flex: 1, }} >
-        <div style={{ maxWidth: width && width < 1700 ? 900 : 1100 }} className='mx-auto my-auto flex h-fit flex-col flex-1 px-8 py-8   sm:px-12 sm:py-12 pt-6 bg-white self-stretch'>
-          <div className='flex items-center w-full justify-between flex-wrap'>
-            <LogoHeader noWidth noPadding noBackgroundImportant social={false} border={false} />
-            <div className='flex ml-auto flex-col items-right'>
-              <Link href='/' passHref>
-                <a className='text-slate-500 hover:text-blue-500 cursor-pointer inline-flex gap-3 text-sm  items-center'>
-                  <Home />
-                  Strona główna
-                </a>
-              </Link>
-              <Link href='/forms/list/all/1' passHref>
-                <a className='text-slate-500 hover:text-blue-500 cursor-pointer inline-flex gap-3 text-sm items-center'>
-                  <Bookmark />
-                  Lista pism
-                </a>
-              </Link>
+    <Head>
+      <title>{form?.title} - POPRAWNIK</title>
+      <meta name="description" content={form?.description}></meta>
+    </Head>
+    <header className='fixed bg-white sm:bg-opacity-50 backdrop-blur top-0 px-8 sm:px-12 md:px-16 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
+      <div className='h-full w-full flex items-center justify-between m-auto'>
+        <div className='inline-flex items-center'>
+          <LogoHeader noBackground noPadding noWidth png />
+        </div>
+
+        <span className='flex items-center'>
+          {
+            width && width > 720
+              ? <div
+                className={
+                  "mr-3  bg-slate-50 hover:bg-blue-100 rounded cursor-text transition-colors flex items-center p-2"
+                }
+                style={{ height: '2rem', width: 200 }}
+              >
+                <Search
+                  color={"primary"}
+                  sx={{ fontSize: "1.2rem !important" }}
+                />
+                <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
+              </div>
+              : <Button className="mr-3 bg-slate-50 " sx={{ padding: "0.4rem", height: '2rem' }}>
+                <Search sx={{ fontSize: "20px !important" }} />
+              </Button>
+
+          }
+          <Avatar role="button" variant='rounded' src={userProfile?.photoURL} className='w-8 h-8 hover:bg-blue-100 cursor-pointer text-blue-400 bg-slate-50' />
+        </span>
+      </div>
+    </header>
+    <div className={`inline-flex fixed top-0 bg-white pt-16 overflow-y-auto right-0 left-0 bottom-0 items-stretch `} style={{ zIndex: 201, }}>
+      <div className='h-full bg-white flex w-full ' style={{ flex: 1, }}  >
+        <div className='mx-auto my-auto flex h-fit flex-col flex-1 px-8 py-8    sm:px-12 md:px-16 md:py-16 sm:py-12 pt-6 self-stretch'>
+          <div className='flex mb-4 flex-col self-start'>
+            <h1 className='mt-4 text-2xl font-bold sm:text-4xl whitespace-normal  text-black mb-2 flex'>{form?.title}</h1>
+            <div className='inline-flex gap-3 flex-wrap w-full justify-between'>
+              <pre className='whitespace-normal'>{form?.category}</pre>
+              <p className='text-lg ml-auto sm:text-xl mt-2'>
+                {(form?.price / 100).toFixed(2).toString().replace('.', ',')}zł<b className='text-blue-500'>*</b>
+              </p>
             </div>
           </div>
-          <pre className='mt-4 self-end text-right whitespace-normal'>Zamierzasz wykonać pismo</pre>
-          <p className='text-sm text-slate-500 mt-4 mb-1'>Tytuł pisma:</p>
-          <h1 className='mt-1 text-2xl whitespace-normal  text-black mb-2 flex'><Bookmark color='primary' className='mr-2 translate-y-1' />{form?.title}</h1>
-          <pre className='whitespace-normal mb-4 text-xs'>{form?.category}</pre>
-          <div className='inline-flex self-stretch gap-3 flex-wrap sm:gap-6  justify-between'>
-            <div className='self-end flex flex-col mt-4'>
-              <pre className='text-xs'>Stworzone przez</pre>
+          <p className='w-full mb-8 sm:text-lg mt-2 h-full rounded-lg'>
+            {form?.description}
+          </p>
+
+
+          <div className='flex-1' />
+          {width && width < 1024
+            ? <div className=' h-full flex rounded-lg my-8 flex-col justify-center w-full bg-slate-50 bg-blend-multiply p-4 sm:p-12' style={{
+              flex: 1 / 2, backgroundSize: 'cover', //backgroundImage: 'url(/bg-new-light.svg)',
+            }}>
+              <pre className='text-lg mb-2 self-end text-black text-right mt-auto'>Jak to działa?</pre>
+              <ExplanationAnimation className='mx-auto max-w-xs mb-auto w-full' active />
+            </div>
+            : null
+          }
+          <Link passHref href={`/forms/${router.query.id}/form`}>
+            <a className='w-full'>
+              <Button className='w-full p-2 mt-8 sm:p-4 bg-blue-400 text-white border-none' >Przejdź do formularza <ArrowRight className='ml-1' /></Button>
+            </a>
+          </Link>
+          <p style={{ maxWidth: '20rem' }} className='text-sm mt-6 text-slate-500'><b className='text-blue-500'>*</b>przejście dalej nie oznacza zakupu pisma - decyzję o zakupie podejmiesz po wypełnieniu formularza</p>
+
+
+          <div className='ml-auto self-end w-fit inline-flex mt-6 gap-3 flex-wrap'>
+
+            <div className='flex flex-col ml-auto'>
+              <pre className='text-xs'>Autor</pre>
               <div className='items-center flex mb-4'>
-                <Avatar className='my-2 ml-2' src={form?.authorPictureURL} />
+                <Avatar className='my-2' src={form?.authorPictureURL} />
                 <span className='flex flex-col ml-3'>
                   <p className='text-sm'>
                     {form?.authorName}
@@ -79,12 +128,15 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
                   <pre className='text-xs mt-1'>Deweloper</pre>
                 </span>
               </div>
+            </div>
 
-              <pre className='text-xs'>Zweryfikowane przez</pre>
+
+            <div className='ml-auto flex flex-col'>
+              <pre className='text-xs'>Zweryfikował/a</pre>
               <div className='items-center flex w-fit'>
                 {
                   form?.verifiedBy === 'admin'
-                    ? <><LogoHeader noBackground={true} noBackgroundImportant noWidth={true} noPadding noText border={false} />
+                    ? <><LogoHeader noBackground noBackgroundImportant noWidth noPadding noText border={false} />
 
                       <span className='flex flex-col ml-2'>
                         <p className='text-sm whitespace-nowrap truncate'>
@@ -98,39 +150,13 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
                 }
               </div>
             </div>
-            <div className='flex flex-col flex-1'>
-              <pre className='text-sm 0 rounded'>Opis</pre>
-              <p style={{ minHeight: 100 }} className='w-full  p-2 mt-2 sm:p-4 h-full bg-slate-50 rounded-lg'>{form?.description}</p>
-            </div>
           </div>
-          <div className='flex-1' />
-          {width && width < 1024
-            ? <div className=' h-full flex rounded-lg my-8 flex-col justify-center w-full bg-slate-200 bg-blend-multiply p-4 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light.svg)', }}>
-              <pre className='text-lg mb-2 self-end text-black text-right mt-auto'>Jak to działa?</pre>
-              <ExplanationAnimation className='mx-auto max-w-xs mb-auto w-full' active />
-            </div>
-            : null
-          }
-          <p className='self-end text-lg mt-12'>
-            <pre className='text-sm mr-1 inline'>Cena:</pre>
-            <b>
-              {(form?.price / 100).toFixed(2).toString().replace('.', ',')}zł
-            </b>
-          </p>
-          <p className='text-sm text-slate-500 self-end'>(przejście dalej nie oznacza zakupu pisma - decyzję o zakupie podejmiesz po wypełnieniu formularza)</p>
-          <Link passHref href={`/forms/${router.query.id}/form`}>
-            <a className='w-full'>
-              <Button className='w-full p-2 mt-8 sm:p-4 bg-blue-400 text-white border-none' >Przejdź do formularza <ArrowRight className='ml-1' /></Button>
-            </a>
-          </Link>
-
         </div>
       </div>
       {width && width >= 1024
-        ? <div className=' h-full flex flex-col justify-center w-full bg-slate-200 p-8 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light.svg)', }}>
-          <pre className='text-lg mb-2 self-end text-right mt-auto text-black'>Jak to działa?</pre>
-          <div className='bg-slate-100 backdrop-blur bg-opacity-50 rounded-lg mb-auto p-6'>
-            <ExplanationAnimation className='mx-auto mb-auto w-full' active />
+        ? <div className=' h-full flex flex-col justify-center w-full p-8 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light.svg)', }}>
+          <div className='bg-slate-50 rounded-lg my-auto p-6'>
+            <PhasedExplanationAnimation phase={0} className='mx-auto mb-auto w-full' active />
           </div>
         </div>
         : null

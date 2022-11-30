@@ -17,6 +17,32 @@
 :root {
   --doublemargin: calc(100vw - 60rem);
   --margin: calc(var(--doublemargin) / 2);
+  --xpadding: 2rem;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --xpadding: 3rem;
+  }
+}
+
+.-translate-x-1-full {
+  transform: translateX(-100%);
+}
+.-translate-x-2-full {
+  transform: translateX(-200%);
+}
+.-translate-x-3-full {
+  transform: translateX(-300%);
+}
+.translate-x-1-full {
+  transform: translateX(100%);
+}
+.translate-x-2-full {
+  transform: translateX(200%);
+}
+.translate-x-3-full {
+  transform: translateX(300%);
 }
 
 @keyframes blink-caret {

@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { collection, doc, getDoc } from '@firebase/firestore';
-import { Add, ArrowBack, ArrowForward, Article, Delete, List as ListIcon, MoveDown, MoveUp } from '@mui/icons-material';
+import { Add, ArrowBack, ArrowForward, Delete, List as ListIcon, MoveDown, MoveUp } from '@mui/icons-material';
 import { Alert, Button, ButtonGroup, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Snackbar, Tooltip } from '@mui/material';
 import { Formik } from 'formik';
 import Link from 'next/link';
@@ -216,11 +216,6 @@ const FormDisplay = () => {
     <div id='fixed-parent' className="bg-white overflow-y-auto fixed top-0 bottom-0 right-0 left-0" style={{ zIndex: 201, /*backgroundImage: 'url(/bg-new-light.svg)',*/ backgroundSize: 'cover' }}>
       <div className='w-full h-full flex sm:px-8 sm:py-8'>
         <Body className='w-full h-auto my-auto mx-auto bg-white  flex flex-col'>
-          <Link href={`/forms/${router.query.id}`}>
-            <a className='text-sm self-start text-slate-500 hover:text-black gap-1 inline-flex items-center'>
-              <Article /> Do strony pisma
-            </a>
-          </Link>
 
           <Snackbar open={incorrect}>
             <Alert severity='error' variant='filled'>
@@ -228,8 +223,12 @@ const FormDisplay = () => {
             </Alert>
           </Snackbar>
 
-          <p className='text-sm self-end whitespace-normal text-slate-500 text-right'>Wypełniasz formularz pisma:</p>
-          <h1 className='self-end text-xl sm:text-2xl mb-2 mt-2 whitespace-normal text-right text-black'>{formDoc?.title}</h1>
+          <span className='inline-flex gap-2 text-2xl sm:text-3xl self-end'>
+            <Link href={`/forms/${router.query.id}`}>
+              <ArrowBack color='primary' className='translate-y-2.5 cursor-pointer' />
+            </Link>
+            <h1 className='self-end font-bold mb-2 mt-2 whitespace-normal text-right text-black'>{formDoc?.title}</h1>
+          </span>
           <pre className='text-xs self-end text-right mb-6'>{formDoc?.newCategory || formDoc?.category}</pre>
           <span className='flex flex-col'>
             <div className="flex justify-between mb-4 flex-wrap items-center">
@@ -249,13 +248,13 @@ const FormDisplay = () => {
 
                   <div className='flex items-start justify-between'>
 
-                    <p className='text-slate-700'>
-                      <pre className='inline mr-1 text-slate-500'>
-                        krok {currentStep + 1}/{description.length}{description[currentStep]?.subtitle ? ': ' : ''}
-                      </pre>
-                      {description[currentStep]?.subtitle}
-                    </p>
+                    <pre className='inline mr-1 normal-case text-slate-500'>
+                      KROK {currentStep + 1} z {description.length}
+                    </pre>
                   </div>
+                  <p className='sm:text-lg'>
+                    {description[currentStep]?.subtitle}
+                  </p>
                 </span>
             }
           </span>
@@ -271,6 +270,7 @@ const FormDisplay = () => {
                   dalej
                   <ArrowForward className='ml-4' />
                 </Button>
+
               </>
               : (description && description.length > 0 && Object.keys(data).length > 0 && currentStep < description.length && currentStep >= 0)
                 ? <Formik
@@ -300,11 +300,6 @@ const FormDisplay = () => {
                         ? <List {...{ step: currentStepDescription, formDescription: description }} />
                         : <Step {...{ step: currentStepDescription, formDescription: description }} />
                       }
-                      {
-                        currentStep > 0
-                          ? <Button onClick={router.back} className='border-none self-start' color='error' size='small'><ArrowBack className='mr-2' /> poprzedni krok</Button>
-                          : null
-                      }
                       <Button onClick={async () => {
                         const errors = await validateForm();
                         if (Object.keys(errors).length === 0)
@@ -319,6 +314,12 @@ const FormDisplay = () => {
                         Dalej
                         <ArrowForward className='ml-2' />
                       </Button>
+
+                      {
+                        currentStep > 0
+                          ? <Button onClick={router.back} fullWidth className='border-none bg-red-50 hover:bg-red-100 w-full mt-4 self-start' color='error' size='small'><ArrowBack className='mr-2' /> poprzedni krok</Button>
+                          : null
+                      }
                     </formikContext.Provider>
                   }}
                 />
@@ -452,9 +453,9 @@ export const List = ({ step, formDescription }: { step: StepDescription, formDes
   )
 
   return <div className='flex flex-col py-8'>
-    <pre className='text-sm justify-end flex text-right'><ListIcon className='mr-2 translate-y-0.5' color='primary' /> Ten krok jest listą</pre>
+    <pre className='flex'><ListIcon className='mr-2 translate-y-0.5' color='primary' /> Ten krok jest listą</pre>
 
-    <p className='mt-2 mb-6'>
+    <p className='mt-2 mb-6 sm:text-lg'>
       {step.listMessage}
     </p>
     {

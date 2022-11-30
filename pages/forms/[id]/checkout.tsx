@@ -1,5 +1,5 @@
 import { collection, doc, getDoc } from '@firebase/firestore';
-import { ArrowBack, ArrowForward, CompareArrows } from '@mui/icons-material';
+import { ArrowBack, ArrowForward, Search } from '@mui/icons-material';
 import { Alert, Avatar, Button, Skeleton, Snackbar } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -17,6 +17,8 @@ import {
   useStripe
 } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import LogoHeader from '../../../components/LogoHeader';
+import useWindowSize from '../../../hooks/WindowSize';
 import publicKeys from "../../../public_keys.json";
 const stripePromise = loadStripe(publicKeys.stripe);
 
@@ -66,6 +68,8 @@ const FormFinalize = () => {
   const [error, setError] = React.useState<string>('');
   const { userProfile } = useAuth();
 
+  const { width } = useWindowSize();
+
   React.useEffect(
     () => {
       if (!userProfile)
@@ -95,22 +99,44 @@ const FormFinalize = () => {
 
 
   return <BodyScrollLock>
-    <div className="top-0 sm:px-8 overflow-y-auto bottom-0 flex flex-col left-0 right-0 fixed bg-white" style={{ /*backgroundImage: 'url(/bg-new-light.svg)',*/ backgroundSize: 'cover', zIndex: 201 }}>
+    <header className='fixed bg-white sm:bg-opacity-50 backdrop-blur top-0 px-8 sm:px-12 md:px-16 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
+      <div className='h-full w-full flex items-center justify-between m-auto'>
+        <div className='inline-flex items-center'>
+          <LogoHeader noBackground noPadding noWidth png />
+        </div>
+
+        <span className='flex items-center'>
+          {
+            width && width > 720
+              ? <div
+                className={
+                  "mr-3  bg-slate-50 hover:bg-blue-100 rounded cursor-text transition-colors flex items-center p-2"
+                }
+                style={{ height: '2rem', width: 200 }}
+              >
+                <Search
+                  color={"primary"}
+                  sx={{ fontSize: "1.2rem !important" }}
+                />
+                <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
+              </div>
+              : <Button className="mr-3 bg-slate-50 " sx={{ padding: "0.4rem", height: '2rem' }}>
+                <Search sx={{ fontSize: "20px !important" }} />
+              </Button>
+
+          }
+          <Avatar role="button" variant='rounded' src={userProfile?.photoURL} className='w-8 h-8 hover:bg-blue-100 cursor-pointer text-blue-400 bg-slate-50' />
+        </span>
+      </div>
+    </header>
+    <div className="top-0 sm:px-8 pt-16 overflow-y-auto bottom-0 flex flex-col left-0 right-0 fixed bg-white" style={{ /*backgroundImage: 'url(/bg-new-light.svg)',*/ backgroundSize: 'cover', zIndex: 201 }}>
       <div className='w-full h-full flex'>
-        <div className='mx-auto p-8 flex my-auto flex-col h-fit w-full bg-white' style={{ maxWidth: 900 }}>
-          <div className='flex-col flex'>
-            <Link href={`/forms/${router.query.id}/form`}>
-              <Button color='error' className='w-full bg-red-200 text-red-500 self-start border-none'><ArrowBack className='mr-2' /> Wróć do formularza</Button>
-            </Link>
-            <p className='text-sm text-slate-500 mt-2'>
-              Po zamówieniu pisma nie będzie możliwości zmiany jego treści, więc jeśli chcesz coś zmienić lub sprawdzić poprawność danych, wróć do formularza.
-            </p>
-          </div>
+        <div className='p-8 flex my-auto flex-col h-fit w-full bg-white' style={{ maxWidth: 900 }}>
 
           <div className='flex flex-col'>
-            <p className='text-sm text-slate-500 mt-6'>Zamawiasz pismo:</p>
-            <h2 className='text-black mb-2 mt-1'>{formDoc?.title}</h2>
+            <h2 className='text-black mb-2 text-2xl mt-8 sm:text-4xl'>{formDoc?.title}</h2>
             <pre className='text-xs mb-4 '>{formDoc?.category}</pre>
+            <p className='sm:text-lg'>{formDoc?.description}</p>
 
             <pre className='text-sm self-end'>Jesteś zalogowany jako</pre>
             <span className='inline-flex gap-4 self-end my-2 items-center'>
@@ -122,12 +148,16 @@ const FormFinalize = () => {
               </span>
             </span>
 
+            <div className='flex-col flex my-8'>
+              <Link href={`/forms/${router.query.id}/form`}>
+                <Button color='error' className='w-full bg-red-200 text-red-500 self-start border-none'><ArrowBack className='mr-2' /> Wróć do formularza</Button>
+              </Link>
+              <p className='text-sm text-slate-500 mt-2'>
+                Po zamówieniu pisma nie będzie możliwości zmiany jego treści, więc jeśli chcesz coś zmienić lub sprawdzić poprawność danych, wróć do formularza.
+              </p>
+            </div>
 
-            <h2>
-              <CompareArrows color='primary' className='mr-2 -translate-y-0.5' />
-              Zamów pismo
-            </h2>
-            <p>Zamów pismo, a my wygenerujemy je i dodamy do Twojego konta.</p>
+
           </div>
 
           <div className='w-full flex flex-col'>
@@ -157,6 +187,8 @@ const FormFinalize = () => {
               </>
             }
           </div>
+
+          <p className='mt-8'>Po sfinalizowaniu płatności dodamy pismo do Twojego konta i przekierujemy cię do podstrony, na której można je pobrać.</p>
 
 
 

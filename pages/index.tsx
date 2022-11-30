@@ -682,8 +682,12 @@ const Explanation = () => {
   const [outDirection, setOutDirection] = React.useState<Directions>(Directions.right);
 
   const modifyStep = (newStep: number) => {
+    if (newStep == step)
+      return;
+
     setTurnedOffCurrent(true);
     setTurnedOffPrevious(false)
+
 
     if (newStep > step) {
       setInDirection(Directions.right);
@@ -703,7 +707,7 @@ const Explanation = () => {
   }
 
   return <div className='flex flex-col-reverse sm:flex-row justify-start' style={{ paddingLeft: 'calc(var(--margin) - var(--xpadding))' }}>
-    <div className='flex flex-col mr-8 sm:mr-12' style={{ maxWidth: '40rem' }} >
+    <div className='flex flex-col sm:mr-8 ' style={{ maxWidth: '40rem' }} >
       <div className='relative flex items-center'>
         <div className={`flex flex-col transition-all z-0 ${(step === 0 && !turnedOffCurrent) || (previousStep === 0 && !turnedOffPrevious) ? 'opacity-1' : `opacity-0 ${(previousStep === 0 ? outDirection : inDirection) ? 'translate-x-1/3' : '-translate-x-1/3'}`} top-0  absolute  left-0 right-0`} >
           <pre>Krok 1</pre>

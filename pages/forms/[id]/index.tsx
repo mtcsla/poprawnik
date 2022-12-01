@@ -96,7 +96,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
 
 
           <div className='flex-1' />
-          {width && width < 1024
+          {width && width < 1024 && false
             ? <div className=' h-full flex rounded-lg my-8 flex-col justify-center w-full bg-slate-50 bg-blend-multiply p-4 sm:p-12' style={{
               flex: 1 / 2, backgroundSize: 'cover', //backgroundImage: 'url(/bg-new-light.svg)',
             }}>
@@ -151,7 +151,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
           </div>
         </div>
       </div>
-      {width && width >= 1024 && false
+      {width && width >= 1024
         ? <div className=' min-h-full flex flex-col justify-center w-full p-8 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light-2.svg)', }}>
           <div className='bg-slate-50 rounded-lg my-auto p-6'>
             <PhasedExplanationAnimation phase={0} className='mx-auto mb-auto w-full' active />

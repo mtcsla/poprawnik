@@ -78,8 +78,8 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
         </span>
       </div>
     </header>
-    <div className={`inline-flex bg-white items-stretch h-full pt-16 w-full min-h-full`} style={{ zIndex: 201, }}>
-      <div className='h-full bg-white flex w-full' style={{ flex: 1, }}  >
+    <div className={`inline-flex bg-white items-stretch h-full pt-16 w-full min-h-screen`} style={{ zIndex: 201, }}>
+      <div className='h-full min-h-full my-auto bg-white flex w-full' style={{ flex: 1, }}  >
         <div className='mx-auto my-auto flex h-fit flex-col flex-1 px-8 py-8    sm:px-12 md:px-16 md:py-16 sm:py-12 pt-6 self-stretch'>
           <div className='flex mb-4 flex-col self-start'>
             <h1 className='mt-4 text-2xl font-bold sm:text-4xl whitespace-normal  text-black mb-2 flex'>{form?.title}</h1>

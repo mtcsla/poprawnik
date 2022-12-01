@@ -187,7 +187,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
   }, []);
 
   return <div
-    className='bg-white bg-blend-darken relative flex-1 lg:flex-auto flex flex-col overflow-x-hidden items-stretch left-0 right-0 bottom-0 top-0 overflow-y-scroll'>
+    className='bg-white bg-blend-darken relative flex-1 lg:flex-auto flex flex-col overflow-x-hidden items-stretch overflow-y-visible'>
     <header className='fixed bg-white backdrop-blur bg-opacity-50 top-0 px-8 sm:px-12 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
       <div style={{ maxWidth: '60rem' }} className='h-full w-full flex items-center justify-between m-auto'>
         <div className='inline-flex items-center'>
@@ -541,7 +541,7 @@ export const ProductCard = ({ product, first, inRow }: { product: any, first?: b
           <pre className='mb-4 text-xs whitespace-normal text-right'>{product.category}</pre>
 
           <pre className='mt-2 text-xs'>Opis</pre>
-          <p className='text-sm mt-2'>
+          <p className='text-sm font-normal mt-2'>
             {
               product.description
             }

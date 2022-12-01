@@ -212,7 +212,9 @@ const FormDisplay = () => {
   const incorrectTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
   return <>
-    <div id='fixed-parent' className="bg-white min-h-screen" style={{ zIndex: 201, backgroundImage: 'url(/bg-new-light.svg)', backgroundSize: 'cover' }}>
+    <div id='fixed-parent' className="bg-white min-h-screen overflow-y-visible" style={{
+      zIndex: 201, //backgroundImage: 'url(/bg-new-light.svg)', backgroundSize: 'cover' 
+    }}>
       <div className='w-full h-full flex sm:px-8 sm:py-8'>
         <Body className='w-full h-auto my-auto mx-auto  flex flex-col'>
 

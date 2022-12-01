@@ -137,7 +137,7 @@ const FormFinalize = () => {
         </span>
       </div>
     </header>
-    <div className='w-full min-h-full flex pt-16'>
+    <div className='w-full min-h-screen flex pt-16'>
       <div className='p-8 flex my-auto px-8 sm:px-12 md:px-16 flex-1 flex-col h-fit w-full bg-white'>
         <div className='flex flex-col'>
           <div className='flex mb-4 flex-col self-start'>

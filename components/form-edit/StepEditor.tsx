@@ -166,9 +166,9 @@ const StepEditor = () => {
     <p className='text-sm'>Jedno bądź dwa zdania w skrócie opisujące krok.</p>
     {editing === 'subtitle'
       ? <div className='w-full flex flex-col'>
-        <textarea maxLength={150} readOnly={saving} defaultValue={currentDescription[step as number].subtitle} ref={subtitleTextArea as any} className='p-4 border rounded mt-4' />
+        <textarea maxLength={150} readOnly={saving} defaultValue={currentDescription[step as number].subtitle} ref={subtitleTextArea as any} className='p-4 bg-slate-50 rounded mt-4' />
       </div>
-      : <div className='text-sm p-4 w-full border rounded mt-4' style={{ minHeight: 70 }}>{currentDescription[step as number].subtitle}</div>
+      : <div className='text-sm p-4 w-full bg-slate-50 rounded mt-4' style={{ minHeight: 70 }}>{currentDescription[step as number].subtitle}</div>
     }
     {currentDescription[step as number].type === 'list' ? <>
       <span className='flex justify-between items-center'>
@@ -286,9 +286,9 @@ const StepEditor = () => {
       <p className='text-sm'>Wskazówka dotycząca wypełniania listy, np. <i>Dodaj do listy wszystkich spadkobierców testamentowych</i>.</p>
       {editing === 'listMessage'
         ? <div className='w-full flex flex-col'>
-          <textarea maxLength={150} readOnly={saving} defaultValue={currentDescription[step as number].listMessage} ref={listMessageTextArea as any} className='p-4 border rounded mt-4' />
+          <textarea maxLength={150} readOnly={saving} defaultValue={currentDescription[step as number].listMessage} ref={listMessageTextArea as any} className='p-4 bg-slate-50 rounded mt-4' />
         </div>
-        : <div className='text-sm p-4 w-full border rounded mt-4' style={{ minHeight: 70 }}>{currentDescription[step as number].listMessage}</div>
+        : <div className='text-sm p-4 w-full bg-slate-50 rounded mt-4' style={{ minHeight: 70 }}>{currentDescription[step as number].listMessage}</div>
       }
 
     </> : null
@@ -305,12 +305,12 @@ const StepEditor = () => {
         <Button onClick={() => {
           setEditing(null);
           router.push({ pathname: router.pathname, query: Object.assign(router.query, { fragment: index.toString() }) })
-        }} className='w-full normal-case text-left hover:border-blue-500 rounded-lg border mb-8  hover:bg-blue-50  cursor-pointer p-4 '>
+        }} className='w-full normal-case text-left hover:border-blue-500 rounded mb-8  hover:bg-blue-50  cursor-pointer p-4 '>
           <div className='text-black w-full pointer-events-none'>
             <EditorFragment fragment={fragment} editor={false} />
           </div>
         </Button>)
-      : <div className='rounded border h-16 mb-8 mt-2 flex items-center justify-center p-4'>
+      : <div className='rounded bg-slate-50 h-16 mb-8 mt-2 flex items-center justify-center p-4'>
         <pre>Brak fragmentów</pre>
       </div>
     }

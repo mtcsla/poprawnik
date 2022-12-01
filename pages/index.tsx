@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Article, Bookmark, DataUsage, Gavel, People, Save, Search, ShoppingCart } from '@mui/icons-material';
+import { ArrowRight, Article, Bookmark, DataUsage, Gavel, People, Save, Search, ShoppingCart } from '@mui/icons-material';
 import { Avatar, Button, FormControl, InputLabel, MenuItem, Pagination, Select } from '@mui/material';
 import { GetStaticPropsContext } from 'next';
 import Link from 'next/link';
@@ -240,7 +240,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 
       </div>
     </header>
-    <Top style={{ backdropFilter: 'grayscale(20%)', backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light.svg)', zIndex: 0, }} className='w-screen pt-32 px-8 sm:px-12 flex-col flex'>
+    <Top style={{ backdropFilter: 'grayscale(20%)', backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light-2.svg)', zIndex: 0, }} className='w-screen pt-32 px-8 sm:px-12 flex-col flex'>
       <div className='flex flex-col my-auto w-full mx-auto ' style={{ maxWidth: '60rem' }}>
         <div className='inline-flex sm:gap-10 md:gap-20 lg:gap-40  pb-8 bg-opacity-50 sm:pb-12 md:pb-16 pt-0 justify-between items-center'>
           <span style={{ minHeight: '20rem' }} className='flex-col flex-1 md:flex-initial h-full justify-between relative flex'>
@@ -271,7 +271,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
                 minWidth: '20rem',
                 maxWidth: '30rem'
               }}
-              className="self-end w-full py-4 px-8 bg-slate-50 rounded"
+              className="self-end w-full py-4 px-8 bg-slate-100 rounded"
               active
             />
             : null
@@ -349,7 +349,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
               </p>
 
               <p className='text-white mt-2 text-sm font-bold'>
-                Trustree sp.j. © 2022
+                POPRAWNIK sp.j. © 2022
               </p>
             </div>
           </div>
@@ -381,6 +381,7 @@ export const MostPopularProducts = ({
             ? <div className='flex xl:flex-shrink min-w-fit xl:flex-grow'>
               <div className='xl:flex-1 w-12 xl:w-full h-full ' />
               <div className='flex  flex-col bg-slate-50  p-8 rounded' >
+                <pre className='self-end mb-4'>Najpopularniejsze pisma</pre>
                 <FormControl className='w-full'>
                   <InputLabel>kategoria</InputLabel>
                   <Select value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
@@ -438,10 +439,17 @@ export const MostPopularProducts = ({
                     </div>
                   </div>
                 </div>
+
+                <Link href='/forms/list/all/1' passHref>
+                  <a>
+                    <Button className='mt-6 w-full p-4 text-white bg-blue-500'>Lista pism <ArrowRight className='ml-2' /></Button>
+                  </a>
+                </Link>
               </div>
             </div>
             : <div />
           }
+
           <div className={`flex flex-col ${width && width < 720 ? '-ml-8 sm:-ml-12 -mr-8 sm:-mr-12 bg-slate-50 pt-12' : ''} my-auto`}>
             <div className={`flex flex-col self-end flex-shrink justify-center ${width && width < 720 ? 'px-8 sm:px-12' : ''} w-fit`} style={{ maxWidth: '25rem', minWidth: 0 }}>
               <h2 className='font-bold text-3xl text-right'>Mamy <b className='text-blue-500'>wszystko</b>, czego potrzebujesz.</h2>
@@ -452,7 +460,7 @@ export const MostPopularProducts = ({
               </p>
             </div>
             {width && width < 720
-              ? <div className='flex flex-col w-screen bg-slate-50 pt-12'>
+              ? <div className='flex flex-col w-screen bg-slate-50 pb-12 pt-12'>
                 <FormControl className='w-full pr-16 sm:pr-24 ml-8 sm:ml-12'>
                   <InputLabel>kategoria</InputLabel>
                   <Select value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
@@ -504,6 +512,12 @@ export const MostPopularProducts = ({
                     mostPopularProducts[category].map(product => <ProductCard {...{ product }} inRow />)
                   }
                 </div>
+
+                <Link href='/forms/list/all/1' passHref >
+                  <a className='mx-8 sm:mx-12'>
+                    <Button className='w-full p-4 text-white bg-blue-500'>Lista pism <ArrowRight className='ml-2' /></Button>
+                  </a>
+                </Link>
               </div>
               : null
             }
@@ -517,31 +531,33 @@ export const MostPopularProducts = ({
 export const ProductCard = ({ product, first, inRow }: { product: any, first?: boolean, inRow?: boolean }) => {
   return <Link href={`/forms/${product.id}`} passHref>
     <a>
-      <div style={{ minHeight: '24rem', width: '20rem', minWidth: '20rem' }} className={`flex p-4 sm:p-8 flex-col ${first ? 'ml-8 sm:ml-12' : inRow ? 'ml-4' : ''}  h-fit hover:bg-slate-200 text-black shadow cursor-pointer bg-slate-100 rounded-lg `}>
+      <Button className='p-0 text-normal normal-case text-left'>
+        <div style={{ minHeight: '24rem', width: '20rem', minWidth: '20rem' }} className={`flex transition-colors p-4 sm:p-8 flex-col ${first ? 'ml-8 sm:ml-12' : inRow ? 'ml-4' : ''}  h-fit hover:bg-slate-200 text-black shadow cursor-pointer bg-slate-100 rounded-lg `}>
 
-        <h2 className='flex text-inherit whitespace-normal mb-1 text-lg sm:text-xl'>
-          {
-            product.title
-          }</h2>
-        <pre className='mb-4 text-xs whitespace-normal text-right'>{product.category}</pre>
+          <h2 className='flex text-inherit whitespace-normal mb-1 text-lg sm:text-xl'>
+            {
+              product.title
+            }</h2>
+          <pre className='mb-4 text-xs whitespace-normal text-right'>{product.category}</pre>
 
-        <pre className='mt-2 text-xs'>Opis</pre>
-        <p className='text-sm mt-2'>
-          {
-            product.description
-          }
-        </p>
-        <div className='flex-1' />
-        <pre className='text-xs mb-2'>Autor</pre>
-        <div className='inline-flex rounded-lg gap-4 w-full mb-8 justify-between'>
-          <Avatar variant='rounded' src={product.authorPictureURL} />
-          <div className='flex flex-col items-end justify-between'>
-            <p>{product.authorName}</p>
-            <pre className='text-sm'>deweloper</pre>
+          <pre className='mt-2 text-xs'>Opis</pre>
+          <p className='text-sm mt-2'>
+            {
+              product.description
+            }
+          </p>
+          <div className='flex-1' />
+          <pre className='text-xs mb-2'>Autor</pre>
+          <div className='inline-flex rounded-lg gap-4 w-full mb-8 justify-between'>
+            <Avatar variant='rounded' src={product.authorPictureURL} />
+            <div className='flex flex-col items-end justify-between'>
+              <p>{product.authorName}</p>
+              <pre className='text-sm'>deweloper</pre>
+            </div>
           </div>
+          <pre className='self-end text-sm text-inherit'><i className='not-italic  text-slate-500'>Cena:</i> <b className='text-lg font-bold normal-case text-inherit'>{(product.price / 100).toFixed(2).replace('.', ',')}zł</b></pre>
         </div>
-        <pre className='self-end text-sm text-inherit'><i className='not-italic  text-slate-500'>Cena:</i> <b className='text-lg font-bold normal-case text-inherit'>{(product.price / 100).toFixed(2).replace('.', ',')}zł</b></pre>
-      </div>
+      </Button>
     </a>
   </Link>
 }

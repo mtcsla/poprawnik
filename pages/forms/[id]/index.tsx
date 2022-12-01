@@ -9,7 +9,6 @@ import { firebaseAdmin } from '../../../buildtime-deps/firebaseAdmin';
 import LogoHeader from '../../../components/LogoHeader';
 import useWindowSize from '../../../hooks/WindowSize';
 import { useAuth } from '../../../providers/AuthProvider';
-import BodyScrollLock from '../../../providers/BodyScrollLock';
 
 export const getStaticPaths = async () => {
   const paths: string[] = [];
@@ -45,11 +44,10 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
   const { width } = useWindowSize();
   const { userProfile } = useAuth();
 
-  return <BodyScrollLock>
-    <Head>
-      <title>{form?.title} - POPRAWNIK</title>
-      <meta name="description" content={form?.description}></meta>
-    </Head>
+  return <> <Head>
+    <title>Wykonaj {(form?.title as string | undefined)?.toLowerCase()} • POPRAWNIK</title>
+    <meta name="description" content={form?.description}></meta>
+  </Head>
     <header className='fixed bg-white sm:bg-opacity-50 backdrop-blur top-0 px-8 sm:px-12 md:px-16 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
       <div className='h-full w-full flex items-center justify-between m-auto'>
         <div className='inline-flex items-center'>
@@ -80,8 +78,8 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
         </span>
       </div>
     </header>
-    <div className={`inline-flex fixed top-0 bg-white pt-16 overflow-y-auto right-0 left-0 bottom-0 items-stretch `} style={{ zIndex: 201, }}>
-      <div className='h-full bg-white flex w-full ' style={{ flex: 1, }}  >
+    <div className={`inline-flex bg-white items-stretch h-full pt-16 w-full min-h-full`} style={{ zIndex: 201, }}>
+      <div className='h-full bg-white flex w-full' style={{ flex: 1, }}  >
         <div className='mx-auto my-auto flex h-fit flex-col flex-1 px-8 py-8    sm:px-12 md:px-16 md:py-16 sm:py-12 pt-6 self-stretch'>
           <div className='flex mb-4 flex-col self-start'>
             <h1 className='mt-4 text-2xl font-bold sm:text-4xl whitespace-normal  text-black mb-2 flex'>{form?.title}</h1>
@@ -153,8 +151,8 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
           </div>
         </div>
       </div>
-      {width && width >= 1024
-        ? <div className=' h-full flex flex-col justify-center w-full p-8 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light.svg)', }}>
+      {width && width >= 1024 && false
+        ? <div className=' min-h-full flex flex-col justify-center w-full p-8 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light-2.svg)', }}>
           <div className='bg-slate-50 rounded-lg my-auto p-6'>
             <PhasedExplanationAnimation phase={0} className='mx-auto mb-auto w-full' active />
           </div>
@@ -162,7 +160,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
         : null
       }
     </div>
-  </BodyScrollLock>
+  </>
 }
 
 export default FormIndex;

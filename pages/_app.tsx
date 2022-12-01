@@ -27,7 +27,7 @@ function MyApp({ Component, pageProps }: any) {
   return (
     <>
       <Head>
-        <title>POPRAWNIK - serwis z pismami sądowymi</title>
+        <title>POPRAWNIK • Serwis z pismami sądowymi</title>
         <meta name="theme-color" content="#fff" />
         <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css' />
       </Head>
@@ -42,8 +42,9 @@ function MyApp({ Component, pageProps }: any) {
 }
 
 const pageWithAppropriateWrapper = (location: string, component: ReactNode) => {
-  if (location === '/')
+  if (location === '/' || (location.includes('forms') && !location.includes('list')))
     return component;
+
   if (location.includes("/login") || location.includes("/signup"))
     return <AuthWrapper>{component}</AuthWrapper>;
   if (location.includes("/account"))

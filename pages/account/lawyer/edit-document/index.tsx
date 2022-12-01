@@ -198,7 +198,7 @@ const EditForm = () => {
         }
       </span>
       {!editingTitle
-        ? <p className="p-4 border rounded-lg">{form.title || 'BRAK'}</p>
+        ? <p className="p-4 bg-slate-50 rounded">{form.title || 'BRAK'}</p>
         : <TextField defaultValue={title} onChange={({ target }) => setTitle(target.value)} />
       }
       <span className="flex items-center mt-2 justify-between">
@@ -218,7 +218,7 @@ const EditForm = () => {
         }
       </span>
       {!editingPrice
-        ? <p className="p-4 border rounded-lg">{form.price || 'BRAK'}</p>
+        ? <p className="p-4 bg-slate-50 rounded">{form.price || 'BRAK'}</p>
         //@ts-ignore
         : <TextField type='number' defaultValue={price} onChange={({ target }) => setPrice(parseFloat(target.value) !== NaN ? parseFloat(target.value) : null)} />
       }
@@ -240,7 +240,7 @@ const EditForm = () => {
         }
       </span>
       {!editingCategory
-        ? <p className="p-4 border rounded-lg">{(form.category === 'new' ? 'nowa kategoria' : form.category) || 'BRAK'}</p>
+        ? <p className="p-4 bg-slate-50 rounded">{(form.category === 'new' ? 'nowa kategoria' : form.category) || 'BRAK'}</p>
         //@ts-ignore
         : <FormControl className='w-full'>
           <Select defaultValue={category} value={category} onChange={(e) => setCategory(e.target.value)}>
@@ -256,7 +256,7 @@ const EditForm = () => {
           <pre className="text-sm">nazwa nowej kategorii</pre>
         </span>
         {!editingCategory
-          ? <p className="p-4 border rounded-lg">{newCategory || 'BRAK'}</p>
+          ? <p className="p-4 bg-slate-50 rounded">{newCategory || 'BRAK'}</p>
           //@ts-ignore
           : <TextField placeholder='np. Prawo spadkowe' defaultValue={newCategory} onChange={({ target }) => setNewCategory(target.value)} />
         }
@@ -276,8 +276,8 @@ const EditForm = () => {
         }
       </span>
       {!editingDescription
-        ? <p className="p-4 border rounded-lg" style={{ minHeight: 150 }}>{form.description || 'BRAK'}</p>
-        : <textarea className='border rounded-lg p-4' defaultValue={description} maxLength={750} style={{ minHeight: 150 }}
+        ? <p className="p-4 bg-slate-50 rounded" style={{ minHeight: 150 }}>{form.description || 'BRAK'}</p>
+        : <textarea className='bg-slate-50 rounded p-4' defaultValue={description} maxLength={750} style={{ minHeight: 150 }}
           onChange={({ target }) => setDescription(target.value)} />
       }
       {verifying
@@ -398,7 +398,7 @@ const EditForm = () => {
         </Button>
       }
       {form.reasonForRejection
-        ? <><div className='p-4 bg-red-50 text-red-500 mt-8 border-red-500 border rounded-lg flex flex-col'>
+        ? <><div className='p-4 bg-red-50 text-red-500 mt-8 border-red-500 bg-slate-50 rounded flex flex-col'>
           <pre className='text-sm text-red-400'>Twoje pismo zostało odrzucone</pre>
           <p className='mt-4 font-bold text-sm'>
             {form.reasonForRejection}
@@ -417,7 +417,7 @@ const EditForm = () => {
           <p className='text-sm mb-4'>
             Podaj powód odrzucenia pisma i sugerowane poprawki. Autor otrzyma powiadomienie o odrzuceniu pisma.
           </p>
-          <textarea className='w-full border rounded-lg p-4' onChange={(e) => setThrowOutReason(e.target.value || '')} style={{
+          <textarea className='w-full bg-slate-50 rounded p-4' onChange={(e) => setThrowOutReason(e.target.value || '')} style={{
             minHeight: 150
           }} />
           {

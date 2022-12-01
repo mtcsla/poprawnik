@@ -170,12 +170,12 @@ const FormEditor = () => {
 
     }
     {currentDescription.length ?
-      <Tabs className='border rounded-lg mb-6' onChange={(e, value) => selectStep(value)} value={parseInt(selectedStep)}>
+      <Tabs className='bg-slate-50 rounded-lg mb-6' onChange={(e, value) => selectStep(value)} value={parseInt(selectedStep)}>
         {currentDescription.map((step, index) =>
           <Tab label={step.type === 'list' ? step.name : `KROK ${index + 1}`} value={index} />
         )}
       </Tabs>
-      : <div className='mb-6 border rounded-lg w-full h-12 items-center flex justify-center' >
+      : <div className='mb-6 bg-slate-50 rounded-lg w-full h-12 items-center flex justify-center' >
         <pre className='text-base'>
           brak kroków
         </pre>
@@ -190,7 +190,7 @@ const FormEditor = () => {
     </locationContext.Provider>
     {
       selectedStep === '-1' ?
-        <div className='p-10 rounded-lg border flex justify-center items-center'>
+        <div className='p-10 rounded-lg flex justify-center items-center'>
           <DoneAll className='mr-3 text-4xl -translate-y-1' fontSize='inherit' color='primary' />
           <p>Wybierz z listy powyżej lub dodaj krok, aby edytować.</p>
         </div>

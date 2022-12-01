@@ -1,12 +1,11 @@
 import { collection, doc, getDoc } from '@firebase/firestore';
 import { ArrowBack, ArrowForward, Search } from '@mui/icons-material';
 import { Alert, Avatar, Button, Skeleton, Snackbar } from '@mui/material';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { firestore } from '../../../buildtime-deps/firebase';
 import { useAuth } from '../../../providers/AuthProvider';
-import BodyScrollLock from '../../../providers/BodyScrollLock';
+import { PhasedExplanationAnimation } from "../../index";
 import { FormValues, RootFormValue } from './form';
 
 import { LoadingButton } from '@mui/lab';
@@ -20,6 +19,10 @@ import { loadStripe } from '@stripe/stripe-js';
 import LogoHeader from '../../../components/LogoHeader';
 import useWindowSize from '../../../hooks/WindowSize';
 import publicKeys from "../../../public_keys.json";
+
+import Head from 'next/head';
+import Link from 'next/link';
+
 const stripePromise = loadStripe(publicKeys.stripe);
 
 const FormFinalize = () => {
@@ -98,14 +101,19 @@ const FormFinalize = () => {
   const [paymentMethod, setPaymentMethod] = React.useState<'blik' | 'p24'>('p24')
 
 
-  return <BodyScrollLock>
-    <header className='fixed bg-white sm:bg-opacity-50 backdrop-blur top-0 px-8 sm:px-12 md:px-16 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
+  return <>
+    <Head>
+      <title>
+        Kup {(formDoc?.title as string | undefined)?.toLowerCase()} • POPRAWNIK
+      </title>
+    </Head>
+    <header className='fixed bg-white px-8 sm:px-12 md:px-16 sm:bg-opacity-50 backdrop-blur top-0 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
       <div className='h-full w-full flex items-center justify-between m-auto'>
         <div className='inline-flex items-center'>
           <LogoHeader noBackground noPadding noWidth png />
         </div>
 
-        <span className='flex items-center'>
+        <span className='flex h-full items-center'>
           {
             width && width > 720
               ? <div
@@ -129,73 +137,85 @@ const FormFinalize = () => {
         </span>
       </div>
     </header>
-    <div className="top-0 sm:px-8 pt-16 overflow-y-auto bottom-0 flex flex-col left-0 right-0 fixed bg-white" style={{ /*backgroundImage: 'url(/bg-new-light.svg)',*/ backgroundSize: 'cover', zIndex: 201 }}>
-      <div className='w-full h-full flex'>
-        <div className='p-8 flex my-auto flex-col h-fit w-full bg-white' style={{ maxWidth: 900 }}>
-
-          <div className='flex flex-col'>
-            <h2 className='text-black mb-2 text-2xl mt-8 sm:text-4xl'>{formDoc?.title}</h2>
-            <pre className='text-xs mb-4 '>{formDoc?.category}</pre>
-            <p className='sm:text-lg'>{formDoc?.description}</p>
-
-            <pre className='text-sm self-end'>Jesteś zalogowany jako</pre>
-            <span className='inline-flex gap-4 self-end my-2 items-center'>
-              <Avatar src={userProfile?.photoURL} />
-
-              <span className='flex flex-col'>
-                <p>{userProfile?.displayName}</p>
-                <pre className='text-sm'>Użytkownik</pre>
-              </span>
-            </span>
-
-            <div className='flex-col flex my-8'>
-              <Link href={`/forms/${router.query.id}/form`}>
-                <Button color='error' className='w-full bg-red-200 text-red-500 self-start border-none'><ArrowBack className='mr-2' /> Wróć do formularza</Button>
-              </Link>
-              <p className='text-sm text-slate-500 mt-2'>
-                Po zamówieniu pisma nie będzie możliwości zmiany jego treści, więc jeśli chcesz coś zmienić lub sprawdzić poprawność danych, wróć do formularza.
+    <div className='w-full min-h-full flex pt-16'>
+      <div className='p-8 flex my-auto px-8 sm:px-12 md:px-16 flex-1 flex-col h-fit w-full bg-white'>
+        <div className='flex flex-col'>
+          <div className='flex mb-4 flex-col self-start'>
+            <h1 className='mt-4 text-2xl font-bold sm:text-4xl whitespace-normal  text-black mb-2 flex'>{formDoc?.title}</h1>
+            <div className='inline-flex gap-3 flex-wrap w-full justify-between'>
+              <pre className='whitespace-normal'>{formDoc?.category}</pre>
+              <p className='text-lg ml-auto sm:text-xl mt-2'>
+                {(formDoc?.price / 100).toFixed(2).toString().replace('.', ',')}zł
               </p>
             </div>
-
-
           </div>
+          <p className='sm:text-lg'>{formDoc?.description}</p>
 
-          <div className='w-full flex flex-col'>
-            {userProfile && clientSecret && formDoc ?
-              <>
-                <Elements stripe={stripePromise} options={{ clientSecret, locale: 'pl' }}>
-                  <PaymentForm formDoc={formDoc} setError={setError} />
-                </Elements>
-              </>
-              : error
-                ? <p className='p-2 mt-8 sm:p-4 border-red-500 rounded-lg bg-red-50 text-red-500 border'>{error}</p>
-                : null
-            }
-            {userProfile && clientSecret && formDoc
-              ? null
-              : <>
-                <span className='inline-flex items-center w-full mt-1 mt-4 gap-4'>
-                  <Skeleton height={100} style={{ flex: 1 / 3 }} /> <Skeleton height={100} style={{ flex: 1 / 3 }} /> <Skeleton height={100} style={{ flex: 1 / 3 }} />
+          <pre className='text-sm self-end mt-8'>Jesteś zalogowany jako</pre>
+          <span className='inline-flex gap-4 self-end my-2 items-center'>
+            <Avatar src={userProfile?.photoURL} />
 
-                </span>
-                <Skeleton variant='rectangular' className='mb-6 rounded' height={50} />
-                <Skeleton variant='rectangular' className='mb-6 rounded' height={50} />
-                <LoadingButton disabled color='primary' className={`bg-gray-100 w-full sm:p-4 p-2 mt-4  self-start border-none`}>
-                  Zapłać {formDoc ? `${(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł` : <Skeleton className='ml-2' height={'2rem'} width={"4rem"} />}<ArrowForward className='ml-2' />
+            <span className='flex flex-col'>
+              <p>{userProfile?.displayName}</p>
+              <pre className='text-sm'>Użytkownik</pre>
+            </span>
+          </span>
 
-                </LoadingButton>
-              </>
-            }
+          <div className='flex-col flex my-8'>
+            <Link href={`/forms/${router.query.id}/form`}>
+              <Button color='error' className='w-full bg-red-50 text-red-500 self-start border-none'><ArrowBack className='mr-2' /> Wróć do formularza</Button>
+            </Link>
+            <p className='text-sm text-slate-500 mt-2'>
+              Po zamówieniu pisma nie będzie możliwości zmiany jego treści, więc jeśli chcesz coś zmienić lub sprawdzić poprawność danych, wróć do formularza.
+            </p>
           </div>
-
-          <p className='mt-8'>Po sfinalizowaniu płatności dodamy pismo do Twojego konta i przekierujemy cię do podstrony, na której można je pobrać.</p>
-
 
 
         </div>
+
+        <div className='w-full flex flex-col'>
+          {userProfile && clientSecret && formDoc ?
+            <>
+              <Elements stripe={stripePromise} options={{ clientSecret, locale: 'pl' }}>
+                <PaymentForm formDoc={formDoc} setError={setError} />
+              </Elements>
+            </>
+            : error
+              ? <p className='p-2 mt-8 sm:p-4 border-red-500 rounded-lg bg-red-50 text-red-500 border'>{error}</p>
+              : null
+          }
+          {userProfile && clientSecret && formDoc
+            ? null
+            : <>
+              <span className='inline-flex items-center w-full mt-1 mt-4 gap-4'>
+                <Skeleton height={100} style={{ flex: 1 / 3 }} /> <Skeleton height={100} style={{ flex: 1 / 3 }} /> <Skeleton height={100} style={{ flex: 1 / 3 }} />
+
+              </span>
+              <Skeleton variant='rectangular' className='mb-6 rounded' height={50} />
+              <Skeleton variant='rectangular' className='mb-6 rounded' height={50} />
+              <LoadingButton disabled color='primary' className={`bg-gray-100 w-full sm:p-4 p-2 mt-4  self-start border-none`}>
+                Zapłać {formDoc ? `${(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł` : <Skeleton className='ml-2' height={'2rem'} width={"4rem"} />}<ArrowForward className='ml-2' />
+
+              </LoadingButton>
+            </>
+          }
+        </div>
+
+        <p className='mt-8'>Po sfinalizowaniu płatności dodamy pismo do Twojego konta i przekierujemy cię do podstrony, na której można je pobrać.</p>
+
+
+
       </div>
+      {width && width >= 1024
+        ? <div className='self-stretch flex flex-col justify-center p-8 sm:p-12 md:p-16' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light-2.svg)', }}>
+          <div className='bg-slate-50 rounded-lg my-auto p-6'>
+            <PhasedExplanationAnimation phase={1} className='mx-auto mb-auto w-full' active />
+          </div>
+        </div>
+        : null
+      }
     </div>
-  </BodyScrollLock>
+  </>
 }
 
 const PaymentForm = ({ formDoc, setError }: {
@@ -244,7 +264,7 @@ const PaymentForm = ({ formDoc, setError }: {
   }
   return <>
     <Snackbar open={notFilledOutError}>
-      <Alert severity='error' className='bg-red-100 text-red-500'>Wprowadź dane płatności.</Alert>
+      <Alert severity='error' variant='filled'>Wprowadź dane płatności.</Alert>
     </Snackbar>
 
     <div className='flex flex-col'>

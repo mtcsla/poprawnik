@@ -14,7 +14,6 @@ import { Evaluate } from '../../../components/utility/Evaluate';
 import { InitialValues } from '../../../components/utility/InitialValues';
 import { ValidatorsObject } from '../../../components/utility/ValidatorsObject';
 import { useAuth } from '../../../providers/AuthProvider';
-import BodyScrollLock from "../../../providers/BodyScrollLock";
 import { FormDescription, FragmentDescription, StepDescription } from '../../../providers/FormDescriptionProvider/FormDescriptionProvider';
 import { IFormData } from '../../account/lawyer/index';
 
@@ -212,10 +211,10 @@ const FormDisplay = () => {
   const [incorrect, setIncorrect] = React.useState<boolean>(false);
   const incorrectTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
-  return <BodyScrollLock>
-    <div id='fixed-parent' className="bg-white overflow-y-auto fixed top-0 bottom-0 right-0 left-0" style={{ zIndex: 201, /*backgroundImage: 'url(/bg-new-light.svg)',*/ backgroundSize: 'cover' }}>
+  return <>
+    <div id='fixed-parent' className="bg-white min-h-screen" style={{ zIndex: 201, backgroundImage: 'url(/bg-new-light.svg)', backgroundSize: 'cover' }}>
       <div className='w-full h-full flex sm:px-8 sm:py-8'>
-        <Body className='w-full h-auto my-auto mx-auto bg-white  flex flex-col'>
+        <Body className='w-full h-auto my-auto mx-auto  flex flex-col'>
 
           <Snackbar open={incorrect}>
             <Alert severity='error' variant='filled'>
@@ -241,6 +240,12 @@ const FormDisplay = () => {
               </span>
               <LinearProgressAdapitve variant={loading ? 'indeterminate' : 'determinate'} value={currentStep / description.length * 100} className='rounded-lg flex-1 w-full h-9' />
             </div>
+
+            {
+              currentStep > 0
+                ? <Button onClick={router.back} fullWidth className='border-none bg-red-50 hover:bg-red-100 mb-4 w-full self-start' color='error' size='small'><ArrowBack className='mr-2' /> poprzedni krok</Button>
+                : null
+            }
             {
               loading
                 ? <></>
@@ -315,11 +320,6 @@ const FormDisplay = () => {
                         <ArrowForward className='ml-2' />
                       </Button>
 
-                      {
-                        currentStep > 0
-                          ? <Button onClick={router.back} fullWidth className='border-none bg-red-50 hover:bg-red-100 w-full mt-4 self-start' color='error' size='small'><ArrowBack className='mr-2' /> poprzedni krok</Button>
-                          : null
-                      }
                     </formikContext.Provider>
                   }}
                 />
@@ -330,7 +330,7 @@ const FormDisplay = () => {
         </Body>
       </div>
     </div>
-  </BodyScrollLock >;
+  </ >;
 }
 
 
@@ -527,7 +527,7 @@ function ListElement({ movingDown, index, movingUp, arr, heights, step, swap, de
         </DialogActions>
       </Dialog>
       <pre className='ml-3 whitespace-normal text-sm'>{step.listItemName || 'Element'} {index + 1}</pre>
-      <div className='flex-1 border-t border-slate-100' />
+      <div className='flex-1' />
       <ButtonGroup disabled={movingDown != -1 || movingUp != -1} variant='text'>
         <Tooltip title='zamień z elementem powyżej'>
           <Button disabled={index == 0} onClick={() => { swap(index, index - 1, 'up'); }} size='small' className='border-none'><MoveUp /></Button>

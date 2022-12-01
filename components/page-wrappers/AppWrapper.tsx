@@ -180,7 +180,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                     <ArrowLeft className={"mr-1"} /> Strona startowa
                   </a>
                 </Link>
-                Trustree sp.j. © 2022
+                POPRAWNIK sp.j. © 2022
               </div>
             </footer>
           </div>

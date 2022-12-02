@@ -9,6 +9,7 @@ import { firebaseAdmin } from '../../../buildtime-deps/firebaseAdmin';
 import LogoHeader from '../../../components/LogoHeader';
 import useWindowSize from '../../../hooks/WindowSize';
 import { useAuth } from '../../../providers/AuthProvider';
+import { useSearch } from '../../../providers/SearchProvider';
 
 export const getStaticPaths = async () => {
   const paths: string[] = [];
@@ -42,6 +43,9 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
   const router = useRouter();
 
   const { width } = useWindowSize();
+  const { setSearchOpen } = useSearch();
+  const onSearch = () => setSearchOpen(true);
+
   const { userProfile } = useAuth();
 
   return <> <Head>
@@ -61,6 +65,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
                 className={
                   "mr-3  bg-slate-50 hover:bg-blue-100 rounded cursor-text transition-colors flex items-center p-2"
                 }
+                onClick={onSearch}
                 style={{ height: '2rem', width: 200 }}
               >
                 <Search
@@ -70,7 +75,10 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
                 <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
               </div>
               : <Button className="mr-3 bg-slate-50 " sx={{ padding: "0.4rem", height: '2rem' }}>
-                <Search sx={{ fontSize: "20px !important" }} />
+                <Search
+                  onClick={onSearch}
+                  sx={{ fontSize: "20px !important" }}
+                />
               </Button>
 
           }

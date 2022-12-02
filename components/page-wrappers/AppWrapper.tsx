@@ -13,6 +13,7 @@ import Router, { NextRouter, useRouter } from "next/router";
 import React, { useEffect } from "react";
 import useWindowSize from "../../hooks/WindowSize";
 import { useAuth } from "../../providers/AuthProvider";
+import { useSearch } from "../../providers/SearchProvider";
 import { useSideNav } from "../../providers/SidenavProvider";
 import LogoHeader from "../LogoHeader";
 import Sidebar from "../sidebar/Sidebar";
@@ -26,6 +27,9 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const { width } = useWindowSize();
   const { userProfile, signOut } = useAuth();
   const router = useRouter();
+
+  const { setSearchOpen } = useSearch();
+  const onSearch = () => setSearchOpen(true);
 
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) =>
@@ -111,6 +115,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                       "mr-3  bg-slate-50 rounded hover:bg-slate-100 cursor-text transition-colors flex items-center p-2"
                     }
                     style={{ height: 35, width: 200 }}
+                    onClick={onSearch}
                   >
                     <Search
                       color={"primary"}
@@ -118,8 +123,8 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                     />
                     <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
                   </div>
-                  : <Button className="mr-3 bg-white" sx={{ padding: "0.4rem" }}>
-                    <Search sx={{ fontSize: "20px !important" }} />
+                  : <Button className="mr-3 bg-slate-50" sx={{ padding: "0.4rem" }}>
+                    <Search onClick={onSearch} sx={{ fontSize: "20px !important" }} />
                   </Button>
 
               }

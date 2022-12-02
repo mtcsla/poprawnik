@@ -22,6 +22,7 @@ import publicKeys from "../../../public_keys.json";
 
 import Head from 'next/head';
 import Link from 'next/link';
+import { useSearch } from '../../../providers/SearchProvider';
 
 const stripePromise = loadStripe(publicKeys.stripe);
 
@@ -32,6 +33,8 @@ const FormFinalize = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
 
   const router = useRouter();
+  const { setSearchOpen } = useSearch();
+  const onSearch = () => setSearchOpen(true);
 
 
   // const stripe = useStripe();
@@ -120,6 +123,7 @@ const FormFinalize = () => {
                 className={
                   "mr-3  bg-slate-50 hover:bg-blue-100 rounded cursor-text transition-colors flex items-center p-2"
                 }
+                onClick={onSearch}
                 style={{ height: '2rem', width: 200 }}
               >
                 <Search
@@ -129,7 +133,10 @@ const FormFinalize = () => {
                 <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
               </div>
               : <Button className="mr-3 bg-slate-50 " sx={{ padding: "0.4rem", height: '2rem' }}>
-                <Search sx={{ fontSize: "20px !important" }} />
+                <Search
+                  onClick={onSearch}
+                  sx={{ fontSize: "20px !important" }}
+                />
               </Button>
 
           }

@@ -188,6 +188,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
   }, []);
 
   const { setSearchOpen } = useSearch();
+  const onSearch = () => setSearchOpen(true);
 
   return <div
     className='bg-white bg-blend-darken relative flex-1 lg:flex-auto flex flex-col overflow-x-hidden items-stretch overflow-y-visible'>
@@ -219,12 +220,14 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
         </div>
 
         <span className='flex items-center'>
+
           {
             width && width > 720
               ? <div
                 className={
                   "mr-3  bg-slate-50 hover:bg-blue-100 rounded cursor-text transition-colors flex items-center p-2"
                 }
+                onClick={onSearch}
                 style={{ height: '2rem', width: 200 }}
               >
                 <Search
@@ -234,10 +237,14 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
                 <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
               </div>
               : <Button className="mr-3 bg-slate-50 " sx={{ padding: "0.4rem", height: '2rem' }}>
-                <Search sx={{ fontSize: "20px !important" }} />
+                <Search
+                  onClick={onSearch}
+                  sx={{ fontSize: "20px !important" }}
+                />
               </Button>
 
           }
+
           <Avatar role="button" variant='rounded' src={userProfile?.photoURL} className='w-8 h-8 hover:bg-blue-100 cursor-pointer text-blue-400 bg-slate-50' />
         </span>
 

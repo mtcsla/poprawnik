@@ -9,6 +9,7 @@ import { ExplanationAnimationSvg } from '../components/ExplanationAnimationSvg';
 import LogoHeader from '../components/LogoHeader';
 import useWindowSize from '../hooks/WindowSize';
 import { useAuth } from '../providers/AuthProvider';
+import { useSearch } from '../providers/SearchProvider';
 
 const SelectAnimation = styled.div`
   color: rgb(0, 0, 0);
@@ -186,6 +187,8 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
     })();
   }, []);
 
+  const { setSearchOpen } = useSearch();
+
   return <div
     className='bg-white bg-blend-darken relative flex-1 lg:flex-auto flex flex-col overflow-x-hidden items-stretch overflow-y-visible'>
     <header className='fixed bg-white backdrop-blur bg-opacity-50 top-0 px-8 sm:px-12 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
@@ -258,7 +261,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
                 Wykonamy dla Ciebie pismo sądowe tak samo dobrze, jak dowolny prawnik.
               </Subtitle>
             </TitleAndSearch>
-            <Button style={{ minWidth: 250, }} className='bg-slate-50 border-none text-slate-500 hover:bg-blue-50 text-lg hover:text-blue-500 w-full mt-8 self-start p-3 sm:p-5 flex justify-between'>
+            <Button onClick={() => setSearchOpen(true)} style={{ minWidth: 250, }} className='bg-slate-50 border-none text-slate-500 hover:bg-blue-50 text-lg hover:text-blue-500 w-full mt-8 self-start p-3 sm:p-5 flex justify-between'>
               <Search className='text-2xl' />
               Wyszukaj pismo
             </Button>

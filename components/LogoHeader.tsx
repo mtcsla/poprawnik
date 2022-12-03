@@ -44,11 +44,23 @@ const LogoHeader = ({
   const { width } = useWindowSize();
   const router = useRouter();
 
-  const [rem, setRem] = React.useState(0);
+  const [rem, setRem] = React.useState(16);
   React.useEffect(
     () => {
-      setRem(parseInt(document.getElementById("__next")?.style.fontSize || "16px"));
-    }
+      setRem(parseInt(document.documentElement.style.fontSize || '16px'))
+
+      const getRem = (mutations: MutationRecord[]) => {
+        setRem(parseInt(document.documentElement.style.fontSize || '16px'))
+      }
+
+      const mutationObserver = new window.MutationObserver(getRem)
+      mutationObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['style']
+      })
+
+      return () => mutationObserver.disconnect()
+    }, []
   )
 
   const TopComponent = styled(Paper) <{ noWidth: boolean | undefined }>`
@@ -63,7 +75,15 @@ const LogoHeader = ({
     variant="outlined"
     classes={!border ? { root: "border-b-0" } : {}}
     className={
-      `${noBackgroundImportant ? 'bg-transparent' : `bg-${width != null && width >= 1100 && !noBackground ? 'white' : 'transparent'}`} rounded-none flex items-center border-l-0 border-t-0 border-r-0  ${noPadding ? '' : `px-5 ${inAccountPage ? '' : 'pr-3'}`}`
+      `${noBackgroundImportant
+        ? 'bg-transparent'
+        : `bg-${width != null && width >= 1100 && !noBackground ? 'white' : 'transparent'}
+        `} rounded-none flex items-center border-l-0 border-t-0 border-r-0  
+        ${noPadding
+        ? ''
+        : `px-5 ${inAccountPage
+          ? ''
+          : 'pr-3'} `}`
     }
   >
     {

@@ -71,6 +71,10 @@ body,
   overflow-y: hidden;
 }
 
+.MuiFormControl-root {
+  border-radius: 0.5rem;
+}
+
 html {
   scroll-behavior: smooth !important;
   overflow-y: auto;

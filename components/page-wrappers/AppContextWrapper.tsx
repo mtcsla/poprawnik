@@ -70,11 +70,14 @@ const theme = createTheme({
     },
     MuiOutlinedInput: {
       styleOverrides: {
+
         inputAdornedStart: {
           background: 'white'
         },
 
         root: {
+          borderRadius: 'inherit',
+          borderColor: 'inherit',
           transition: 'background-color 0.3s ease-in-out',
           '&.Mui-disabled': {
             backgroundColor: colors.transparent
@@ -131,7 +134,6 @@ const theme = createTheme({
           marginTop: '0.5rem',
           marginBottom: '0.5rem',
           background: 'rgba(0, 0, 0, 0.8) !important',
-          borderRadius: '10px !important',
           color: 'white !important',
         }
       }
@@ -188,7 +190,6 @@ const theme = createTheme({
           ":hover": {
             backgroundColor: 'rgb(248 250 252)',
           },
-          borderRadius: 5,
           minHeight: '0 !important',
           height: 'auto !important'
         }

@@ -268,10 +268,10 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
                 Wykonamy dla Ciebie pismo sądowe tak samo dobrze, jak dowolny prawnik.
               </Subtitle>
             </TitleAndSearch>
-            <Button onClick={() => setSearchOpen(true)} style={{ minWidth: 250, }} className='bg-slate-50 border-none text-slate-500 hover:bg-blue-50 text-lg hover:text-blue-500 w-full mt-8 self-start p-3 sm:p-5 flex justify-between'>
+            <div onClick={() => setSearchOpen(true)} style={{ minWidth: 250, }} role='button' className='bg-slate-50 border-none rounded-lg text-slate-500 hover:bg-blue-50 text-lg hover:text-blue-500 w-full mt-8 self-start p-3 sm:p-5 flex justify-between'>
               <Search className='text-2xl' />
-              Wyszukaj pismo
-            </Button>
+              Szukaj pisma...
+            </div>
           </span>
 
           {width && width >= 848

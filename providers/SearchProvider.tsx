@@ -9,6 +9,7 @@ import { BasicDoc, Hit, Index } from "react-instantsearch-core";
 import { algoliaAppId, algoliaSearchKey } from '../public_keys.json';
 
 
+import Router from 'next/router';
 import { Configure, connectHits, createConnector, InstantSearch } from 'react-instantsearch-dom';
 import { useOnClickOutside } from "usehooks-ts";
 import useWindowSize from "../hooks/WindowSize";
@@ -33,6 +34,10 @@ export default function SearchProvider({ children }: { children: React.ReactNode
   const [searchOpen, setSearchOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
+
+    const handler = () => { setSearchOpen(false); }
+    Router.events.on('routeChangeComplete', handler);
+
     const listener = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setSearchOpen(false);
@@ -46,7 +51,7 @@ export default function SearchProvider({ children }: { children: React.ReactNode
       'keydown',
       listener
     );
-    return () => window.removeEventListener('keydown', listener);
+    return () => { window.removeEventListener('keydown', listener); Router.events.off('routeChangeComplete', handler); };
   }, []);
 
 

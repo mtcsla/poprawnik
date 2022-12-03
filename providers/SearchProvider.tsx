@@ -1,6 +1,6 @@
 
 import styled from '@emotion/styled';
-import { AccountBox, ArrowForward, Bookmark, Close, DescriptionRounded, Home, Newspaper, Search as SearchIcon } from "@mui/icons-material";
+import { AccountBox, ArrowForwardIos, Bookmark, Close, DescriptionOutlined, Home, NewspaperOutlined, Search as SearchIcon } from "@mui/icons-material";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import algoliasearch from "algoliasearch";
 import Link from "next/link";
@@ -98,7 +98,7 @@ export const Search = () => {
       <ConnectedSearchBox />
       <Configure hitsPerPage={5} />
 
-      <div className="w-full h-full px-4 pt-8 flex justify-between flex-col overflow-y-scroll">
+      <div className="w-full h-full px-4 pt-4 flex justify-between flex-col overflow-y-scroll">
         <div className='flex flex-col w-full'>
           <indexContext.Provider value={'products'}>
             <Index indexName="products">
@@ -114,7 +114,7 @@ export const Search = () => {
         </div>
 
         <div className="flex gap-6 flex-wrap pt-8 pb-4 mt-auto">
-          <div className="inline-flex mr-auto px-4 flex-wrap gap-6 sm:gap-12 justify-between w-full">
+          <div className="inline-flex mr-auto px-2 flex-wrap gap-6 sm:gap-12 justify-between w-full">
             <div className="flex flex-col">
               <p className="flex items-center">
 
@@ -124,17 +124,17 @@ export const Search = () => {
               <ul className="inline-flex flex-col gap-1 my-2 text-sm text-blue-500">
                 <Link href="/faq">
                   <li>
-                    Najczęściej zadawane pytania <ArrowForward />
+                    Najczęściej zadawane pytania <ArrowForwardIos className='text-xs' />
                   </li>
                 </Link>
                 <Link href="/faq">
                   <li>
-                    Polityka prywatności <ArrowForward />
+                    Polityka prywatności <ArrowForwardIos className='text-xs' />
                   </li>
                 </Link>
                 <Link href="/faq">
                   <li>
-                    Warunku świadczenia usług <ArrowForward />
+                    Warunku świadczenia usług <ArrowForwardIos className='text-xs' />
                   </li>
                 </Link>
               </ul>
@@ -149,19 +149,19 @@ export const Search = () => {
                 <ul className="inline-flex flex-col gap-1 my-2 text-sm text-blue-500">
                   <Link href="/faq">
                     <li>
-                      Logowanie <ArrowForward />
+                      Logowanie <ArrowForwardIos className='text-xs' />
                     </li>
                   </Link>
                   <Link href="/faq">
                     <li>
-                      Rejestracja <ArrowForward />
+                      Rejestracja <ArrowForwardIos className='text-xs' />
                     </li>
                   </Link>
                 </ul>
               </div>
             </div>
 
-            <div className="inline-flex gap-6 flex-col mr-auto">
+            <div className="inline-flex gap-6 flex-col">
               <div className="flex  flex-col">
                 <p className="flex items-center">
                   <Home className="mr-2" color='primary' />
@@ -170,17 +170,17 @@ export const Search = () => {
                 <ul className="inline-flex flex-col gap-1 my-2 text-sm text-blue-500">
                   <Link href="/faq">
                     <li>
-                      Wszystkie pisma <ArrowForward />
+                      Wszystkie pisma <ArrowForwardIos className='text-xs' />
                     </li>
                   </Link>
                   <Link href="/faq">
                     <li>
-                      Wszystkie artykuły <ArrowForward />
+                      Wszystkie artykuły <ArrowForwardIos className='text-xs' />
                     </li>
                   </Link>
                   <Link href="/faq">
                     <li>
-                      Strona startowa <ArrowForward />
+                      Strona startowa <ArrowForwardIos className='text-xs' />
                     </li>
                   </Link>
                 </ul>
@@ -246,15 +246,19 @@ const MyHit = ({ hit }: { hit: Hit<BasicDoc> }) => {
       <Link href={`/forms/${hit.path.split('/')[1]}`} passHref>
         <a className="w-full">
 
-          <HitHover className='flex flex-col p-2 hover:bg-blue-100 hover:text-blue-500 rounded transition-colors cursor-pointer'>
-            <div className='inline-flex ml-1 mb-1 justify-between gap-2 items-end'>
+          <HitHover className='flex flex-col p-2 hover:bg-blue-50 hover:text-blue-500 rounded transition-colors cursor-pointer'>
+            <div className='inline-flex mb-1 justify-between gap-2 items-end'>
               <pre className='text-xs icon'>{hit.category}</pre>
               <p className='text-sm'>{(parseInt(hit.price) / 100).toFixed(2).toString().replace('.', ',')}zł</p>
             </div>
-            <HitHover className="flex w-full rounded gap-6 max-w-full items-center">
-              <DescriptionRounded className='icon w-12 h-12' />
-              <div className="flex flex-col flex-1" style={{ width: 'calc(100% - 4.5rem)' }}>
-                <h5 className="text-base truncate">{hit.title}</h5>
+            <HitHover className="flex w-full rounded gap-6 max-w-full">
+              <div className="flex flex-col flex-1 w-full" style={{}}>
+                <div className='w-full flex items-center'>
+                  <DescriptionOutlined className='icon w-4 mb-1 h-4 mr-2' />
+                  <h5 className="text-base truncate">
+                    {hit.title}
+                  </h5>
+                </div>
                 <p className="text-sm truncate">{hit.description}</p>
               </div>
             </HitHover>
@@ -266,15 +270,19 @@ const MyHit = ({ hit }: { hit: Hit<BasicDoc> }) => {
       hit.title ?
         <Link href={`/articles/${hit.path.split('/')[1]}`} passHref>
           <a className='w-full'>
-            <HitHover className='flex flex-col p-2 hover:bg-blue-100 hover:text-blue-500 rounded transition-colors cursor-pointer'>
+            <HitHover className='flex flex-col p-2 hover:bg-blue-50 hover:text-blue-500 rounded transition-colors cursor-pointer'>
               <div className='inline-flex ml-1 hidden mb-1 justify-between gap-2 items-end'>
                 <pre className='text-xs icon'>{hit.category}</pre>
                 <p className='text-sm'>{hit.author}</p>
               </div>
-              <HitHover className="flex w-full rounded gap-6 max-w-full items-center">
-                <Newspaper className='icon w-12 h-12' />
-                <div className="flex flex-col flex-1" style={{ width: 'calc(100% - 4.5rem)' }}>
-                  <h5 className="text-base truncate">{hit.title}</h5>
+              <HitHover className="flex w-full rounded gap-6 max-w-full">
+                <div className="flex flex-col flex-1 w-full" style={{}}>
+                  <div className='w-full flex items-center'>
+                    <NewspaperOutlined className='icon w-4 mb-1 h-4 mr-2' />
+                    <h5 className="text-base truncate">
+                      {hit.title}
+                    </h5>
+                  </div>
                   <p className="text-sm truncate">{hit.subtitle}</p>
                 </div>
               </HitHover>

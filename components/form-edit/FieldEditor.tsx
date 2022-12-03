@@ -100,7 +100,7 @@ const FieldEditor = () => {
             Wypełnij wszystkie pola poprawnie.
           </Alert>
         </Snackbar>
-        <Dialog open={dialogOpen}>
+        <Dialog scroll="body" open={dialogOpen}>
           <DialogTitle><pre className="text-sm">Anulujesz {router?.query?.new == '1' ? 'dodawanie' : 'edycję'} pola</pre></DialogTitle>
           <DialogContent>
             <BodyScrollLock>
@@ -112,7 +112,7 @@ const FieldEditor = () => {
             <Button className="border-none" size='small' color='error' onClick={() => setDialogOpen(false)}>Wróć</Button>
           </DialogActions>
         </Dialog>
-        <Dialog open={newOptionDialogOpen}>
+        <Dialog scroll="body" open={newOptionDialogOpen}>
           <DialogTitle><pre className="text-sm">Dodajesz opcję</pre></DialogTitle>
           <DialogContent>
             <div className="w-full pt-3" style={{ minWidth: 250 }}>
@@ -131,7 +131,7 @@ const FieldEditor = () => {
           </DialogActions>
 
         </Dialog>
-        <Dialog open={deleteConditionOpen}>
+        <Dialog scroll="body" open={deleteConditionOpen}>
           <DialogTitle>
             <pre className="text-sm">
               Usuwasz warunek pola
@@ -148,7 +148,7 @@ const FieldEditor = () => {
             </span>
           </DialogContent>
         </Dialog>
-        <Dialog open={deleteDialogOpen || !!conditionToAdd.components.length || settingOptional}>
+        <Dialog scroll="body" open={deleteDialogOpen || !!conditionToAdd.components.length || settingOptional}>
           <DialogTitle>
             <pre className="text-sm">
               {!deleteDialogOpen

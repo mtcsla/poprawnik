@@ -61,12 +61,14 @@ div.MuiPaper-root:before {
 
 html {
   height: stretch !important;
+  position: relative;
 }
 
 body,
 #__next {
   overflow-x: hidden !important;
   padding: 0;
+  position: relative;
   margin: 0;
   overflow-y: hidden;
 }

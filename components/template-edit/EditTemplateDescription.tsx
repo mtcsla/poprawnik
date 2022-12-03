@@ -194,7 +194,7 @@ export const EditTemplateDescription = (
         setDeleteDialogOpen(true);
       }}><Delete color='error' className='mr-2' /> Usuń element</MenuItem>
     </Menu>
-    <Dialog open={!!warning}>
+    <Dialog scroll="body" open={!!warning}>
       <DialogTitle><pre className='text-sm'>Uwaga</pre></DialogTitle>
       <DialogContent>
         <BodyScrollLock>
@@ -211,7 +211,7 @@ export const EditTemplateDescription = (
         <Button size='small' className='border-none' color='error' onClick={() => setWarning(null)}>Anuluj</Button>
       </DialogActions>
     </Dialog>
-    <Dialog open={!!deleteDialogOpen}>
+    <Dialog scroll="body" open={!!deleteDialogOpen}>
       <DialogTitle><pre className='text-sm'>Usuwasz element</pre></DialogTitle>
       <DialogContent>
         <BodyScrollLock>
@@ -243,7 +243,7 @@ export const EditTemplateDescription = (
         <Button disabled={deleting} size='small' className='border-none' color='error' onClick={() => setDeleteDialogOpen(false)}>Anuluj</Button>
       </DialogActions>
     </Dialog>
-    <Dialog open={addingElement || (editingElement != null)}>
+    <Dialog scroll="body" open={addingElement || (editingElement != null)}>
 
       <DialogTitle><pre className='text-sm'>{addingElement ? 'Dodajesz' : 'Edytujesz'} element</pre></DialogTitle>
       <DialogContent style={{ minWidth: 600 }} className='flex flex-col'>

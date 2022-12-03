@@ -107,7 +107,7 @@ const FormEditor = () => {
   }, [])
 
   return <>
-    <Dialog open={dialogOpen}>
+    <Dialog scroll="body" open={dialogOpen}>
       <DialogTitle className='font-mono uppercase text-slate-500 text-sm'>Dodajesz nowy krok</DialogTitle>
       <DialogContent>
         <BodyScrollLock>
@@ -130,7 +130,7 @@ const FormEditor = () => {
         </span>
       </DialogActions>
     </Dialog>
-    <Dialog open={nameDialogOpen}>
+    <Dialog scroll="body" open={nameDialogOpen}>
       <DialogTitle className='font-mono uppercase text-slate-500 text-sm'>Dodajesz listę</DialogTitle>
       <Formik initialValues={{ name: '' }}
         onSubmit={(values) => { newStep('list', values.name); setNameDialogOpen(false) }}

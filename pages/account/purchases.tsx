@@ -59,7 +59,7 @@ const Purchases = () => {
 
 
   return <article className="w-full pb-12 flex items-stretch flex-col ">
-    <Dialog open={!!deleteDialogOpen}>
+    <Dialog scroll="body" open={!!deleteDialogOpen}>
       <DialogTitle>
         <pre className='text-sm'>
           Czy na pewno chcesz usunąć ten zakup?

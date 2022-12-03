@@ -528,7 +528,7 @@ function ListElement({ movingDown, index, movingUp, arr, heights, step, swap, de
         : '0px'})`
   }} className={`w-full flex-col ${((movingDown === index || movingUp === index + 1) && index != arr.length - 1) || ((movingUp === index || movingDown === index - 1) && index != 0) ? 'transition_transform' : ''}`}>
     <div className={'inline-flex w-full items-center gap-4 h-4'}>
-      <Dialog open={deleting}>
+      <Dialog scroll="body" open={deleting}>
         <DialogTitle className='text-red-500'><pre>Usuwasz element listy</pre></DialogTitle>
         <DialogContent>
           <p className='mb-4'>Czy na pewno chcesz usunąć ten element?</p>

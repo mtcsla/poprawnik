@@ -112,7 +112,7 @@ const ConditionCalculationEditor = ({ exit, save, type, initValue }: {
 
   return <sequenceContext.Provider value={{ sequence, modifySequence }}>
     <parenthesesContext.Provider value={{ parenthesesEditor, setParenthesesEditor, parentheses, setParentheses, modifyParentheses }}>
-      <Dialog className='max-w-none' open>
+      <Dialog scroll="body" className='max-w-none' open>
         <DialogTitle className='flex flex-col'>
           {!parenthesesEditor ? <>
             <pre className='text-sm'>Edytujesz warunek</pre>

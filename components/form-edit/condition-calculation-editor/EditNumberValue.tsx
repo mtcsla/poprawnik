@@ -73,7 +73,7 @@ export const EditNumberValue = ({ type, inputType, save, cancel, initValue, nest
 
   const emptyList = <MenuItem disabled><pre>brak</pre></MenuItem>;
 
-  return <Dialog open>
+  return <Dialog scroll="body" open>
     <DialogTitle>
       <pre className='text-sm'>Edytujesz wartość</pre>
       <p className='text-sm'>Wybierz rodzaj wartości oraz wartość.</p>

@@ -132,7 +132,7 @@ const StepEditor = () => {
   return currentDescription[step as number] ? <>
     <Snackbar open={error} color="error" message="Zapisywanie nie powiodło się."></Snackbar>
 
-    <Dialog open={deleteDialogOpen}>
+    <Dialog scroll="body" open={deleteDialogOpen}>
       <DialogTitle>
         <pre className='text-sm'>Usuwasz krok</pre>
       </DialogTitle>

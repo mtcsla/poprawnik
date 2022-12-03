@@ -150,7 +150,7 @@ const EditDocumentTemplate = () => {
                   <Link href={`/forms/${id}/form?testing=true`}>
                     <Button className='w-full mt-8 p-4 bg-blue-500 text-white hover:bg-blue-400'> {Object.keys(values).length ? 'Edytuj dane' : 'Wypełnij formularz'} <Edit className='ml-2' /></Button>
                   </Link>
-                  <Dialog className='w-screen h-screen m-0' open={!loading && editorOpen}>
+                  <Dialog scroll="body" className='w-screen h-screen m-0' open={!loading && editorOpen}>
                     <DialogContent sx={{ width: '98vw' }} className='relative h-screen'>
                       <BodyScrollLock>
                         <IconButton style={{ top: '2.5rem', right: '1.5vw', zIndex: 20000 }} className='fixed  border-none' onClick={() => setEditorOpen(false)}><Close /></IconButton>

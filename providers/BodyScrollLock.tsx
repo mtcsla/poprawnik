@@ -8,6 +8,7 @@ const BodyScrollLock = ({ children }: { children: React.ReactNode }): JSX.Elemen
     return () => removeConsumer();
   }, [])
 
-  return children as JSX.Element;
+
+  return <>{children}</> as JSX.Element;
 }
 export default BodyScrollLock;

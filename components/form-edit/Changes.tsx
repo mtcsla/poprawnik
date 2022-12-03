@@ -263,7 +263,7 @@ const Changes = ({ deletionType, deletePath, requiredChange, onSubmit, onCancel,
                       <div className='relative top-0 bottom-0 left-0 right-0' style={{ maxWidth: '100vw' }}>
                         <TemplateChangesDisplayProvider initValues={{ changedConditions: templateConditionChanges, deletionPaths: templateChanges }} >
                           <TemplateEditor display />
-                          <Dialog open={viewingTemplateChanges}>
+                          <Dialog scroll="body" open={viewingTemplateChanges}>
                             <DialogTitle>
                               <pre className='inline-flex gap-3 items-center'><Visibility /> Oglądasz zmiany wzoru pisma</pre>
                               <Button color='error' className='px-1.5 fixed top-12 right-12 bg-white border-none' onClick={() => {

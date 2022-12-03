@@ -209,7 +209,7 @@ const YourArticles = () => {
         </ul>
       </SidenavContent>
 
-      <Dialog open={!!confirmVisibility}>
+      <Dialog scroll="body" open={!!confirmVisibility}>
         <div className={"p-5"}>
           <pre className={"mb-4"}>{confirmVisibility?.title || "Brak tytułu"}</pre>
           <p className={"text-sm"}>Czy na pewno chcesz {confirmVisibility?.visible ? 'ukryć' : 'uwidocznić'} ten artykuł?</p>
@@ -234,7 +234,7 @@ const YourArticles = () => {
             {confirmVisibility?.visible ? 'Ukryj' : 'Opublikuj'}
           </LoadingButton>
         </DialogActions>
-      </Dialog> <Dialog open={!!confirmDelete}>
+      </Dialog> <Dialog scroll="body" open={!!confirmDelete}>
         <div className={"p-5"}>
           <pre className={"mb-4"}>{confirmDelete?.title || "Brak tytułu"}</pre>
           <p className={"text-sm"}>Czy na pewno chcesz usunąć ten artykuł?</p>

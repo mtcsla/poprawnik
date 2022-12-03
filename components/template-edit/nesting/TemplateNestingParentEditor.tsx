@@ -259,11 +259,11 @@ export const TemplateNestingParentEditor = ({ editing, adding, editorPath }: { e
         {error}
       </Alert>
     </Snackbar>
-    <Dialog open={(parentheses[0] != null || parentheses[1] != null) && _.isEqual(path, editorPath)}>
+    <Dialog scroll="body" open={(parentheses[0] != null || parentheses[1] != null) && _.isEqual(path, editorPath)}>
       <DialogTitle><pre className='text-sm'>{editing ? 'Edytujesz' : 'Dodajesz'} element okalający zagnieżdżenie</pre></DialogTitle>
 
       <DialogContent sx={{ maxWidth: 600 }} className='flex flex-col'>
-        <Dialog open={deleting}>
+        <Dialog scroll="body" open={deleting}>
           <DialogTitle><pre className='text-sm'>Usuwasz element okalający</pre></DialogTitle>
           <DialogContent>
             <p>
@@ -279,7 +279,7 @@ export const TemplateNestingParentEditor = ({ editing, adding, editorPath }: { e
             <Button size='small' className='border-none' color='error' onClick={() => { setDeleting(false); }} >Anuluj</Button>
           </DialogActions>
         </Dialog>
-        <Dialog open={!!newType}>
+        <Dialog scroll="body" open={!!newType}>
           <DialogTitle><pre className='text-sm'>Zmieniasz typ elementu okalającego</pre></DialogTitle>
           <DialogContent>
             <p>Wprowadzone wartości zostaną wyczyszczone, ale <i>zmiany wejdą w życie dopiero po zapisaniu elementu</i>.</p>
@@ -293,7 +293,7 @@ export const TemplateNestingParentEditor = ({ editing, adding, editorPath }: { e
             <Button size='small' className='border-none' color='error' onClick={() => { setNewType(null); }} >Anuluj</Button>
           </DialogActions>
         </Dialog>
-        <Dialog open={editSaving && !!breakingChanges}>
+        <Dialog scroll="body" open={editSaving && !!breakingChanges}>
           <DialogTitle>
             <pre className='text-sm'>Zapisujesz znaczące zmiany</pre>
           </DialogTitle>

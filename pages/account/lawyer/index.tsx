@@ -210,7 +210,7 @@ const YourForms = ({ }) => {
         </span>
       </>
     }
-    <Dialog open={confirmDelete !== -1}>
+    <Dialog scroll="body" open={confirmDelete !== -1}>
       <DialogTitle><pre className='text-sm'>Potwierdzenie</pre></DialogTitle>
       <DialogContent>
         <BodyScrollLock>

@@ -68,7 +68,7 @@ export const EditCondition = ({ path, add, cancel, initValue }: { path: number[]
   const emptyList = <MenuItem disabled><pre>brak</pre></MenuItem>;
 
 
-  return <Dialog open>
+  return <Dialog scroll="body" open>
     <DialogTitle>
       <pre className='text-sm'>{!add ? 'Edytujesz' : 'Dodajesz'} warunek</pre>
       <p className='text-sm'>Edytuj ten prosty warunek...</p>

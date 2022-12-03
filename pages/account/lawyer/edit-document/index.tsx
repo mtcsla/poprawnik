@@ -316,7 +316,7 @@ const EditForm = () => {
           }
         </Button>
       </pre>
-      <Dialog open={completeDialogOpen}>
+      <Dialog scroll="body" open={completeDialogOpen}>
         <DialogTitle>
           <pre className='text-sm'>Oddajesz pismo do weryfikacji</pre>
         </DialogTitle>
@@ -334,7 +334,7 @@ const EditForm = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={publishDialogOpen}>
+      <Dialog scroll="body" open={publishDialogOpen}>
         <DialogTitle>
           <pre className='text-sm'>Zatwierdzasz i publikujesz pismo</pre>
         </DialogTitle>
@@ -353,7 +353,7 @@ const EditForm = () => {
 
         </DialogActions>
       </Dialog>
-      <Dialog open={errorDialogOpen}>
+      <Dialog scroll="body" open={errorDialogOpen}>
 
         <DialogTitle>
           <pre className='text-sm text-red-500'>Dane pisma zawierają błędy</pre>
@@ -411,7 +411,7 @@ const EditForm = () => {
 
         : null
       }
-      <Dialog open={throwOutDialogOpen}>
+      <Dialog scroll="body" open={throwOutDialogOpen}>
         <DialogTitle><pre className='text-sm'>Odrzucasz pismo</pre></DialogTitle>
         <DialogContent className='flex flex-col'>
           <p className='text-sm mb-4'>

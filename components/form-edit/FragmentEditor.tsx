@@ -100,7 +100,7 @@ const FragmentEditor = () => {
     <Snackbar open={error}>
       <Alert severity='error'>Nie udało się zapisać fragmentu. Spróbuj ponownie.</Alert>
     </Snackbar>
-    <Dialog open={dialogOpen}>
+    <Dialog scroll="body" open={dialogOpen}>
       <DialogTitle>
         <pre className="text-sm">
           Anulujesz {router.query.new == '1' ? 'dodawanie' : 'edycję'} fragmentu
@@ -119,7 +119,7 @@ const FragmentEditor = () => {
       </DialogActions>
 
     </Dialog>
-    <Dialog open={deleteDialogOpen || !!conditionToAdd?.components?.length}>
+    <Dialog scroll="body" open={deleteDialogOpen || !!conditionToAdd?.components?.length}>
       <DialogTitle>
         <pre className="text-sm">
           {deleteDialogOpen

@@ -15,12 +15,30 @@ export default function BodyScrollLockProvider({ children }: { children: React.R
 
   React.useEffect(
     () => {
+      const scrollPosition = window.pageYOffset;
+
+      const $html = document.getElementsByTagName('html')[0];
+      const $body = document.body;
+
       if (consumers > 0) {
-        document.body.style.overflowY = "hidden";
-        document.getElementsByTagName("html")[0].style.overflowY = "hidden";
-      } else {
-        document.body.style.overflowY = "auto";
-        document.getElementsByTagName("html")[0].style.overflowY = "auto";
+        $body.style.overflow = 'hidden';
+        $html.style.overflow = 'hidden';
+        if (window.innerWidth < 640) {
+          $body.style.position = 'fixed';
+          $body.style.top = `-${scrollPosition}px`;
+          $body.style.width = '100%';
+        }
+      }
+
+      //position: absolute; top: 0; right: 0; bottom: 0; left: 0; overflow-y: auto;
+      else {
+        $html.style.removeProperty('overflow');
+        $body.style.removeProperty('overflow');
+        $body.style.removeProperty('position');
+        $body.style.removeProperty('top');
+        $body.style.removeProperty('width');
+        window.scrollTo(0, scrollPosition);
+
       }
     }, [consumers]
   )

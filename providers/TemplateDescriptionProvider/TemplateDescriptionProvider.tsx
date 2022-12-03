@@ -44,6 +44,10 @@ export interface ListElement extends TemplateElementPrototype<TemplateDescriptio
   type: 'list';
   list: string;
   filter: Expression<Condition, OperatorCondition>;
+  displayType: 'all' | 'count',
+  displayCount: `${number}`;
+  elementOrder: 'default' | 'ascending' | 'descending';
+  criterium: Expression<Calculation, OperatorCalculation>
 }
 export interface TextElement extends TemplateElementPrototype<never> {
   type: 'text';

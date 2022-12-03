@@ -271,15 +271,13 @@ const Changes = ({ deletionType, deletePath, requiredChange, onSubmit, onCancel,
                               }} >
                                 <Close />
                               </Button>
-                              <p className='text-sm mt-2'>
-                                <b className='p-1 rounded text-purple-500 bg-purple-200'>
-                                  Kolor fioletowy
-                                </b> - zmiana w warunku
+                              <p className='text-sm font-normal mt-2'>
+                                <b className='px-4 py-1 mr-3 rounded text-purple-500 bg-purple-400'>
+                                </b> zmiana w warunku
                               </p>
-                              <p className='text-sm mt-2'>
-                                <b className='p-1 rounded text-red-500 bg-red-200'>
-                                  Kolor czerwony
-                                </b> - usunięcie fragmentu
+                              <p className='text-sm mt-2 font-normal'>
+                                <b className='px-4 py-1 mr-3 rounded text-red-500 bg-red-400'>
+                                </b> usunięcie fragmentu
                               </p>
                             </DialogTitle>
                             <DialogContent>

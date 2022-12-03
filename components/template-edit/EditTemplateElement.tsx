@@ -38,8 +38,8 @@ export const EditTemplateElement = ({ disabled, path, index, openMenu, menuTarge
 
 
         return <div className='flex flex-col' >
-          <pre className={`text-xs ${hovered ? 'text-blue-500' : ''} -mb-2.5 z-30 ml-4  px-1 bg-white self-start`}>Tekst</pre>
-          <div className={`p-2 ${hovered ? 'border-blue-500 text-blue-500' : ''} text-sm flex-col flex sm:p-4 rounded-lg border`}>
+          <pre className={`text-xs rounde ${hovered ? 'text-blue-500' : ''} -mb-2.5 z-30 ml-4  px-1 bg-white self-start`}>Tekst</pre>
+          <div className={`p-2 ${hovered ? 'bg-blue-100 text-blue-500' : ''} text-sm flex-col flex sm:p-4 rounded-lg `}>
             <El>
               {element.text}
             </El>
@@ -48,23 +48,23 @@ export const EditTemplateElement = ({ disabled, path, index, openMenu, menuTarge
       }
       if (element.type === 'calculation')
         return <div className='flex flex-col' >
-          <pre className={`text-xs ${hovered ? 'text-blue-500' : ''} -mb-2.5 z-30 ml-4  px-1 bg-white self-start`}>Obliczenia</pre>
+          <pre className={`text-xs rounde ${hovered ? 'text-blue-500' : ''} -mb-2.5 z-30 ml-4  px-1 bg-white self-start`}>Obliczenia</pre>
           <ConditionCalculationDisplay sequence={element.calculation} type='calculation' focused={hovered} />
         </div>;
       if (element.type === 'variable')
         return <div className='flex flex-col'  >
-          <pre className={`text-xs ${hovered ? 'text-blue-500' : ''} -mb-2.5 z-30 ml-4  px-1 bg-white self-start`}>Zmienna</pre>
-          <div className={`p-2 ${hovered ? 'border-blue-500 text-blue-500' : ''} text-sm flex-col flex sm:p-4 rounded-lg border`}>
+          <pre className={`text-xs rounde ${hovered ? 'text-blue-500' : ''} -mb-2.5 z-30 ml-4  px-1 bg-white self-start`}>Zmienna</pre>
+          <div className={`p-2 ${hovered ? 'bg-blue-100 text-blue-500' : ''} text-sm flex-col flex sm:p-4 rounded-lg `}>
             <Chip label={element.variable} color='primary' className='pointer-events-none' />
           </div>
         </div>;
       if (element.type === 'enter')
-        return <pre className={`text-center ${hovered ? 'text-blue-500 border-blue-500' : ''} p-1 sm:p-2 rounded-lg border text-sm`}>
+        return <pre className={`text-center ${hovered ? 'text-blue-500 bg-blue-100' : ''} p-1 sm:p-2 rounded-lg  text-sm`}>
           <KeyboardReturn className='mr-2' />
           enter
         </pre>;
       if (element.type === 'space')
-        return <pre className={`text-center ${hovered ? 'text-blue-500 border-blue-500' : ''} p-1 sm:p-2 rounded-lg border text-sm`}>
+        return <pre className={`text-center ${hovered ? 'text-blue-500 bg-blue-100' : ''} p-1 sm:p-2 rounded-lg  text-sm`}>
           <SpaceBar className='mr-2' />
           spacja
         </pre>;

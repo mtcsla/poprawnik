@@ -11,7 +11,7 @@ const EditorFragment = ({ fragment, editor, }: { editor: boolean, fragment: Frag
   const { description, currentDescription } = useFormDescription();
   const rightDescription = editor ? description : currentDescription;
 
-  return <div className='w-full'>
+  return <div className='w-full bg-slate-50 rounded p-4'>
     <pre className='font-normal hidden whitespace-pre-wrap'>{JSON.stringify(fragment, undefined, 2)}</pre>
     {fragment.title ?
       <h2 className='p-1 pb-0 inline-flex gap-3 text-xl'>

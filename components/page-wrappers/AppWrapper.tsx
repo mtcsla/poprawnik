@@ -1,7 +1,7 @@
 import {
   AccountBoxRounded,
   AccountCircle, ArrowLeft, Lock,
-  Logout, NotificationsOutlined, Search
+  Logout, NotificationsOutlined
 } from "@mui/icons-material";
 import {
   Avatar, Button, Menu,
@@ -17,6 +17,7 @@ import { useSearch } from "../../providers/SearchProvider";
 import { useSideNav } from "../../providers/SidenavProvider";
 import LogoHeader from "../LogoHeader";
 import Sidebar from "../sidebar/Sidebar";
+import SearchBar from "../utility/SearchBar";
 
 
 const AppWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -108,32 +109,16 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
               {/*SEARCH BAR OR BUTTON*/}
 
-              {
-                width && width > 430
-                  ? <div role='button'
-                    className={
-                      "mr-3  bg-slate-50 rounded hover:bg-slate-100 cursor-text transition-colors flex items-center p-2"
-                    }
-                    style={{ height: 35, width: 200 }}
-                    onClick={onSearch}
-                  >
-                    <Search
-                      color={"primary"}
-                      sx={{ fontSize: "1.2rem !important" }}
-                    />
-                    <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
-                  </div>
-                  : <Button className="mr-3 bg-slate-50" sx={{ padding: "0.4rem" }}>
-                    <Search onClick={onSearch} sx={{ fontSize: "20px !important" }} />
-                  </Button>
-
-              }
+              <SearchBar />
 
               {/*NOTIFICATIONS*/}
-
-              <Button className="mr-3 bg-slate-50 hover:bg-slate-100 text-blue-500   border-none" sx={{ padding: "0.4rem" }}>
-                <NotificationsOutlined sx={{ fontSize: "20px !important" }} />
-              </Button>
+              {
+                false
+                  ? <Button className="mr-3 bg-slate-50 hover:bg-slate-100 text-blue-500   border-none" sx={{ padding: "0.4rem" }}>
+                    <NotificationsOutlined sx={{ fontSize: "20px !important" }} />
+                  </Button>
+                  : null
+              }
 
 
               {

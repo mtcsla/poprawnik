@@ -2,10 +2,11 @@ import { LoadingButton as Button, LoadingButton } from '@mui/lab';
 import { Alert, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Tab, Tabs } from '@mui/material';
 import _, { cloneDeep } from 'lodash';
 import React from "react";
+import { listContext } from '../../../pages/account/lawyer/edit-document/template';
 import BodyScrollLock from "../../../providers/BodyScrollLock";
 import { ModifyTemplate } from "../../../providers/TemplateDescriptionProvider/ModifyTemplate";
 import { ExistsElement, IfElseElement, ListElement, TemplateDescription, TemplateElementType, TemplatePath, TextFormattingElement, useTemplateDescription } from '../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
-import { useTemplateParenthesesEditor } from "../TemplateEditor";
+import { listStepsContext, useTemplateParenthesesEditor } from "../TemplateEditor";
 import { TemplateParentExistsEditor } from "./TemplateParentExistsEditor";
 import { TemplateParentIfElseEditor } from "./TemplateParentIfElseEditor";
 import { TemplateParentListEditor } from "./TemplateParentListEditor";
@@ -45,7 +46,9 @@ export const TemplateNestingParentEditor = ({ editing, adding, editorPath }: { e
 
   const parenthesesEditor = useTemplateParenthesesEditor();
   const { parentheses, setParentheses, path, setPath, setEditing } = parenthesesEditor;
-  const { description, modifyDescription, updateFirebaseDoc } = useTemplateDescription();
+  const { description, modifyDescription, updateFirebaseDoc, form } = useTemplateDescription();
+
+  const lists = React.useContext(listContext);
 
   const cancel = () => {
     setParentheses([null, null]);
@@ -121,13 +124,22 @@ export const TemplateNestingParentEditor = ({ editing, adding, editorPath }: { e
   const isValidParent = (
     type: TemplateElementType['parent'],
     element: IfElseElement | ExistsElement | ListElement | TextFormattingElement | null) => {
-    if (type === 'ifElse')
+    if (element?.type === 'ifElse')
       return !!(element as IfElseElement)?.condition.components.length;
-    if (type === 'exists')
+    if (element?.type === 'exists')
       return !!(element as ExistsElement)?.variables.length;
-    if (type === 'list')
-      return !!(element as ListElement)?.list;
-    if (type === 'textFormatting') {
+    if (element?.type === 'list') {
+      return !!element?.list && (
+        element.displayType === 'count'
+          ? !!(element.displayCount.match(/[1-9]+[0-9]*/)?.length || element.displayCount === '0')
+          : true
+      ) && !!(
+        element.elementOrder === 'default'
+          ? true
+          : element.criterium?.components?.length
+      )
+    }
+    if (element?.type === 'textFormatting') {
       return !!(element as TextFormattingElement)?.textFormattingType && (
         (element as TextFormattingElement)?.textFormattingType === 'effect'
           ? (element as TextFormattingElement)?.effect
@@ -190,7 +202,13 @@ export const TemplateNestingParentEditor = ({ editing, adding, editorPath }: { e
           return false;
         break;
       case 'list':
-        if (_.isEqual((initState as ListElement).list, (parent as ListElement).list) && _.isEqual((initState as ListElement).filter, (parent as ListElement).filter))
+        if (_.isEqual((initState as ListElement).list, (parent as ListElement).list)
+          && _.isEqual((initState as ListElement).filter, (parent as ListElement).filter)
+          && _.isEqual((initState as ListElement).displayType, (parent as ListElement).displayType)
+          && _.isEqual((initState as ListElement).displayCount, (parent as ListElement).displayCount)
+          && _.isEqual((initState as ListElement).elementOrder, (parent as ListElement).elementOrder)
+          && _.isEqual((initState as ListElement).criterium, (parent as ListElement).criterium)
+        )
           return false;
         break;
       case 'textFormatting':
@@ -334,8 +352,13 @@ export const TemplateNestingParentEditor = ({ editing, adding, editorPath }: { e
           {parentType === 'exists'
             ? <TemplateParentExistsEditor onChange={(element) => setParent(element)} path={path!} element={editing ? parent! as ExistsElement : undefined} />
             : null}
-          {parentType === 'list'
-            ? <TemplateParentListEditor onChange={(element) => setParent(element)} path={path!} element={editing ? parent! as ListElement : undefined} />
+          {parent.type === 'list'
+            ?
+            <listContext.Provider value={parent?.list != null ? lists.concat(parent.list) : lists}>
+              <listStepsContext.Provider value={(parent?.list ? lists.concat(parent?.list) : lists).map((item) => form.findIndex((step) => step.type === 'list' && step.name === item))}>
+                <TemplateParentListEditor onChange={(element) => setParent(element)} path={path!} element={editing ? parent! as ListElement : undefined} />
+              </listStepsContext.Provider>
+            </listContext.Provider>
             : null}
         </BodyScrollLock>
       </DialogContent>

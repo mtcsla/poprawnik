@@ -398,7 +398,7 @@ const EditForm = () => {
         </Button>
       }
       {form.reasonForRejection
-        ? <><div className='p-4 bg-red-50 text-red-500 mt-8 border-red-500 bg-slate-50 rounded flex flex-col'>
+        ? <><div className='p-4 bg-red-50 text-red-500 mt-8  rounded flex flex-col'>
           <pre className='text-sm text-red-400'>Twoje pismo zostało odrzucone</pre>
           <p className='mt-4 font-bold text-sm'>
             {form.reasonForRejection}

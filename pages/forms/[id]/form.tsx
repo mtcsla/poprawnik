@@ -290,6 +290,9 @@ const FormDisplay = () => {
                     const currentStepDescription = React.useMemo(() => description[currentStep], [currentStep]);
                     const isList = React.useMemo(() => currentStepDescription.type === 'list', [currentStep]);
 
+                    const buttonDisabled = isList &&
+                      (description[currentStep]?.listMinMaxItems?.min != null && (values[description[currentStep].name] as FormValues<NestedFormValue>[])?.length < (description[currentStep]?.listMinMaxItems?.min ?? 0)) ||
+                      (description[currentStep]?.listMinMaxItems?.max != null && (values[description[currentStep].name] as FormValues<NestedFormValue>[])?.length > (description[currentStep]?.listMinMaxItems?.max ?? 10000000000000))
 
                     React.useEffect(
                       () => {
@@ -307,7 +310,22 @@ const FormDisplay = () => {
                         ? <List {...{ step: currentStepDescription, formDescription: description }} />
                         : <Step {...{ step: currentStepDescription, formDescription: description }} />
                       }
-                      <Button onClick={async () => {
+
+                      {description[currentStep].type === 'list' &&
+                        (description[currentStep]?.listMinMaxItems?.min != null && (values[description[currentStep].name] as FormValues<NestedFormValue>[])?.length < (description[currentStep]?.listMinMaxItems?.min ?? 0))
+                        ? <p className='text-sm text-slate-500'>{
+                          description[currentStep]?.listMinMaxItems?.min === 1
+                            ? 'Ta lista musi zawierać przynajmniej jeden element.'
+                            : `Ta lista musi zawierać przynajmniej ${description[currentStep]?.listMinMaxItems?.min} elementów.`
+                        }</p>
+                        : null
+                      }
+                      {description[currentStep].type === 'list' &&
+                        (description[currentStep]?.listMinMaxItems?.max != null && (values[description[currentStep].name] as FormValues<NestedFormValue>[])?.length > (description[currentStep]?.listMinMaxItems?.max ?? 1000000000000))
+                        ? <p className='text-sm text-slate-500'>Ta lista może zawierać maksymalnie {description[currentStep]?.listMinMaxItems?.max} elementów.</p>
+                        : null
+                      }
+                      <Button disabled={buttonDisabled} onClick={async () => {
                         const errors = await validateForm();
                         if (Object.keys(errors).length === 0)
                           nextStep();
@@ -317,7 +335,7 @@ const FormDisplay = () => {
                           setIncorrect(true);
                           incorrectTimeout.current = setTimeout(() => setIncorrect(false), 5000);
                         }
-                      }} className='bg-blue-400 p-2 sm:p-4 text-white hover:bg-blue-300'>
+                      }} className={`${buttonDisabled ? 'bg-gray-300 cursor-default' : 'bg-blue-400 hover:bg-blue-300'} p-2 sm:p-4 text-white `}>
                         Dalej
                         <ArrowForward className='ml-2' />
                       </Button>
@@ -326,7 +344,6 @@ const FormDisplay = () => {
                   }}
                 />
                 : <></>
-
           }
 
         </Body>

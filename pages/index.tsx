@@ -7,6 +7,7 @@ import React, { HTMLAttributes } from 'react';
 import { firebaseAdmin } from '../buildtime-deps/firebaseAdmin';
 import { ExplanationAnimationSvg } from '../components/ExplanationAnimationSvg';
 import LogoHeader from '../components/LogoHeader';
+import SearchBar from '../components/utility/SearchBar';
 import useWindowSize from '../hooks/WindowSize';
 import { useAuth } from '../providers/AuthProvider';
 import { useSearch } from '../providers/SearchProvider';
@@ -196,55 +197,23 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
       <div style={{ maxWidth: '60rem' }} className='h-full w-full flex items-center justify-between m-auto'>
         <div className='inline-flex items-center'>
           <LogoHeader small noText noBackground noPadding noWidth png />
-          <p className='flex ml-2 items-center text-sm p-1 px-3 whitespace-nowrap hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
-            <People className={width && width > 900 ? 'mr-1' : ''} />
-            {width && width > 900 ?
-              "Nasza misja"
-              : null
-            }
+
+          <p className={`${width && width > 900 ? 'flex' : 'hidden'} items-center ml-4 text-sm p-1 px-3 whitespace-nowrap hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer`}>
+            <People className='mr-1' />
+            Nasza misja
           </p>
-          <p className='flex items-center text-sm p-1 px-3 whitespace-nowrap  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
-            <Article className={width && width > 900 ? 'mr-1' : ''} />
-            {width && width > 900 ?
-              "Jak to działa"
-              : null
-            }
+          <p className={`${width && width > 900 ? 'flex' : 'hidden'} items-center text-sm p-1 px-3 whitespace-nowrap  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer`}>
+            <Article className='mr-1' />
+            Jak to działa
           </p>
-          <p className='flex items-center text-sm p-1 px-3 whitespace-nowrap  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer'>
-            <Bookmark className={width && width > 900 ? 'mr-1' : ''} />
-            {width && width > 900 ?
-              "Pisma"
-              : null
-            }
+          <p className={`${width && width > 900 ? 'flex' : 'hidden'} items-center text-sm p-1 px-3 whitespace-nowrap  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer`}>
+            <Bookmark className='mr-1' />
+            Pisma
           </p>
         </div>
 
         <span className='flex items-center'>
-
-          {
-            width && width > 720
-              ? <div
-                className={
-                  "mr-3  bg-slate-50 hover:bg-blue-100 rounded cursor-text transition-colors flex items-center p-2"
-                }
-                onClick={onSearch}
-                style={{ height: '2rem', width: 200 }}
-              >
-                <Search
-                  color={"primary"}
-                  sx={{ fontSize: "1.2rem !important" }}
-                />
-                <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
-              </div>
-              : <Button className="mr-3 bg-slate-50 " sx={{ padding: "0.4rem", height: '2rem' }}>
-                <Search
-                  onClick={onSearch}
-                  sx={{ fontSize: "20px !important" }}
-                />
-              </Button>
-
-          }
-
+          <SearchBar />
           <Avatar role="button" variant='rounded' src={userProfile?.photoURL} className='w-8 h-8 hover:bg-blue-100 cursor-pointer text-blue-400 bg-slate-50' />
         </span>
 

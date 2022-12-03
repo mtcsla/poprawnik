@@ -12,7 +12,7 @@ export const ConditionCalculationDisplay = ({ reversed, sequence, first, type, t
 
   const Wrapper = ({ children, first }: { children: React.ReactNode; first?: true; }) => {
     return first ? <span
-      className={`rounded-lg inline-flex gap-1 ${tooltip ? '' : 'p-3'} items-center flex-wrap justify-start` + (reversed ? '' : ' border ') + (focused ? 'border-blue-500 text-blue-500' : '')}
+      className={`rounded-lg inline-flex gap-1 ${tooltip ? '' : 'p-3'} items-center flex-wrap justify-start` + (reversed ? '' : ' ') + (focused ? 'border-blue-500 text-blue-500' : '')}
       style={tooltip ? {} : { background: reversed ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.3)' }}
     >
       {children}
@@ -59,7 +59,7 @@ export const ConditionCalculationDisplay = ({ reversed, sequence, first, type, t
                       : (element as Condition).value.value} <p className='inline text-xs italic ml-2'>(wartość stała)</p>
                     </p>
                     : <Tooltip title={
-                      <div className='p-2 sm:p-4 border rounded-lg bg-white'>
+                      <div className='p-2 sm:p-4 rounded-lg bg-white'>
                         <ConditionCalculationDisplay tooltip reversed type='calculation' sequence={(element as Condition).value.value as ConditionCalculationSequence} />
                       </div>
                     }><Chip className='rounded  bg-green-500 flex items-center' label={<pre className='text-sm text-white'><AddTask className='mr-2' /> obliczenia</pre>} /></Tooltip>

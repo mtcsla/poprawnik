@@ -1,16 +1,11 @@
 import React from 'react';
+import { bodyScrollLockContext } from './BodyScrollLockProvider';
 const BodyScrollLock = ({ children }: { children: React.ReactNode }): JSX.Element => {
+  const { addConsumer, removeConsumer } = React.useContext(bodyScrollLockContext);
+
   React.useEffect(() => {
-    const body = document.getElementsByTagName('body')[0];
-    const html = document.getElementsByTagName('html')[0];
-
-    body.style.overflow = 'hidden';
-    html.style.overflow = 'hidden';
-
-    return () => {
-      body.style.overflow = 'auto';
-      html.style.overflow = 'auto';
-    }
+    addConsumer();
+    return () => removeConsumer();
   }, [])
 
   return children as JSX.Element;

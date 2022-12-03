@@ -43,7 +43,6 @@ export default function SearchProvider({ children }: { children: React.ReactNode
         setSearchOpen(false);
       }
       if (e.keyCode === 75 && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
         setSearchOpen(true);
       }
     }
@@ -94,11 +93,11 @@ export const Search = () => {
   const { width } = useWindowSize();
 
   return (
-    <div className={`bg-white flex border flex-col h-fit ${width && width >= 640 ? 'rounded-lg max-h-[60rem]' : 'h-screen max-h-screen'} mx-auto `} ref={divRef} style={{ maxWidth: '40rem', }} >
+    <div className={`bg-white flex flex-col h-fit ${width && width >= 640 ? 'rounded-lg max-h-[60rem]' : 'h-screen max-h-screen'} mx-auto `} ref={divRef} style={{ maxWidth: '40rem', }} >
       <ConnectedSearchBox />
       <Configure hitsPerPage={5} />
 
-      <div className="w-full h-full px-4 pt-4 flex justify-between flex-col overflow-y-scroll">
+      <div className="w-full h-full px-6 pt-6 flex justify-between flex-col overflow-y-scroll">
         <div className='flex flex-col w-full'>
           <indexContext.Provider value={'products'}>
             <Index indexName="products">
@@ -114,7 +113,7 @@ export const Search = () => {
         </div>
 
         <div className="flex gap-6 flex-wrap pt-8 pb-4 mt-auto">
-          <div className="inline-flex mr-auto px-2 flex-wrap gap-6 sm:gap-12 justify-between w-full">
+          <div className="inline-flex mr-auto flex-wrap gap-6 sm:gap-12 justify-between w-full">
             <div className="flex flex-col">
               <p className="flex items-center">
 
@@ -254,7 +253,7 @@ const MyHit = ({ hit }: { hit: Hit<BasicDoc> }) => {
             <HitHover className="flex w-full rounded gap-6 max-w-full">
               <div className="flex flex-col flex-1 w-full" style={{}}>
                 <div className='w-full flex items-center'>
-                  <DescriptionOutlined className='icon w-4 mb-1 h-4 mr-2' />
+                  <DescriptionOutlined className='text-blue-500 w-4 mb-1 h-4 mr-2' />
                   <h5 className="text-base truncate">
                     {hit.title}
                   </h5>
@@ -278,7 +277,7 @@ const MyHit = ({ hit }: { hit: Hit<BasicDoc> }) => {
               <HitHover className="flex w-full rounded gap-6 max-w-full">
                 <div className="flex flex-col flex-1 w-full" style={{}}>
                   <div className='w-full flex items-center'>
-                    <NewspaperOutlined className='icon w-4 mb-1 h-4 mr-2' />
+                    <NewspaperOutlined className='text-blue-500 w-4 mb-1 h-4 mr-2' />
                     <h5 className="text-base truncate">
                       {hit.title}
                     </h5>

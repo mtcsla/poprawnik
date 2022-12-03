@@ -1,5 +1,5 @@
 import { collection, doc, getDoc } from '@firebase/firestore';
-import { ArrowBack, ArrowForward, Search } from '@mui/icons-material';
+import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import { Alert, Avatar, Button, Skeleton, Snackbar } from '@mui/material';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -22,6 +22,7 @@ import publicKeys from "../../../public_keys.json";
 
 import Head from 'next/head';
 import Link from 'next/link';
+import SearchBar from '../../../components/utility/SearchBar';
 import { useSearch } from '../../../providers/SearchProvider';
 
 const stripePromise = loadStripe(publicKeys.stripe);
@@ -117,29 +118,7 @@ const FormFinalize = () => {
         </div>
 
         <span className='flex h-full items-center'>
-          {
-            width && width > 720
-              ? <div
-                className={
-                  "mr-3  bg-slate-50 hover:bg-blue-100 rounded cursor-text transition-colors flex items-center p-2"
-                }
-                onClick={onSearch}
-                style={{ height: '2rem', width: 200 }}
-              >
-                <Search
-                  color={"primary"}
-                  sx={{ fontSize: "1.2rem !important" }}
-                />
-                <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
-              </div>
-              : <Button className="mr-3 bg-slate-50 " sx={{ padding: "0.4rem", height: '2rem' }}>
-                <Search
-                  onClick={onSearch}
-                  sx={{ fontSize: "20px !important" }}
-                />
-              </Button>
-
-          }
+          <SearchBar />
           <Avatar role="button" variant='rounded' src={userProfile?.photoURL} className='w-8 h-8 hover:bg-blue-100 cursor-pointer text-blue-400 bg-slate-50' />
         </span>
       </div>
@@ -214,9 +193,9 @@ const FormFinalize = () => {
 
       </div>
       {width && width >= 1024
-        ? <div className='self-stretch flex flex-col justify-center p-8 sm:p-12 md:p-16' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light-2.svg)', }}>
-          <div className='bg-slate-50 rounded-lg my-auto p-6'>
-            <PhasedExplanationAnimation phase={1} className='mx-auto mb-auto w-full' active />
+        ? <div className='self-stretch flex flex-col justify-center p-8 sm:p-12 md:p-16' style={{ flex: 1, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light-2.svg)', }}>
+          <div className='bg-slate-50 rounded-lg my-auto flex p-6'>
+            <PhasedExplanationAnimation phase={1} style={{ maxWidth: '20rem' }} className='mx-auto mb-auto w-full' active />
           </div>
         </div>
         : null

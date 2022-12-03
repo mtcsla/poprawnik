@@ -7,23 +7,26 @@ import NoInternetWrapper from "./NoInternetWrapper";
 import { LocalizationProvider } from '@mui/x-date-pickers-pro';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import colors from "tailwindcss/colors";
+import BodyScrollLockProvider from '../../providers/BodyScrollLockProvider';
 import SearchProvider from '../../providers/SearchProvider';
 
 
 const AppContextWrapper = ({ children }: { children: React.ReactNode }) => {
   return <LocalizationProvider dateAdapter={AdapterDateFns}>
-    <SidenavProvider>
-
-      <AuthProvider>
-        <ThemeProvider theme={theme}>
-          <NoInternetWrapper>
-            <SearchProvider>
-              {children}
-            </SearchProvider>
-          </NoInternetWrapper>
-        </ThemeProvider>
-      </AuthProvider>
-    </SidenavProvider></LocalizationProvider>;
+    <BodyScrollLockProvider>
+      <SidenavProvider>
+        <AuthProvider>
+          <ThemeProvider theme={theme}>
+            <NoInternetWrapper>
+              <SearchProvider>
+                {children}
+              </SearchProvider>
+            </NoInternetWrapper>
+          </ThemeProvider>
+        </AuthProvider>
+      </SidenavProvider>
+    </BodyScrollLockProvider>
+  </LocalizationProvider>;
 }
 export default AppContextWrapper;
 

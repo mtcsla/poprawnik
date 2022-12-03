@@ -1,4 +1,4 @@
-import { ArrowRight, Search } from '@mui/icons-material';
+import { ArrowRight } from '@mui/icons-material';
 import { Avatar, Button } from '@mui/material';
 import { GetStaticPropsContext } from 'next';
 import Head from 'next/head';
@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { ExplanationAnimation, PhasedExplanationAnimation } from '../..';
 import { firebaseAdmin } from '../../../buildtime-deps/firebaseAdmin';
 import LogoHeader from '../../../components/LogoHeader';
+import SearchBar from '../../../components/utility/SearchBar';
 import useWindowSize from '../../../hooks/WindowSize';
 import { useAuth } from '../../../providers/AuthProvider';
 import { useSearch } from '../../../providers/SearchProvider';
@@ -59,29 +60,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
         </div>
 
         <span className='flex items-center'>
-          {
-            width && width > 720
-              ? <div
-                className={
-                  "mr-3  bg-slate-50 hover:bg-blue-100 rounded cursor-text transition-colors flex items-center p-2"
-                }
-                onClick={onSearch}
-                style={{ height: '2rem', width: 200 }}
-              >
-                <Search
-                  color={"primary"}
-                  sx={{ fontSize: "1.2rem !important" }}
-                />
-                <p className={"ml-2 text-sm text-slate-500"}>Szukaj...</p>
-              </div>
-              : <Button className="mr-3 bg-slate-50 " sx={{ padding: "0.4rem", height: '2rem' }}>
-                <Search
-                  onClick={onSearch}
-                  sx={{ fontSize: "20px !important" }}
-                />
-              </Button>
-
-          }
+          <SearchBar />
           <Avatar role="button" variant='rounded' src={userProfile?.photoURL} className='w-8 h-8 hover:bg-blue-100 cursor-pointer text-blue-400 bg-slate-50' />
         </span>
       </div>
@@ -106,7 +85,7 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
           <div className='flex-1' />
           {width && width < 1024 && false
             ? <div className=' h-full flex rounded-lg my-8 flex-col justify-center w-full bg-slate-50 bg-blend-multiply p-4 sm:p-12' style={{
-              flex: 1 / 2, backgroundSize: 'cover', //backgroundImage: 'url(/bg-new-light.svg)',
+              flex: 1, backgroundSize: 'cover', //backgroundImage: 'url(/bg-new-light.svg)',
             }}>
               <pre className='text-lg mb-2 self-end text-black text-right mt-auto'>Jak to działa?</pre>
               <ExplanationAnimation className='mx-auto max-w-xs mb-auto w-full' active />
@@ -160,9 +139,9 @@ const FormIndex = ({ form, error }: { form: any, error: string }) => {
         </div>
       </div>
       {width && width >= 1024
-        ? <div className=' min-h-full flex flex-col justify-center w-full p-8 sm:p-12' style={{ flex: 1 / 2, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light-2.svg)', }}>
-          <div className='bg-slate-50 rounded-lg my-auto p-6'>
-            <PhasedExplanationAnimation phase={0} className='mx-auto mb-auto w-full' active />
+        ? <div className=' min-h-full flex flex-col justify-center w-full p-8 sm:p-12' style={{ flex: 1, backgroundSize: 'cover', backgroundImage: 'url(/bg-new-light-2.svg)', }}>
+          <div className='bg-slate-50 rounded-lg my-auto p-6 flex'>
+            <PhasedExplanationAnimation style={{ maxWidth: '20rem' }} phase={0} className='mx-auto mb-auto w-full' active />
           </div>
         </div>
         : null

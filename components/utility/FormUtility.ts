@@ -177,7 +177,11 @@ export namespace FormUtility {
       }
 
       if (item.type === "list") {
-        if (type === "removed" && names.includes(item.list)) {
+        if (
+          (type === "removed" && names.includes(item.list)) ||
+          (["removed", "notRequired"].includes(type) &&
+            FormNameCheck.calculation(names, item.criterium).length)
+        ) {
           paths.push([...path, index]);
         } else
           paths.push(

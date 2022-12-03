@@ -1,12 +1,12 @@
 import { ArrowDownward, Edit } from '@mui/icons-material';
-import { Button, Chip, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Button, Chip, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import _ from 'lodash';
 import React from 'react';
 import { listContext } from '../../../pages/account/lawyer/edit-document/template';
 import { Expression, ListElement, TemplatePath, useTemplateDescription } from '../../../providers/TemplateDescriptionProvider/TemplateDescriptionProvider';
 import { useTemplateChangesDisplay } from '../../form-edit/Changes';
 import { ConditionCalculationDisplay } from '../../form-edit/condition-calculation-editor/ConditionCalculationDisplay';
-import ConditionCalculationEditor, { Condition, OperatorCondition } from '../../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
+import ConditionCalculationEditor, { Calculation, Condition, OperatorCalculation, OperatorCondition } from '../../form-edit/condition-calculation-editor/ConditionCalculationEditorProvider';
 import { listStepsContext, ParentElementPropsType, useListSteps } from '../TemplateEditor';
 
 
@@ -16,18 +16,46 @@ import { listStepsContext, ParentElementPropsType, useListSteps } from '../Templ
 export const TemplateParentListEditor = ({ path, element, onChange }: ParentElementPropsType<ListElement>) => {
   const [list, setList] = React.useState(element?.list ?? '');
   const [filter, setFilter] = React.useState<Expression<Condition, OperatorCondition>>(element?.filter ?? { operators: [], components: [] });
+  const [displayType, setDisplayType] = React.useState<'all' | 'count'>(element?.displayType ?? 'all');
+  const [displayCount, setDisplayCount] = React.useState(element?.displayCount ?? '-1');
 
-  const [editing, setEditing] = React.useState(false);
+  const [elementOrder, setElementOrder] = React.useState(element?.elementOrder ?? 'default');
+  const [criterium, setCriterium] = React.useState(element?.criterium ?? { operators: [], components: [] });
+
+
+  const [editingFilter, setEditingFilter] = React.useState(false);
+  const [editingCriterium, setEditingCriterium] = React.useState(false);
 
   const { form } = useTemplateDescription();
 
 
 
   React.useEffect(() => {
-    onChange({ type: 'list', list, filter, child: element?.child?.length ? element?.child : [] });
+    onChange({ type: 'list', list, filter, displayCount, elementOrder, criterium, displayType, child: element?.child?.length ? element?.child : [], });
   }, [
-    list, filter
+    list, filter, displayCount, elementOrder, criterium, displayType,
   ]);
+
+  React.useEffect(
+    () => {
+      setFilter({ operators: [], components: [] });
+      setCriterium({ operators: [], components: [] });
+      setDisplayCount('-1');
+      setDisplayType('all');
+      setElementOrder('default');
+    },
+    [list]
+  )
+  React.useEffect(
+    () => {
+      setFilter(element?.filter ?? { operators: [], components: [] });
+      setCriterium(element?.criterium ?? { operators: [], components: [] });
+      setDisplayCount(element?.displayCount ?? '-1');
+      setDisplayType(element?.displayType ?? 'all');
+      setElementOrder(element?.elementOrder ?? 'default');
+    },
+    [element]
+  )
 
   const listNames = React.useMemo(() => form.filter(step => step.type === 'list' && step.name).map(list => <MenuItem value={list.name} className='w-full flex items-center justify-between'>
     <Chip size='small' className='mr-2' color='warning' label={list.name} />
@@ -53,19 +81,97 @@ export const TemplateParentListEditor = ({ path, element, onChange }: ParentElem
         {listNames}
       </Select>
     </FormControl>
-    <pre className='mt-8 mb-2 text-sm'>Warunek filtrujący</pre>
-    {(element?.filter ?? filter).operators.length
+    <div className='inline-flex gap-3 justify-between w-full'>
+      <pre className='mt-8 mb-2 text-sm'>Warunek filtrujący</pre>
+      <Button disabled={!list} className='self-end border-none' size='small' onClick={() => setEditingFilter(true)}>Zmień</Button>
+    </div>
+    {(element?.filter ?? filter).components.length
       ? <ConditionCalculationDisplay type='condition' sequence={element?.filter ?? filter} />
-      : <div className='p-4 flex justify-center border rounded-lg'>
+      : <div className='p-4 flex justify-center bg-slate-50 rounded-lg'>
         <pre>
           Brak warunku
         </pre>
       </div>}
-    <Button className='self-end border-none' size='small' onClick={() => setEditing(true)}>Zmień</Button>
+
+    <FormControl className='mt-8'>
+      <InputLabel>
+        ilość elementów do wyświetlenia
+      </InputLabel>
+      <Select label='ilość elementów do wyświetlenia'
+        value={displayType}
+        disabled={!list}
+        onChange={(e, value) => {
+          if (e.target.value === 'all') {
+            setDisplayCount('-1');
+            setDisplayType('all');
+          } else
+            setDisplayType('count');
+        }}>
+        <MenuItem value={'all'}>
+          wszystkie
+        </MenuItem>
+        <MenuItem value={'count'}>
+          ustalona ilość
+        </MenuItem>
+      </Select>
+    </FormControl>
+
+    <TextField value={displayCount !== '-1' ? displayCount : ''} disabled={displayType === 'all' || !list}
+      onChange={e => { setDisplayCount(e.target.value as `${number}`); }}
+      className='mt-4'
+      error={displayCount !== '0' && !displayCount?.match(/[1-9]+[0-9]*/)}
+      label="liczba elementów do wyświetlenia" />
+
+    <FormControl className='mt-4'>
+      <InputLabel>
+        kolejność elementów
+      </InputLabel>
+      <Select value={elementOrder} disabled={!list} onChange={(e) => {
+        if (e.target.value === 'default')
+          setCriterium(
+            { operators: [], components: [] }
+          )
+        setElementOrder(e.target.value as any);
+      }} label='kolejność elementów' >
+
+        <MenuItem value={'default'}>
+          ustalona przez użytkownika
+        </MenuItem>
+        <MenuItem value={'ascending'}>
+          sortuj rosnąco
+        </MenuItem>
+        <MenuItem value={'descending'}>
+          sortuj malejąco
+        </MenuItem>
+      </Select>
+    </FormControl>
+
+    <div className='inline-flex gap-3 justify-between w-full'>
+      <pre className='mt-8 mb-2 text-sm'>Kryterium sortowania</pre>
+      <Button disabled={elementOrder === 'default' || !list} className='self-end border-none' size='small' onClick={() => setEditingCriterium(true)}>Zmień</Button>
+    </div>
+    {(criterium).components.length
+      ? <ConditionCalculationDisplay type='calculation' sequence={criterium} />
+      : <div className='p-4 flex justify-center bg-slate-50 rounded-lg'>
+        <pre>
+          Brak kryterium
+        </pre>
+      </div>}
+
+
+
+
     {
-      editing
-        ? <ConditionCalculationEditor type='condition' initValue={filter} exit={() => setEditing(false)} save={(value) => {
-          setFilter(value as Expression<Condition, OperatorCondition>); setEditing(false)
+      editingCriterium
+        ? <ConditionCalculationEditor type='calculation' initValue={criterium} exit={() => setEditingCriterium(false)} save={(value) => {
+          setCriterium(value as Expression<Calculation, OperatorCalculation>); setEditingCriterium(false)
+        }} />
+        : null
+    }
+    {
+      editingFilter
+        ? <ConditionCalculationEditor type='condition' initValue={filter} exit={() => setEditingFilter(false)} save={(value) => {
+          setFilter(value as Expression<Condition, OperatorCondition>); setEditingFilter(false)
         }} />
         : null
     }
@@ -83,6 +189,7 @@ export const TemplateParentListDisplay = ({ element, children, edit, path, index
     return changed ? changed[1] : null;
   }, [])
 
+
   return <div style={{ maxWidth: 800 }} className='rounded-lg sm:pt-6 pt-4 flex flex-col overflow-x-visible bg-yellow-100'>
     <span className='px-4 sm:px-6 pb-4 sm:pb-6 w-full inline-flex items-center flex-wrap justify-end gap-3'>
       <pre className='text-sm mb-4'>Interpretacja listy</pre>
@@ -94,9 +201,13 @@ export const TemplateParentListDisplay = ({ element, children, edit, path, index
       }
     </span>
     <p className='text-sm mb-4 mx-4 sm:mx-6'>
-      Każdy element listy
-      <span className='inline-flex items-center mx-1 p-1 bg-white rounded-lg'><Chip size='small' color='warning' label={element.list} /></span>
-      zostanie wstawiony jako poniższy fragment.
+      {element?.displayType === 'all' ? <>Każdy element listy
+        <span className='inline-flex items-center mx-1 p-1 bg-white rounded-lg'><Chip size='small' color='warning' label={element.list} /></span>
+        zostanie wstawiony jako poniższy fragment.
+      </>
+        : <>Pierwsze <span className='inline-flex items-center mx-1 p-1 bg-white rounded-lg'><Chip size='small' color='warning' label={element.displayCount} /></span> elementów listy
+          <span className='inline-flex items-center mx-1 p-1 bg-white rounded-lg'><Chip size='small' color='warning' label={element.list} /></span> zostanie wstawionych jako poniższy fragment.</>
+      }
     </p>
 
     <pre className='mx-4 sm:mx-6 mb-2 mt-4 text-xs'>Warunek filtrujący</pre>
@@ -127,6 +238,22 @@ export const TemplateParentListDisplay = ({ element, children, edit, path, index
           </pre>
         </div>}
     </div>
+
+
+    {element?.criterium?.components?.length ? <>
+
+      <pre className='mx-4 sm:mx-6 mb-2 mt-4 text-xs'>Kryterium sortowania</pre>
+      <p className='text-sm mb-4 mx-4 sm:mx-6'>
+        Elementy zostaną posortowane <b>{
+          element?.elementOrder === 'ascending' ? 'rosnąco'
+            : 'malejąco'
+        }</b> według kryterium:
+      </p>
+      <div className={`bg-white p-4 flex-col inline-flex gap-3 mb-6  mx-4 sm:mx-6 rounded-lg items-stretch justify-center`}>
+        <ConditionCalculationDisplay type='calculation' sequence={element.criterium as Expression<Calculation, OperatorCalculation>} />
+      </div>
+    </> : null}
+
 
     <div className='bg-yellow-100 min-w-full pt-4 pb-4 sm:pb-6 sm:px-6 px-4 rounded-lg w-fit'>
       <div className='bg-white sm:p-4 p-2 rounded-lg'>

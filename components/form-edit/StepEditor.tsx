@@ -305,7 +305,7 @@ const StepEditor = () => {
         <Button onClick={() => {
           setEditing(null);
           router.push({ pathname: router.pathname, query: Object.assign(router.query, { fragment: index.toString() }) })
-        }} className='w-full normal-case text-left hover:border-blue-500 rounded mb-8  hover:bg-blue-50  cursor-pointer p-4 '>
+        }} className='w-full normal-case text-left rounded mb-8  hover:bg-blue-200  cursor-pointer p-4 '>
           <div className='text-black w-full pointer-events-none'>
             <EditorFragment fragment={fragment} editor={false} />
           </div>

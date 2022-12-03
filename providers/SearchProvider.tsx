@@ -109,7 +109,7 @@ export const Search = () => {
         </div>
 
         <div className="flex gap-6 flex-wrap pt-8 pb-4 mt-auto">
-          <div className="inline-flex mr-auto flex-wrap gap-12">
+          <div className="inline-flex mr-auto px-4 flex-wrap gap-6 sm:gap-12 justify-between w-full">
             <div className="flex flex-col">
               <p className="flex items-center">
 

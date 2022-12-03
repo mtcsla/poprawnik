@@ -1,3 +1,5 @@
 {
-  "stripe": "pk_test_51LwZPDJU4XTOEvCbbpEWb5rrkiMfR38tZGG7A6dbCNEv9NBRF5UeBeeVuPlB2E9uIwmrk2nbRuhMB0ZGHTIUEPr500LkmUHhGh"
+  "stripe": "pk_test_51LwZPDJU4XTOEvCbbpEWb5rrkiMfR38tZGG7A6dbCNEv9NBRF5UeBeeVuPlB2E9uIwmrk2nbRuhMB0ZGHTIUEPr500LkmUHhGh",
+  "algoliaAppId": "EO5MUD2TW6",
+  "algoliaSearchKey": "fb22312881e8704badd098407c3ccc52"
 }

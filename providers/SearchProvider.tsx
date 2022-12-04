@@ -32,6 +32,7 @@ const searchOpenContext = React.createContext<{ searchOpen: boolean, setSearchOp
 
 export default function SearchProvider({ children }: { children: React.ReactNode }) {
   const [searchOpen, setSearchOpen] = React.useState<boolean>(false);
+  const { width } = useWindowSize();
 
   React.useEffect(() => {
 
@@ -57,7 +58,7 @@ export default function SearchProvider({ children }: { children: React.ReactNode
   return <searchOpenContext.Provider value={{ searchOpen, setSearchOpen }}>
     {searchOpen
       ? <BodyScrollLock>
-        <div className="fixed h-full left-0 sm:p-8 md:p-12 right-0 flex-col top-0 buttom-0 bg-opacity-10  justify-start items-center"
+        <div className="fixed h-full overflow-hidden left-0 sm:p-8 md:p-12 right-0 flex-col top-0 buttom-0 bg-opacity-10  justify-start items-center"
 
           style={{
             backdropFilter: 'blur(4px)',
@@ -78,7 +79,8 @@ export default function SearchProvider({ children }: { children: React.ReactNode
       : null
     }
 
-    {children}
+
+    {(width && width < 640 ? !searchOpen : true) ? children : null}
   </searchOpenContext.Provider >
 }
 
@@ -93,11 +95,11 @@ export const Search = () => {
   const { width } = useWindowSize();
 
   return (
-    <div className={`bg-white flex flex-col h-fit ${width && width >= 640 ? 'rounded-lg max-h-[60rem]' : 'h-screen max-h-screen'} mx-auto `} ref={divRef} style={{ maxWidth: '40rem', }} >
+    <div className={`bg-white flex overflow-y-scroll sm:overflow-hidden flex-col ${width && width >= 640 ? 'rounded-lg h-fit' : 'h-full max-h-full'} mx-auto `} ref={divRef} style={{ maxWidth: '40rem', maxHeight: 'min(60rem, 100%)' }} >
       <ConnectedSearchBox />
       <Configure hitsPerPage={5} />
 
-      <div className="w-full h-full px-6 pt-6 flex justify-between flex-col overflow-y-scroll">
+      <div className="w-full h-full px-6 pt-6 flex justify-between flex-col overflow-y-visible sm:overflow-y-scroll">
         <div className='flex flex-col w-full'>
           <indexContext.Provider value={'products'}>
             <Index indexName="products">
@@ -239,6 +241,8 @@ const MyHit = ({ hit }: { hit: Hit<BasicDoc> }) => {
   const { setSearchOpen } = useSearch();
 
 
+
+
   return <>
     {type === HitType.product
       ?
@@ -330,14 +334,18 @@ const connectWithQuery = createConnector({
 
 const MySearchBox = ({ currentRefinement, refine }: any) => {
   const { setSearchOpen } = useSearch();
+  const { width } = useWindowSize();
+
+
 
 
   return <TextField
     placeholder="Szukaj..."
     autoFocus={true}
     focused={false}
-
-    onBlur={(e) => e.target.focus()}
+    onBlur={(e) => {
+      e.target.focus({ preventScroll: true });
+    }}
     InputProps={{
       startAdornment:
         <InputAdornment position='start'>

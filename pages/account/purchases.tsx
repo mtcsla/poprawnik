@@ -1,9 +1,10 @@
 import { collection, doc, getDocs, orderBy, query, updateDoc } from '@firebase/firestore';
 import { Delete, Download, Refresh, ShoppingBag } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Skeleton } from '@mui/material';
 import { useRouter } from 'next/router';
 import React from "react";
+import { sleep } from '..';
 import { firestore } from '../../buildtime-deps/firebase';
 import { useAuth } from "../../providers/AuthProvider";
 
@@ -14,6 +15,7 @@ const Purchases = () => {
   const router = useRouter();
 
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState<string>('');
+  const [downloadDialogOpen, setDownloadDialogOpen] = React.useState<string>('');
 
 
   const getPurchases = () => {
@@ -53,6 +55,69 @@ const Purchases = () => {
     )
   }
 
+  const [err, setErr] = React.useState<string>('');
+  const [downloading, setDownloading] = React.useState<boolean>(false);
+  const [progress, setProgress] = React.useState<number>(0);
+
+  const downloadPurchase = async (id: string, name?: string) => {
+    setDownloadDialogOpen(id);
+    try {
+      await fetch(`/api/create-purchase-download?id=${id}`);
+    } catch (e) {
+      console.log(e);
+      setErr('Wystąpił błąd podczas pobierania dokumentu. Spróbuj ponownie później.');
+      setDownloadDialogOpen('');
+      return;
+    }
+    setDownloading(true);
+
+    const res = await fetch(`/api/download-purchase?id=${id}`);
+
+    if (res.status != 200) {
+      setErr('Wystąpił błąd podczas pobierania dokumentu. Spróbuj ponownie później.');
+      setDownloadDialogOpen('');
+      setDownloading(false);
+      return;
+    }
+
+    const reader = res.body!.getReader()
+    const chunks: any[] = [];
+    let length = +res.headers.get('Content-Length')!;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      length += value.length;
+      setProgress(
+        Math.round(
+          (value.length / length) * 100
+        )
+      )
+      console.log(
+        (value.length / length) * 100)
+
+      chunks.push(value);
+    }
+    setProgress(100);
+
+    const blob = new Blob(chunks);
+
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (name || 'dokument') + '.pdf';
+    a.click();
+
+    await sleep(3000);
+
+    setDownloadDialogOpen('');
+    await sleep(1000);
+    setDownloading(false);
+    setProgress(0);
+  }
+
   React.useEffect(() => {
     if (userProfile?.uid) getPurchases();
   }, [])
@@ -74,10 +139,30 @@ const Purchases = () => {
         <Button className='border-none' onClick={() => setDeleteDialogOpen('')} size='small' color='error'>Anuluj</Button>
       </DialogActions>
     </Dialog>
+    <Dialog scroll='body' open={!!downloadDialogOpen}>
+
+      <DialogContent className='inline-flex min-w-[98vw] sm:min-w-[30rem] w-full flex-col items-center'>
+        <div className='flex flex-col w-full'>
+
+          <h4 className='text-left font-bold w-full'>{progress < 100 ? (downloading ? 'Trwa pobieranie Twojego pisma.' : 'Przygotowujemy Twoje pismo do pobrania.') : 'Pomyślnie pobrano'}</h4>
+          <p className='w-full'>{progress < 100 ? 'Nie opuszczaj strony.' : 'Możesz teraz wydrukować swoje pismo.'}</p>
+        </div>
+        <LinearProgress variant={downloading ? 'determinate' : 'indeterminate'} value={downloading ? progress : undefined} className='mt-4 rounded h-[2rem] w-full' />
+      </DialogContent>
+    </Dialog>
     <h1>
       <ShoppingBag color='primary' className='-translate-y-1' /> Twoje zakupy
     </h1>
     <p className='mb-8'>Tutaj możesz uzyskać dostęp do zakupionych pism.</p>
+    <div className='inline-flex my-6 flex-col-reverse sm:flex-row gap-3 sm:items-center'>
+      <img src='/succesful-purchase.svg' className='max-w-[15rem]' />
+      <div className='flex flex-col text-blue-500 rounded'>
+        <h4 className='font-bold'>Dziękujemy za zakup!</h4>
+        <p className='text-blue-400'>
+          Pismo zostało dodane do Twojego konta. Możesz je pobrać w dowolnym momencie.
+        </p>
+      </div>
+    </div>
     <div className='inline-flex mb-12 w-full gap-3 flex-wrap-reverse justify-between items-center '>
       <p>
         Jeśli pismo, które zakupiłeś/aś nie pojawi się na liście w przeciągu 10 minut pomimo odświeżenia strony
@@ -92,72 +177,74 @@ const Purchases = () => {
         </Button>
       </div>
     </div>
-    {purchasesList ? <>
-      {purchasesList.length
-        ?
-        purchasesList.map((purchase, index, arr) => <><div className={`${paymentIntentId === purchase.paymentIntentId ? 'bg-blue-100 text-blue-500' : purchase.contents ? 'bg-slate-100 text-black' : 'bg-slate-200 text-slate-400'} relative rounded-lg flex-col h-36 flex justify-between p-4`}>
-          {paymentIntentId === purchase.paymentIntentId
-            ? <pre style={{ fontSize: '0.8rem', top: '-1.3rem' }} className=' inline-flex gap-2 items-center font-bold right-0 absolute text-blue-500'>
-              Nowy
-            </pre>
-            : null
-          }
+    {
+      purchasesList ? <>
+        {purchasesList.length
+          ?
+          purchasesList.map((purchase, index, arr) => <><div className={`${paymentIntentId === purchase.paymentIntentId ? 'bg-blue-100 text-blue-500' : purchase.contents ? 'bg-slate-100 text-black' : 'bg-slate-200 text-slate-400'} relative rounded-lg flex-col h-36 flex justify-between p-4`}>
+            {paymentIntentId === purchase.paymentIntentId
+              ? <pre style={{ fontSize: '0.8rem', top: '-1.3rem' }} className=' inline-flex gap-2 items-center font-bold right-0 absolute text-blue-500'>
+                Nowy
+              </pre>
+              : null
+            }
 
-          <div className='flex items-center flex-wrap'>
-            <div className='flex flex-col'>
-              <h3 className="text-xl text-inherit whitespace-normal">{purchase.product_name}</h3>
-              <pre className='text-xs'>{purchase.product_category}</pre>
+            <div className='flex items-center flex-wrap'>
+              <div className='flex flex-col'>
+                <h3 className="text-xl text-inherit whitespace-normal">{purchase.product_name}</h3>
+                <pre className='text-xs'>{purchase.product_category}</pre>
+              </div>
+              <div className='ml-auto flex items-end flex-col'>
+                <pre className="text-sm">{purchase.date.toDate().toLocaleDateString('pl-PL')}</pre>
+                {!purchase.contents
+                  ? <p className='text-xs'>Usunięto</p>
+                  : null
+                }
+              </div>
             </div>
-            <div className='ml-auto flex items-end flex-col'>
-              <pre className="text-sm">{purchase.date.toDate().toLocaleDateString('pl-PL')}</pre>
-              {!purchase.contents
-                ? <p className='text-xs'>Usunięto</p>
-                : null
-              }
+            <div className='flex items-center justify-between flex-wrap'>
+              <p className='text-sm'><b className='font-normal text-slate-500'>Zapłacono:</b> <b className='text-inherit'>{(purchase.product_price / 100).toFixed(2).toString().replace('.', ',')}zł</b></p>
+              <div className='inline-flex bg-white rounded items-center gap-2 ml-auto'>
+                <LoadingButton onClick={() => downloadPurchase(purchase.id)} className='border-none bg-white' disabled={!purchase.contents} ><Download /></LoadingButton>
+                <Button className='border-none bg-white' disabled={!purchase.contents} color='error' onClick={() => setDeleteDialogOpen(purchase.id)}><Delete /></Button>
+              </div>
             </div>
-          </div>
-          <div className='flex items-center justify-between flex-wrap'>
-            <p className='text-sm'><b className='font-normal text-slate-500'>Zapłacono:</b> <b className='text-inherit'>{(purchase.product_price / 100).toFixed(2).toString().replace('.', ',')}zł</b></p>
-            <div className='inline-flex bg-white rounded items-center gap-2 ml-auto'>
-              <LoadingButton className='border-none bg-white' disabled={!purchase.contents} ><Download /></LoadingButton>
-              <Button className='border-none bg-white' disabled={!purchase.contents} color='error' onClick={() => setDeleteDialogOpen(purchase.id)}><Delete /></Button>
-            </div>
-          </div>
 
-        </div>
-          {index < arr.length - 1
-            ?
-            <div className='w-full border-slate-100 my-4' />
-            : null
-          }
-        </>)
-        :
-        <div
-          className={
-            "p-4 flex items-center justify-center rounded-lg border h-32 mt-4"
-          }
-        >
-          <div className={"flex flex-col"}>
-            <pre>brak zakupów</pre>
-            <p className={"mt-1"}>Nie dokonałeś/aś jeszcze żadnych zakupów w naszym serwisie.</p>
           </div>
-        </div>
-      }
-    </> : <>
-      <Skeleton variant='rectangular' className='mt-6 rounded' height={110} />
-      <span className='flex items-center w-full mt-1'>
-        <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
-      </span>
-      <Skeleton variant='rectangular' className='rounded' height={110} />
-      <span className='flex items-center w-full mt-1'>
-        <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
-      </span>
-      <Skeleton variant='rectangular' className='rounded' height={110} />
-      <span className='flex items-center w-full mt-1'>
-        <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
-      </span>
-    </>}
-  </article>
+            {index < arr.length - 1
+              ?
+              <div className='w-full border-slate-100 my-4' />
+              : null
+            }
+          </>)
+          :
+          <div
+            className={
+              "p-4 flex items-center justify-center rounded-lg border h-32 mt-4"
+            }
+          >
+            <div className={"flex flex-col"}>
+              <pre>brak zakupów</pre>
+              <p className={"mt-1"}>Nie dokonałeś/aś jeszcze żadnych zakupów w naszym serwisie.</p>
+            </div>
+          </div>
+        }
+      </> : <>
+        <Skeleton variant='rectangular' className='mt-6 rounded' height={110} />
+        <span className='flex items-center w-full mt-1'>
+          <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
+        </span>
+        <Skeleton variant='rectangular' className='rounded' height={110} />
+        <span className='flex items-center w-full mt-1'>
+          <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
+        </span>
+        <Skeleton variant='rectangular' className='rounded' height={110} />
+        <span className='flex items-center w-full mt-1'>
+          <Skeleton className='mb-4 flex-1 mr-4' /> <Skeleton className='mb-4' style={{ flex: 0.2 }} />
+        </span>
+      </>
+    }
+  </article >
 }
 
 export default Purchases;

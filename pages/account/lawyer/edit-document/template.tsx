@@ -120,10 +120,10 @@ const EditDocumentTemplate = () => {
               <TemplateDescriptionProvider id={id as string} form={formDescription} initTemplate={templateDescription}>
                 <div className="w-full flex-col flex pb-8 mb-2">
 
-                  <h1 className="inline-flex gap-2 mb-1"><Bookmark color='primary' /> Edytujesz wzór pisma</h1>
+                  <h1 className="inline-flex gap-2 text-2xl items-center whitespace-nowrap sm:text-4xl mb-1"><Bookmark color='primary' /> Edytujesz wzór pisma</h1>
                   <p>Wypełnij formularz przykładowymi danymi, aby szybko generować podgląd.</p>
                   {Object.keys(values).length === 0 || formDescription.length === 0
-                    ? <div className='border sm:p-8 p-4 bg-slate-50 mt-8 rounded-lg flex justify-center items-center'>
+                    ? <div className='sm:p-8 p-4 bg-slate-100 mt-8 rounded-lg flex justify-center items-center'>
                       <pre>Brak przykładowych danych</pre>
                     </div>
                     : <>
@@ -150,8 +150,8 @@ const EditDocumentTemplate = () => {
                   <Link href={`/forms/${id}/form?testing=true`}>
                     <Button className='w-full mt-8 p-4 bg-blue-500 text-white hover:bg-blue-400'> {Object.keys(values).length ? 'Edytuj dane' : 'Wypełnij formularz'} <Edit className='ml-2' /></Button>
                   </Link>
-                  <Dialog scroll="body" className='w-screen h-screen m-0' open={!loading && editorOpen}>
-                    <DialogContent sx={{ width: '98vw' }} className='relative h-screen'>
+                  <Dialog scroll="body" open={!loading && editorOpen}>
+                    <DialogContent sx={{ width: '98vw', height: '98vh' }} className='relative h-screen'>
                       <BodyScrollLock>
                         <IconButton style={{ top: '2.5rem', right: '1.5vw', zIndex: 20000 }} className='fixed  border-none' onClick={() => setEditorOpen(false)}><Close /></IconButton>
                         <TemplateEditor />

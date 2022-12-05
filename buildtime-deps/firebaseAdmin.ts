@@ -15,6 +15,7 @@ const serviceAccount = JSON.parse(
 if (!firebaseAdmin.apps.length) {
   firebaseAdmin.initializeApp({
     credential: firebaseAdmin.credential.cert(serviceAccount),
+    storageBucket: "trustree-release.appspot.com",
   });
 }
 

@@ -4,16 +4,17 @@ import { AccountBox, ArrowForwardIos, Bookmark, Close, DescriptionOutlined, Home
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import algoliasearch from "algoliasearch";
 import Link from "next/link";
+import Router from 'next/router';
 import React from "react";
 import { BasicDoc, Hit, Index } from "react-instantsearch-core";
-import { algoliaAppId, algoliaSearchKey } from '../public_keys.json';
-
-
-import Router from 'next/router';
 import { Configure, connectHits, createConnector, InstantSearch } from 'react-instantsearch-dom';
 import { useOnClickOutside } from "usehooks-ts";
 import useWindowSize from "../hooks/WindowSize";
 import BodyScrollLock from "./BodyScrollLock";
+
+
+import publicKeys from '../public_keys.json';
+const { algoliaAppId, algoliaSearchKey } = publicKeys;
 
 enum HitType {
   product,

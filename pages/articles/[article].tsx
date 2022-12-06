@@ -51,7 +51,7 @@ const Article = ({ article }: { article: IArticleContents }) => {
       </div>
       <p>{article.date}</p>
     </div>
-    <div className={'mb-8 mt-6 border-b'} />
+    <div className={'mb-8 mt-6'} />
     <h1>{article.title}</h1>
     <h4>{article.subtitle}</h4>
     <div

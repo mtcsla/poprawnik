@@ -100,7 +100,7 @@ const LogIn = () => {
             </Button>
             <p
               className={'text-xs text-red-500'}>{error}</p>
-            <p className={'text-sm mt-4'}>Lub zaloguj się przez:</p>
+            <p className={'text-sm mt-4'}>Lub zaloguj się jednym kliknięciem przez:</p>
             <Button onClick={signInGoogle} loading={loadingGoogle} disabled={loading || loadingFacebook} className={`mt-2 p-2 ${loadingFacebook || loading ? 'bg-gray-100' : 'bg-red-200 text-red-500'} border-none flex`}>
               <div className={`flex-1 ${loadingGoogle ? 'opacity-0' : null} flex items-center justify-between pl-2 pr-2`}>
                 <Google className={'mr-2'} />

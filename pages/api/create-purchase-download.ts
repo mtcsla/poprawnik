@@ -5,6 +5,7 @@ import { firebaseAdmin } from "../../buildtime-deps/firebaseAdmin";
 
 import htmlPdfNode from "html-pdf-node";
 import { templateToHtmlFile } from "./template/generate.pdf";
+import { sleep } from "..";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const idToken = req.cookies["--user-token"];
@@ -116,5 +117,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(500).json({ message: "Failed to create PDF." });
     return;
   }
+  while (true) {
+    if (await docRef.exists()) break;
+  }
+  if (!exists) await sleep(1000);
+
   res.status(200).json({ message: "Success" });
 };

@@ -1,6 +1,6 @@
 import { doc, getDoc, updateDoc } from '@firebase/firestore';
 import { deleteObject, ref } from "@firebase/storage";
-import { EditRounded, ImageRounded, ModeEdit } from "@mui/icons-material";
+import { Add, EditRounded, ImageRounded, ModeEdit } from "@mui/icons-material";
 import { Button, Chip, Menu, MenuItem, Skeleton, TextField } from "@mui/material";
 import debounce from "debounce";
 import Link from "next/link";
@@ -74,7 +74,7 @@ const Edit = () => {
           value={article.subtitle}
           onChange={(title) => modify(["set-subtitle", title.target.value])}
         />
-        <div className={"mt-10 mb-8 border-b w-full"} />
+        <div className={"mt-10 mb-8 w-full"} />
         <article className={"flex flex-col"}>
           <h1>{article.title}</h1>
           <h4>{article.subtitle}</h4>
@@ -90,7 +90,7 @@ const Edit = () => {
               <span className={"flex justify-between"}>
                 <Chip label={index + 1} size={"small"} />
                 <Button
-                  sx={{ border: "none", marginRight: "-1rem" }}
+                  sx={{ marginRight: "-1rem" }}
                   size={"small"}
                   color={"error"}
                   onClick={() => modify([`delete-fragment-${index}`, null])}
@@ -129,9 +129,10 @@ const Edit = () => {
 
         <Button
           onClick={() => setAddingNew(true)}
-          className={"w-full mb-4"}
+          className={"w-full mt-8 mb-4 p-4 bg-blue-100"}
           ref={menuAnchor}
         >
+          <Add className='mr-2' />
           DODAJ FRAGMENT
         </Button>
         <Menu

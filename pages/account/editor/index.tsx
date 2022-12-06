@@ -4,9 +4,9 @@ import {
   deleteDoc,
   doc, getDocs, query, updateDoc, where
 } from "@firebase/firestore";
-import { Edit } from "@mui/icons-material";
+import { Delete, Edit, Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { Button, Dialog, DialogActions, Skeleton } from "@mui/material";
+import { Dialog, DialogActions, IconButton, Skeleton } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
@@ -137,40 +137,42 @@ const YourArticles = () => {
           articles.map((article, index) => (
             <>
               <div
-                className={"p-4 flex flex-col rounded-lg justify-between border h-32 mt-2 "}
+                className={"p-4 flex flex-col rounded-lg w-full justify-between bg-slate-50 mt-2 "}
               >
-                <div className={'flex justify-between'}>
-                  <h4 className={'text-ellipsis'}>
-                    {article.title || <i>BRAK TYTUŁU</i>}
-                  </h4>
-                  <div style={{ minWidth: 50 }} />
+                <div className={'flex justify-between w-full flex-wrap'}>
+                  <div className="flex flex-col w-full">
+                    <h4 className={'font-bold truncate'}>
+                      {article.title || 'BRAK TYTUŁU'}
+                    </h4>
 
+                    <p className="truncate">
+                      {article.subtitle || 'Brak podtytułu.'}
+                    </p>
+                  </div>
+                </div>
+                <div className={"mt-1 flex items-center justify-end "}>
                   <Link passHref href={`/account/editor/edit?id=${article.id}&type=article`}>
-                    <a>
-                      <Button
+                    <a >
+                      <IconButton
                         size={'small'}
                         disabled={makingPublic}
-                        className='p-0'
                         sx={{ border: 'none' }}
                       >
-
-                        Edytuj
-                      </Button>
+                        <Edit />
+                      </IconButton>
                     </a>
                   </Link>
-                </div>
-                <div className={"mt-1 flex items-start justify-between "}>
-                  <p onClick={() => setConfirmVisibility(article)}
+                  <IconButton onClick={() => setConfirmVisibility(article)}
                     className={"text-sm text-blue-500 cursor-pointer " + (makingPublic ? 'text-slate-400 cursor-default' : '')}>
-                    {article.visible ? "Ukryj" : "Opublikuj"}</p>
-                  <div style={{ minWidth: 50 }} />
-                  <p
+                    {article.visible ? <Visibility /> : <VisibilityOff />}</IconButton>
+                  <div />
+                  <IconButton
                     className={"text-sm cursor-pointer text-red-500 " + (makingPublic ? 'text-slate-400 cursor-default' : '')}
                     onClick={makingPublic ? () => {
                     } : () => setConfirmDelete(article)}
                   >
-                    Usuń
-                  </p>
+                    <Delete />
+                  </IconButton>
                 </div>
               </div>
             </>

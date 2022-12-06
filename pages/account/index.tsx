@@ -136,7 +136,7 @@ const Account = () => {
         <SocialMedia {...{ loading, saving, editing, setEditing, updateUserDoc, userDoc }} />
 
       </div>
-      <Button disabled={saving || editing} variant='outlined' className='flex justify-between mt-6 mb-6 border-none' color='error'>Usuń konto <Delete /></Button>
+      <Button disabled={saving || editing} variant='outlined' className='flex bg-red-100 justify-between mt-6 mb-6 border-none' color='error'>Usuń konto <Delete /></Button>
     </> :
       <>
         <span className='flex items-stretch w-full'>

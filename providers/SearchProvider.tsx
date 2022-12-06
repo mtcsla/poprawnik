@@ -206,7 +206,7 @@ const MyHits = ({ hits }: { hits: Hit<BasicDoc>[] }) => {
     {
       hits.length
         ? <>
-          <pre className="my-4">{index === 'articles' ? 'artykuły' : 'pisma'}</pre>
+          <pre className="my-4">{index === 'articles' ? 'proponowane artykuły' : 'pisma'}</pre>
           {hits.map(hit => <MyHit hit={hit} key={hit.objectID} />)}
         </>
         : index === 'products' ? <div style={{ maxWidth: '15rem' }} className="mx-auto flex-col flex text-gray-500">
@@ -250,7 +250,7 @@ const MyHit = ({ hit }: { hit: Hit<BasicDoc> }) => {
       <Link href={`/forms/${hit.path.split('/')[1]}`} passHref>
         <a className="w-full">
 
-          <HitHover className='flex flex-col p-2 hover:bg-blue-50 hover:text-blue-500 rounded transition-colors cursor-pointer'>
+          <HitHover className='flex flex-col p-2 px-6 hover:bg-blue-50 hover:text-blue-500 rounded transition-colors cursor-pointer'>
             <div className='inline-flex mb-1 justify-between gap-2 items-end'>
               <pre className='text-xs icon'>{hit.category}</pre>
               <p className='text-sm'>{(parseInt(hit.price) / 100).toFixed(2).toString().replace('.', ',')}zł</p>
@@ -274,7 +274,7 @@ const MyHit = ({ hit }: { hit: Hit<BasicDoc> }) => {
       hit.title ?
         <Link href={`/articles/${hit.path.split('/')[1]}`} passHref>
           <a className='w-full'>
-            <HitHover className='flex flex-col p-2 hover:bg-blue-50 hover:text-blue-500 rounded transition-colors cursor-pointer'>
+            <HitHover className='flex flex-col p-2 px-6 hover:bg-blue-50 hover:text-blue-500 rounded transition-colors cursor-pointer'>
               <div className='inline-flex ml-1 hidden mb-1 justify-between gap-2 items-end'>
                 <pre className='text-xs icon'>{hit.category}</pre>
                 <p className='text-sm'>{hit.author}</p>

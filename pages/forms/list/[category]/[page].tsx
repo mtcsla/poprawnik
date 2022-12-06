@@ -142,36 +142,33 @@ const FormsIndex = ({ products, category, page, categories, pagesNumber }: { pro
 
             </FormControl>
           </div>
-          {products.map(
-            (product, index, arr) =>
-              <span className='flex flex-col items-stretch'>
-                <Link passHref href={`/forms/${product.id}`} >
-                  <a>
-                    <div key={product.id} style={{ minHeight: 120 }} className="flex hover:text-blue-500 hover:bg-blue-50  flex-col justify-between p-4 my-4 bg-white rounded-lg">
-                      <div className='w-full inline-flex items-center gap-3 flex-wrap'>
-                        <h4>{product.title}</h4>
-                        <pre className='ml-auto text-xs'>{product.category}</pre>
-                      </div>
-                      <span className='inline-flex gap-4 justify-between w-full items-center'>
-                        <p className="self-end">{(product.price / 100).toFixed(2).toString().replace('.', ',')} zł</p>
-                        <span className='inline-flex gap-3 items-center'>
-                          <Avatar src={product.authorPictureURL} />
-                          <span className='flex flex-col'>
-                            <p className='font-bold text-sm'>{product.authorName}</p>
-                            <pre className='text-sm'>Deweloper</pre>
+          <div className="w-full inline-flex flex-col gap-2">
+            {products.map(
+              (product, index, arr) =>
+                <span className='flex flex-col items-stretch'>
+                  <Link passHref href={`/forms/${product.id}`} >
+                    <a>
+                      <div key={product.id} style={{ minHeight: 120 }} className="flex transition-colors hover:text-blue-500 hover:bg-blue-50  flex-col justify-between p-4 my-4 bg-white rounded-lg">
+                        <div className='w-full inline-flex items-center gap-3 flex-wrap'>
+                          <h4>{product.title}</h4>
+                          <pre className='ml-auto text-xs'>{product.category}</pre>
+                        </div>
+                        <span className='inline-flex gap-4 justify-between w-full items-center'>
+                          <p className="self-end">{(product.price / 100).toFixed(2).toString().replace('.', ',')} zł</p>
+                          <span className='inline-flex gap-3 items-center'>
+                            <Avatar src={product.authorPictureURL} />
+                            <span className='flex flex-col'>
+                              <p className='font-bold text-sm'>{product.authorName}</p>
+                              <pre className='text-sm'>Deweloper</pre>
+                            </span>
                           </span>
                         </span>
-                      </span>
-                    </div>
-                  </a>
-                </Link>
-                {
-                  index != arr.length - 1
-                    ? <div className='border-t my-4' />
-                    : null
-                }
-              </span>
-          )}
+                      </div>
+                    </a>
+                  </Link>
+                </span>
+            )}
+          </div>
           <Pagination shape="rounded" color={'primary'} renderItem={(props) =>
 
             props.page && (props.page > pagesNumber || props.page < 1) || !props.page

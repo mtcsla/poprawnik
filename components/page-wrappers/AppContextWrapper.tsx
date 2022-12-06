@@ -184,14 +184,17 @@ const theme = createTheme({
         },
 
         root: {
+          borderRadius: '0.25rem',
           marginLeft: '0.5rem',
           marginBottom: '0 !important',
           padding: '0.35rem',
+          cursor: 'pointer',
           paddingLeft: '0.4rem',
           paddingRight: '0.4rem',
           marginRight: '0.5rem',
           ":hover": {
-            backgroundColor: 'rgb(248 250 252)',
+            backgroundColor: colors.blue[100],
+            color: colors.blue[500] + ' !important'
           },
           minHeight: '0 !important',
           height: 'auto !important'

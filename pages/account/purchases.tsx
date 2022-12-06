@@ -7,6 +7,7 @@ import React from "react";
 import { sleep } from '..';
 import { firestore } from '../../buildtime-deps/firebase';
 import { useAuth } from "../../providers/AuthProvider";
+import BodyScrollLock from '../../providers/BodyScrollLock';
 
 const Purchases = () => {
   const [purchasesList, setPurchasesList] = React.useState<any[] | null>(null);
@@ -58,6 +59,7 @@ const Purchases = () => {
   const [err, setErr] = React.useState<string>('');
   const [downloading, setDownloading] = React.useState<boolean>(false);
   const [progress, setProgress] = React.useState<number>(0);
+  const [downloadUrl, setDownloadUrl] = React.useState<string>('');
 
   const downloadPurchase = async (id: string, name?: string) => {
     setDownloadDialogOpen(id);
@@ -71,6 +73,7 @@ const Purchases = () => {
     }
     setDownloading(true);
 
+    await sleep(500);
     const res = await fetch(`/api/download-purchase?id=${id}`);
 
     if (res.status != 200) {
@@ -108,16 +111,11 @@ const Purchases = () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = (name || 'dokument') + '.pdf';
+    setDownloadUrl(url);
     a.click();
 
     await sleep(3000);
-
-    setDownloadDialogOpen('');
-    await sleep(1000);
-    setDownloading(false);
-    setProgress(0);
   }
-
   React.useEffect(() => {
     if (userProfile?.uid) getPurchases();
   }, [])
@@ -140,29 +138,50 @@ const Purchases = () => {
       </DialogActions>
     </Dialog>
     <Dialog scroll='body' open={!!downloadDialogOpen}>
-
       <DialogContent className='inline-flex min-w-[98vw] sm:min-w-[30rem] w-full flex-col items-center'>
-        <div className='flex flex-col w-full'>
+        <BodyScrollLock>
+          <div className='flex flex-col w-full'>
 
-          <h4 className='text-left font-bold w-full'>{progress < 100 ? (downloading ? 'Trwa pobieranie Twojego pisma.' : 'Przygotowujemy Twoje pismo do pobrania.') : 'Pomyślnie pobrano'}</h4>
-          <p className='w-full'>{progress < 100 ? 'Nie opuszczaj strony.' : 'Możesz teraz wydrukować swoje pismo.'}</p>
-        </div>
-        <LinearProgress variant={downloading ? 'determinate' : 'indeterminate'} value={downloading ? progress : undefined} className='mt-4 rounded h-[2rem] w-full' />
+            <h4 className='text-left font-bold w-full'>{progress < 100 ? (downloading ? 'Trwa pobieranie Twojego pisma.' : 'Przygotowujemy Twoje pismo do pobrania.') : 'Pomyślnie pobrano'}</h4>
+            <p className='w-full'>{progress < 100 ? 'Nie opuszczaj strony.' : 'Możesz teraz wydrukować swoje pismo.'}</p>
+          </div>
+          <LinearProgress variant={downloading ? 'determinate' : 'indeterminate'} value={downloading ? progress : undefined} className='mt-4 rounded h-[2rem] w-full' />
+          {progress === 100
+            ? <p className='w-full mt-4'>
+              <a href={downloadUrl} download={(purchasesList?.find((({ id }) => id === downloadDialogOpen))?.product_name?.toLowerCase()?.replace(' ', '-') || 'dokument') + '.pdf'} className='text-blue-500'>Kliknij tutaj, jeśli plik nie zapisał się automatycznie.</a>
+            </p>
+            : null
+          }
+          {progress === 100
+            ?
+            <Button className='border-none bg-red-100 self-end text-red-500 mt-4' onClick={async () => {
+              setDownloadDialogOpen('');
+              await sleep(1000);
+              setDownloading(false);
+              setDownloadUrl('');
+              setProgress(0);
+            }} size='small' color='error'>Zamknij</Button>
+            : null
+          }
+        </BodyScrollLock>
       </DialogContent>
     </Dialog>
     <h1>
       <ShoppingBag color='primary' className='-translate-y-1' /> Twoje zakupy
     </h1>
     <p className='mb-8'>Tutaj możesz uzyskać dostęp do zakupionych pism.</p>
-    <div className='inline-flex my-6 flex-col-reverse sm:flex-row gap-3 sm:items-center'>
-      <img src='/succesful-purchase.svg' className='max-w-[15rem]' />
-      <div className='flex flex-col text-blue-500 rounded'>
-        <h4 className='font-bold'>Dziękujemy za zakup!</h4>
-        <p className='text-blue-400'>
-          Pismo zostało dodane do Twojego konta. Możesz je pobrać w dowolnym momencie.
-        </p>
+    {paymentIntentId ?
+      <div className='inline-flex my-6 flex-col-reverse sm:flex-row gap-3 sm:items-center'>
+        <img src='/succesful-purchase.svg' className='max-w-[15rem]' />
+        <div className='flex flex-col text-blue-500 rounded'>
+          <h4 className='font-bold'>Dziękujemy za zakup!</h4>
+          <p className='text-blue-400'>
+            Pismo zostało dodane do Twojego konta. Możesz je pobrać w dowolnym momencie.
+          </p>
+        </div>
       </div>
-    </div>
+      : null
+    }
     <div className='inline-flex mb-12 w-full gap-3 flex-wrap-reverse justify-between items-center '>
       <p>
         Jeśli pismo, które zakupiłeś/aś nie pojawi się na liście w przeciągu 10 minut pomimo odświeżenia strony
@@ -205,27 +224,29 @@ const Purchases = () => {
             <div className='flex items-center justify-between flex-wrap'>
               <p className='text-sm'><b className='font-normal text-slate-500'>Zapłacono:</b> <b className='text-inherit'>{(purchase.product_price / 100).toFixed(2).toString().replace('.', ',')}zł</b></p>
               <div className='inline-flex bg-white rounded items-center gap-2 ml-auto'>
-                <LoadingButton onClick={() => downloadPurchase(purchase.id)} className='border-none bg-white' disabled={!purchase.contents} ><Download /></LoadingButton>
+                <LoadingButton onClick={() => downloadPurchase(purchase.id, purchase!.product_name.toLowerCase().replace(' ', '-'))} className='border-none bg-white' disabled={!purchase.contents || progress != 0} ><Download /></LoadingButton>
                 <Button className='border-none bg-white' disabled={!purchase.contents} color='error' onClick={() => setDeleteDialogOpen(purchase.id)}><Delete /></Button>
               </div>
             </div>
 
           </div>
-            {index < arr.length - 1
-              ?
-              <div className='w-full border-slate-100 my-4' />
-              : null
+            {
+              index < arr.length - 1
+                ?
+                <div className='w-full border-slate-100 my-4' />
+                : null
             }
           </>)
           :
           <div
             className={
-              "p-4 flex items-center justify-center rounded-lg border h-32 mt-4"
+              "p-12 flex items-center justify-center rounded-lg bg-slate-100  mt-4"
             }
           >
             <div className={"flex flex-col"}>
               <pre>brak zakupów</pre>
               <p className={"mt-1"}>Nie dokonałeś/aś jeszcze żadnych zakupów w naszym serwisie.</p>
+              <img src='/empty-street.svg' className='max-w-[30rem] mt-4' />
             </div>
           </div>
         }

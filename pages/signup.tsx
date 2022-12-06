@@ -94,10 +94,10 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
                     : val?.length < 6
                       ? "Hasło musi mieć conajmniej 6 znaków."
                       : null,
-                repeatPassword: (val: any) =>
+                repeatPassword: (val: string) =>
                   !val
                     ? "To pole jest wymagane."
-                    : values.password !== values.repeatPassword
+                    : values.password !== val
                       ? "Hasła nie są takie same."
                       : null,
                 name: (val: any) => (!val ? "To pole jest wymagane." : null),
@@ -110,39 +110,45 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
                     as={TextField}
                     name={"email"}
                     label={"adres e-mail"}
+
                     className={"mt-4"}
-                    size={"small"}
                     validate={validators.email}
                   />
                   <ErrorMessage name={"email"}>
                     {ErrorMessageFunction}
                   </ErrorMessage>
 
-                  <Field disabled={loading || loadingGoogle || loadingFacebook}
-                    error={errors.name && touched.name}
-                    as={TextField}
-                    name={"name"}
-                    label={"imię"}
-                    className={"mt-2"}
-                    size={"small"}
-                    validate={validators.name}
-                  />
-                  <ErrorMessage name={"name"}>
-                    {ErrorMessageFunction}
-                  </ErrorMessage>
+                  <div className="inline-flex gap-2 w-full">
+                    <div className="flex flex-col w-full">
+                      <Field disabled={loading || loadingGoogle || loadingFacebook}
+                        error={errors.name && touched.name}
+                        as={TextField}
+                        name={"name"}
+                        label={"imię"}
+                        className={"mt-2"}
+                        size={"small"}
+                        validate={validators.name}
+                      />
+                      <ErrorMessage name={"name"}>
+                        {ErrorMessageFunction}
+                      </ErrorMessage>
+                    </div>
 
-                  <Field disabled={loading || loadingGoogle || loadingFacebook}
-                    error={errors.surname && touched.surname}
-                    as={TextField}
-                    name={"surname"}
-                    label={"nazwisko"}
-                    className={"mt-2"}
-                    size={"small"}
-                    validate={validators.surname}
-                  />
-                  <ErrorMessage name={"surname"}>
-                    {ErrorMessageFunction}
-                  </ErrorMessage>
+                    <div className="flex flex-col w-full">
+                      <Field disabled={loading || loadingGoogle || loadingFacebook}
+                        error={errors.surname && touched.surname}
+                        as={TextField}
+                        name={"surname"}
+                        label={"nazwisko"}
+                        className={"mt-2"}
+                        size={"small"}
+                        validate={validators.surname}
+                      />
+                      <ErrorMessage name={"surname"}>
+                        {ErrorMessageFunction}
+                      </ErrorMessage>
+                    </div>
+                  </div>
 
                   <Field disabled={loading || loadingGoogle || loadingFacebook}
                     error={errors.password && touched.password}
@@ -178,7 +184,7 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
                       isValid ? submitForm() : setError('Wypełnij pola poprawnie.')
                     }}>
                     <span className={`${loading ? 'opacity-0' : null} flex items-center`}>
-                      Zarejestruj się
+                      Załóż konto
                       <ArrowRight />
                     </span>
 
@@ -188,7 +194,7 @@ const SignUp = ({ redirect }: { redirect?: string }) => {
               );
             }}
           </Formik>
-          <p className={"text-sm mt-4"}>Lub zarejestruj się przez:</p>
+          <p className={"text-sm mt-4"}>Lub zarejestruj się jednym kliknięciem przez:</p>
           <Button onClick={signInGoogle} loading={loadingGoogle} disabled={loading || loadingFacebook} className={`mt-2 p-2 ${loadingFacebook || loading ? 'bg-gray-100' : 'bg-red-200 text-red-500'} border-none flex`}>
             <div className={`flex-1 ${loadingGoogle ? 'opacity-0' : null} flex items-center justify-between pl-2 pr-2`}>
               <Google className={'mr-2'} />

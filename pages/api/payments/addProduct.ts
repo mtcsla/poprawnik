@@ -42,53 +42,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       return;
     }
 
-    const product = await stripe.products.create({
-      name: data.title,
-    });
-    const price = await stripe.prices.create({
-      product: product.id,
-      currency: "pln",
-      unit_amount: (parseFloat(req.query.price as string) ?? 100) * 100,
-    });
-
     await firebaseAdmin.firestore().collection("forms").doc(id).update({
       published: true,
       awaitingVerification: false,
     });
 
-    if (req.query.category) {
-      await firebaseAdmin
-        .firestore()
-        .collection("categories")
-        .doc(req.query.category as string)
-        .set({
-          count: 1,
-        });
-    } else {
-      const count =
-        ((
-          await firebaseAdmin
-            .firestore()
-            .collection("categories")
-            .doc(data.category as string)
-            .get()
-        ).data()?.count as number) + 1;
-      await firebaseAdmin
-        .firestore()
-        .collection("categories")
-        .doc(data.category as string)
-        .set({
-          count: count,
-        });
-    }
-
     await firebaseAdmin
       .firestore()
       .doc(`/products/${id}`)
       .set({
-        productId: product.id,
-        priceId: price.id,
-
         formData: data.formData,
         title: data.title,
         description: data.description,
@@ -102,6 +64,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
         verifiedBy: decodedToken.admin ? "admin" : decodedToken.uid,
       });
+
     await firebaseAdmin.firestore().doc(`/products-stats/${id}`).set({
       timesSold: 0,
     });

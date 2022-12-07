@@ -185,7 +185,7 @@ const Purchases = () => {
     <div className='inline-flex mb-12 w-full gap-3 flex-wrap-reverse justify-between items-center '>
       <p>
         Jeśli pismo, które zakupiłeś/aś nie pojawi się na liście w przeciągu 10 minut pomimo odświeżenia strony
-        powiadom nas o tym wysyłając wiadomość na adres e-mail <a href="mailto:pomoc@poprawnik.pl" className='font-bold text-blue-500'>pomoc@poprawnik.pl</a>.
+        powiadom nas o tym wysyłając wiadomość na adres e-mail <a href="mailto:pomoc@poprawnik.com" className='font-bold text-blue-500'>pomoc@poprawnik.com</a>.
       </p>
       <div className='flex flex-col ml-auto items-end'>
         <p className='text-sm text-slate-500'>

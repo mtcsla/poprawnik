@@ -15,7 +15,7 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
   let categories: string[] = [];
 
   try {
-    (await firebaseAdmin.firestore().collection('categories').get()).docs.forEach(doc => {
+    (await firebaseAdmin.firestore().collection('product-categories').get()).docs.forEach(doc => {
       categories.push(doc.id);
       allCategoriesDocsNumber += doc.data().count;
       if (
@@ -76,11 +76,14 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
 }
 export const getStaticPaths = async () => {
 
-  const categories = (await firebaseAdmin.firestore().collection('categories').get()).docs.map(
+  const categories = (await firebaseAdmin.firestore().collection('product-categories').get()).docs.map(
     (doc) => ({ category: doc.id, count: doc.data().count, pages: Math.floor(doc.data().count / 10) + 1 })
   );
   const allCount = categories.reduce((acc, cur) => acc + cur.count, 0);
-  const paths: string[] = [`/forms/list/all/${Math.floor(allCount / 10) + 1}`];
+  const paths: string[] = [];
+  for (let i = 1; i <= Math.floor(allCount / 10) + 1; i++) {
+    paths.push(`/forms/list/all/${i}`);
+  }
   for (const category of categories) {
     for (let i = 1; i <= category.pages; i++) {
       paths.push(`/forms/list/${category.category}/${i}`);

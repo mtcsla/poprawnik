@@ -5,7 +5,7 @@ import RichMarkdownEditor from "rich-markdown-editor";
 import { firebaseAdmin } from "../../buildtime-deps/firebaseAdmin";
 import ContentsList from "../../components/ContentsList.jsx";
 import { SidenavContent } from "../../providers/SidenavProvider";
-import { IArticleContents } from "../account/editor/edit";
+import { ArticleContents } from "../account/editor/edit";
 
 export const getStaticPaths = async (ctx: GetStaticPathsContext) => {
   const articles = await firebaseAdmin
@@ -19,6 +19,7 @@ export const getStaticPaths = async (ctx: GetStaticPathsContext) => {
     },
   }));
 
+
   return {
     paths,
     fallback: 'blocking',
@@ -31,7 +32,7 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
     await firebaseAdmin.firestore().doc(`articles/${articleId}`).get()
   ).data();
 
-  let notFound = !article || !article.visible;
+  let notFound = !article;
 
   return {
     props: {
@@ -42,7 +43,7 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
   };
 };
 
-const Article = ({ article }: { article: IArticleContents }) => {
+const Article = ({ article }: { article: ArticleContents }) => {
   return <>
     <div className={'w-full flex items-center justify-between'}>
       <div className={'flex items-center'}>

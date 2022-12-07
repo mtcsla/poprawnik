@@ -1,7 +1,7 @@
-import { doc, getDoc, updateDoc } from '@firebase/firestore';
+import { collection, doc, getDoc, getDocs, updateDoc } from '@firebase/firestore';
 import { deleteObject, ref } from "@firebase/storage";
 import { Add, EditRounded, ImageRounded, ModeEdit } from "@mui/icons-material";
-import { Button, Chip, Menu, MenuItem, Skeleton, TextField } from "@mui/material";
+import { Button, Chip, FormControl, InputLabel, Menu, MenuItem, Select, Skeleton, TextField } from "@mui/material";
 import debounce from "debounce";
 import Link from "next/link";
 import { useRouter } from 'next/router';
@@ -12,9 +12,9 @@ import ArticleImage from "../../../components/edit-article/ImageUpload";
 import { useAuth } from "../../../providers/AuthProvider";
 import { SidenavContent } from "../../../providers/SidenavProvider";
 
-const updateFirestore = async (article: IArticleContents) => {
+const updateFirestore = async (article: ArticleContents) => {
 
-  await updateDoc(doc(firestore, `/articles/${article.id}`), {
+  await updateDoc(doc(firestore, `/article-drafts/${article.id}`), {
     ...article,
   });
 };
@@ -25,8 +25,8 @@ const debouncedUpdate =
 
 const Edit = () => {
   const [article, modify] = useReducer<
-    Reducer<IArticleContents | null, [ArticleEditAction, any]>,
-    IArticleContents | null
+    Reducer<ArticleContents | null, [ArticleEditAction, any]>,
+    ArticleContents | null
   >(reducer, null, () => null);
 
   const [addingNew, setAddingNew] = React.useState(false);
@@ -35,6 +35,8 @@ const Edit = () => {
   const { user, userProfile } = useAuth();
   const router = useRouter();
 
+  const [categories, setCategories] = React.useState<string[]>([]);
+
 
   useEffect(() => {
     if (article)
@@ -42,12 +44,16 @@ const Edit = () => {
   }, [article]);
   useEffect(() => {
     if (!article && router.isReady && userProfile) {
-      getDoc(doc(firestore, `/articles/${router.query.id}`)).then((snapshot) => {
+      getDocs(collection(firestore, `article-categories`)).then((snapshot) => {
+        setCategories(snapshot.docs.map(doc => doc.id));
+      });
+
+      getDoc(doc(firestore, `/article-drafts/${router.query.id}`)).then((snapshot) => {
         if (!snapshot.data()) {
           router.push('/account/editor')
           return
         }
-        modify(['set', { ...snapshot.data(), id: snapshot.id } as IArticleContents]);
+        modify(['set', { ...snapshot.data(), id: snapshot.id } as ArticleContents]);
       });
     }
   }, [userProfile, router.isReady])
@@ -63,17 +69,35 @@ const Edit = () => {
         <TextField
           className={"w-full mt-4"}
           label={"tytuł"}
-          size={"small"}
           value={article.title}
-          onChange={(title) => modify(["set-title", title.target.value])}
+          onChange={(event) => modify(["set-title", event.target.value])}
         />
         <TextField
           className={"w-full mt-4"}
           label={"podtytuł"}
-          size={"small"}
           value={article.subtitle}
-          onChange={(title) => modify(["set-subtitle", title.target.value])}
+          onChange={(event) => modify(["set-subtitle", event.target.value])}
         />
+        <FormControl className='w-full mt-4'>
+          <InputLabel>kategoria</InputLabel>
+          <Select label='kategoria' value={
+            article.category
+          } onChange={(event) => {
+            modify(["set-new-category", '']);
+            modify(["set-category", event.target.value]);
+          }}>
+            <MenuItem value={"_new"}>nowa kategoria</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField
+          className={"w-full mt-4"}
+          label={"nowa kategoria"}
+          value={article.newCategory}
+          onChange={(event) => modify(["set-new-category", event.target.value])}
+        />
+
+
+
         <div className={"mt-10 mb-8 w-full"} />
         <article className={"flex flex-col"}>
           <h1>{article.title}</h1>
@@ -186,9 +210,9 @@ const Edit = () => {
 export default Edit;
 
 function reducer(
-  state: IArticleContents | null,
+  state: ArticleContents | null,
   action: [ArticleEditAction, any]
-): IArticleContents {
+): ArticleContents {
   if (state == null)
     return action[1];
   if (action[0].includes("set-fragment-value")) {
@@ -248,6 +272,16 @@ function reducer(
         ...state,
         contents: [...state.contents, action[1]],
       };
+    case "set-category":
+      return {
+        ...state,
+        category: action[1],
+      };
+    case "set-new-category":
+      return {
+        ...state,
+        newCategory: action[1],
+      };
   }
 }
 
@@ -259,9 +293,11 @@ type ArticleEditAction =
   | "append-fragment"
   | `set-fragment-value-${number}`
   | `delete-fragment-${number}`
-  | `insert-fragment-${number}`;
+  | `insert-fragment-${number}`
+  | "set-category"
+  | "set-new-category";
 
-export interface IArticleContents {
+export interface ArticleContents {
   id?: string;
   authorPictureURL?: string;
   coverURL: string;
@@ -270,6 +306,8 @@ export interface IArticleContents {
   visible: boolean;
   title: string;
   subtitle: string;
+  category: string;
+  newCategory: string;
   contents: {
     type: "markdown" | "alert" | "image";
     value:

@@ -34,7 +34,7 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
   let products: any[] = [];
   let productsStats: { [id: string]: number } = {};
 
-  await firebaseAdmin.firestore().collection('categories').get().then(snap => {
+  await firebaseAdmin.firestore().collection('product-categories').get().then(snap => {
     categories = snap.docs.map(doc => doc.id);
   })
   await firebaseAdmin.firestore().collection('products').get().then(snap => {

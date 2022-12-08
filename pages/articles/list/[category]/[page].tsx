@@ -9,6 +9,9 @@ import Link from 'next/link';
 import { useRouter } from "next/router";
 import React from "react";
 
+
+
+
 export const getStaticProps = async (ctx: GetStaticPropsContext) => {
   const category = ctx.params?.["category"];
   const page = ctx.params?.["page"];

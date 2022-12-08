@@ -57,11 +57,6 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
     }
   )
 
-  console.log(
-    mostPopularProducts
-  )
-
-
   return {
     props: { categories, mostPopularProducts },
   }

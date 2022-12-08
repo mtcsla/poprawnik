@@ -22,7 +22,7 @@ export default function SearchBar() {
   const [isMac, setIsMac] = React.useState(false);
 
   React.useEffect(
-    () => { setIsMac(window.navigator.platform.toLowerCase().includes('mac')); console.log(window.navigator.platform) }, []
+    () => { setIsMac(window.navigator.platform.toLowerCase().includes('mac')); }, []
   )
 
 

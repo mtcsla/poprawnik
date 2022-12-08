@@ -19,8 +19,6 @@ export const getStaticPaths = async () => {
       paths.push('/forms/' + doc.id);
     }
   )
-  console.log(paths)
-
   return { paths, fallback: true };
 }
 export const getStaticProps = async (context: GetStaticPropsContext) => {
@@ -31,7 +29,6 @@ export const getStaticProps = async (context: GetStaticPropsContext) => {
 
   try {
     const form = (await firebaseAdmin.firestore().doc(`products/${context.params!.id}`).get()).data()
-    console.log(context.params)
 
     return { props: { form: form ?? null, error: '' } };
   }

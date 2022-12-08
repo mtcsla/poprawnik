@@ -159,7 +159,7 @@ const Articles = ({ articles, category, pagesNumber, page, categories }: {
         </FormControl>
       </div>
       {articles.map((article) => (
-        <Link href={`articles/${article.id}`} passHref>
+        <Link href={`/articles/${article.id}`} passHref>
           <a>
             <div className={"flex flex-col w-full"}>
               <div

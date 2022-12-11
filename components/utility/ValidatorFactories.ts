@@ -19,10 +19,10 @@ export namespace Validators {
           const parser = field.numberType === "real" ? parseFloat : parseInt;
 
           const min = field.min
-            ? parser((field.min as string).replaceAll(",", "."))
+            ? parser((field.min as string).replace(/,/g, "."))
             : -1000000000000000000000000000000000000000000000;
           const max = field.max
-            ? parser((field.max as string).replaceAll(",", "."))
+            ? parser((field.max as string).replace(/,/g, "."))
             : 1000000000000000000000000000000000000000000000;
 
           if (field.numberType === "real") {

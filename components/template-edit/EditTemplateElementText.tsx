@@ -17,17 +17,17 @@ export const EditTemplateElementText = ({ path, index, onChange, element }: {
 
   const process = React.useCallback((text: string) => {
     let newText = text;
-    newText = newText.replaceAll('\n', '⮐')
-    newText = newText.replaceAll(' ', '•');
-    newText = newText.replaceAll('\t', '••');
-    newText = newText.replaceAll('••', '⇥');
+    newText = newText.replace(/\n/g, '⮐')
+    newText = newText.replace(/ /g, '•');
+    newText = newText.replace(/\t/g, '••');
+    newText = newText.replace(/••/g, '⇥');
     return newText;
   }, [])
   const normalize = React.useCallback((text: string) => {
     let newText = text;
-    newText = newText.replaceAll('⇥', '\t');
-    newText = newText.replaceAll('•', ' ');
-    newText = newText.replaceAll('⮐', '\n');
+    newText = newText.replace(/⇥/g, '\t');
+    newText = newText.replace(/•/g, ' ');
+    newText = newText.replace(/⮐/g, '\n');
     return newText
   }, []);
 

@@ -73,10 +73,10 @@ const useHeadingsData = () => {
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .replace(/\s/g, "-")
-        .replaceAll("ł", "l")
-        .replaceAll(".", "")
-        .replaceAll(",", "")
-        .replaceAll("#", "");
+        .replace(/ł/g, "l")
+        .replace(/./g, "")
+        .replace(/,/g, "")
+        .replace(/#/g, "");
 
       heading.id = `${id}`;
       const anchor = document.getElementById(`h-${id}`);
@@ -142,7 +142,6 @@ const useIntersectionObserver = (setActiveId, headingElements) => {
       }
     };
 
-
     const rem = getComputedStyle(document.documentElement).fontSize;
 
     const value = `-${
@@ -165,7 +164,7 @@ export const headingToId = (heading) =>
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s/g, "-")
-    .replaceAll("ł", "l")
-    .replaceAll(".", "")
-    .replaceAll(",", "")
-    .replaceAll("#", "");
+    .replace(/ł/g, "l")
+    .replace(/./g, "")
+    .replace(/,/g, "")
+    .replace(/#/g, "");

@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import { firebaseAdmin } from "../../../buildtime-deps/firebaseAdmin";
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
-import { i } from "mathjs";
 
 const stripe = new Stripe(process.env.STRIPE_TEST_KEY_SECRET as string, {
   apiVersion: "2022-08-01",
@@ -30,20 +29,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         JSON.stringify({ message: "Invalid user token", code: 400 })
       );
     }
-
     const user = await firebaseAdmin.auth().getUser(token.uid);
-
-    let customer: Stripe.Customer | null = null;
-    try {
-      customer = await stripe.customers.create({
-        email: user.email,
-        name: user.displayName,
-      });
-    } catch {
-      throw new Error(
-        JSON.stringify({ message: "Failed to create customer", code: 500 })
-      );
-    }
 
     let formDoc: firebaseAdmin.firestore.DocumentSnapshot | null = null;
     try {
@@ -111,12 +97,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       );
     }
 
-    res.status(200).json({ clientSecret: paymentIntent.client_secret });
+    return res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       message: JSON.parse(error.message).message,
       code: JSON.parse(error.message).code,
     });
-    return;
   }
 };

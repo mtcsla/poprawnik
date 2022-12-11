@@ -37,9 +37,9 @@ type Contexts = {
 
 const normalizeText = (text: string) => {
   let newText = text;
-  newText = newText.replaceAll("⇥", "\t");
-  newText = newText.replaceAll("•", " ");
-  newText = newText.replaceAll("⮐", "\n");
+  newText = newText.replace(/⇥/g, "\t");
+  newText = newText.replace(/•/g, " ");
+  newText = newText.replace(/⮐/g, "\n");
   return newText;
 };
 

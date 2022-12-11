@@ -6,51 +6,52 @@ import AuthWrapper from "../components/page-wrappers/AuthWrapper";
 import "../styles/globals.css";
 
 import nprogress from "nprogress";
+nprogress.configure({ showSpinner: false });
 
 Router.events.on('routeChangeStart', () => {
-  nprogress.start();
+	nprogress.start();
 
 })
 Router.events.on('routeChangeComplete', () => {
-  nprogress.done();
+	nprogress.done();
 })
 Router.events.on('routeChangeError', () => {
-  nprogress.done();
+	nprogress.done();
 })
 
 import Head from "next/head";
 import AccountPageWrapper from "../components/page-wrappers/AccountPageWrapper";
 
 function MyApp({ Component, pageProps }: any) {
-  const router = useRouter();
+	const router = useRouter();
 
-  return (
-    <>
-      <Head>
-        <title>POPRAWNIK • Serwis z pismami sądowymi</title>
-        <meta name="theme-color" content="#fff" />
-        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css' />
-      </Head>
-      <AppContextWrapper>
-        {pageWithAppropriateWrapper(
-          router.pathname,
-          <Component {...pageProps} />
-        )}
-      </AppContextWrapper>
-    </>
-  );
+	return (
+		<>
+			<Head>
+				<title>POPRAWNIK • Serwis z pismami sądowymi</title>
+				<meta name="theme-color" content="#fff" />
+				<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css' />
+			</Head>
+			<AppContextWrapper>
+				{pageWithAppropriateWrapper(
+					router.pathname,
+					<Component {...pageProps} />
+				)}
+			</AppContextWrapper>
+		</>
+	);
 }
 
 const pageWithAppropriateWrapper = (location: string, component: ReactNode) => {
-  if (location === '/' || (location.includes('forms') && !location.includes('list')))
-    return component;
+	if (location === '/' || (location.includes('forms') && !location.includes('list')))
+		return component;
 
-  if (location.includes("/login") || location.includes("/signup"))
-    return <AuthWrapper>{component}</AuthWrapper>;
-  if (location.includes("/account"))
-    return <AccountPageWrapper>{component}</AccountPageWrapper>
+	if (location.includes("/login") || location.includes("/signup"))
+		return <AuthWrapper>{component}</AuthWrapper>;
+	if (location.includes("/account"))
+		return <AccountPageWrapper>{component}</AccountPageWrapper>
 
-  return <div className="flex flex-col"><AppWrapper>{component}</AppWrapper></div>;
+	return <div className="flex flex-col"><AppWrapper>{component}</AppWrapper></div>;
 };
 
 export default MyApp;

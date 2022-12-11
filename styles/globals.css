@@ -174,9 +174,17 @@ h6 {
   z-index: 100000 !important;
   position: absolute;
 }
+#nprogeess .spinner {
+  display: none;
+}
+#nprogress .peg {
+  height: 5px;
+  background: #93c5fd;
+  display: none;
+}
 #nprogress .bar {
-  height: 3px;
-  background: #0070f3;
+  height: 5px;
+  background: #93c5fd;
 }
 
 .transition_transform {

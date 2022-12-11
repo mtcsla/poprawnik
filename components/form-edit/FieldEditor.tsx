@@ -479,8 +479,8 @@ const FieldEditor = () => {
                                   return 'To pole musi zawierać poprawną liczbę całkowitą.'
 
                                 if (values.numberType === 'real'
-                                  ? parseFloat(value.replaceAll(',', '.')) <= parseFloat((values.min as string).replaceAll(',', '.'))
-                                  : parseInt(value.replaceAll(',', '.')) <= parseInt((values.min as string).replaceAll(',', '.'))
+                                  ? parseFloat(value.replace(/,/g, '.')) <= parseFloat((values.min as string).replace(/,/g, '.'))
+                                  : parseInt(value.replace(/,/g, '.')) <= parseInt((values.min as string).replace(/,/g, '.'))
                                 )
                                   return 'Wartość maksymalna musi być większa od wartości minimalnej.'
                                 return null;

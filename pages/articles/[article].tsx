@@ -19,7 +19,6 @@ export const getStaticPaths = async (ctx: GetStaticPathsContext) => {
     },
   }));
 
-
   return {
     paths,
     fallback: 'blocking',
@@ -38,7 +37,6 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
     props: {
       article,
     },
-    revalidate: 60 * 60 * 12,
     notFound,
   };
 };

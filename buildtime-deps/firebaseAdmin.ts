@@ -1,10 +1,6 @@
-import chalk from "chalk";
 import * as firebaseAdmin from "firebase-admin";
 
-// get this JSON from the Firebase board
-// you can also store the values in environment variables
-
-const dev = false;
+const dev = process.env.NODE_ENV == "development";
 
 const serviceAccount = JSON.parse(
   dev

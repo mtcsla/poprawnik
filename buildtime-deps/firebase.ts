@@ -3,16 +3,16 @@ import { getFirestore } from "@firebase/firestore";
 import { getStorage } from "@firebase/storage";
 import { getAuth } from "@firebase/auth";
 
-const devConfig = {
-  apiKey: "AIzaSyBNiZwjBb_UFqvgweyrv-QayFTWxom1Dh4",
-  authDomain: "trustree-fd2aa.firebaseapp.com",
-  projectId: "trustree-fd2aa",
-  storageBucket: "trustree-fd2aa.appspot.com",
-  messagingSenderId: "972787504894",
-  appId: "1:972787504894:web:2a4382e9d9737152d137af",
-  measurementId: "G-VWQNT29FTM",
-};
 const prodConfig = {
+  apiKey: "AIzaSyCk_vIY4toVfR9KBDH1aVZ4DW80DFiKm7U",
+  authDomain: "poprawnik-prod.firebaseapp.com",
+  projectId: "poprawnik-prod",
+  storageBucket: "poprawnik-prod.appspot.com",
+  messagingSenderId: "202331496756",
+  appId: "1:202331496756:web:a5d03e3563afed44344561",
+  measurementId: "G-R7XF3CTHQE",
+};
+const devConfig = {
   apiKey: "AIzaSyDwIgbpl5E_h6WQWAu33rRSzfj6I5zqLnI",
   authDomain: "trustree-release.firebaseapp.com",
   projectId: "trustree-release",
@@ -22,19 +22,16 @@ const prodConfig = {
   measurementId: "G-RC8D0J99L5",
 };
 
-const dev = //process.env.NODE_ENV == "development";
-  false;
+const dev = process.env.NODE_ENV == "development";
 
 let firebase_app;
-
-initializeApp(prodConfig, "Iusinus");
 
 if (!getApps().length) {
   firebase_app = initializeApp(
     dev ? devConfig : prodConfig,
-    dev ? "Iusinus DEV" : "Iusinus"
+    dev ? "Iusinus" : "POPRAWNIK"
   );
-} else firebase_app = getApp(dev ? "Iusinus DEV" : "Iusinus");
+} else firebase_app = getApp(dev ? "Iusinus" : "POPRAWNIK");
 
 export const app = firebase_app;
 export const firestore = getFirestore(app);

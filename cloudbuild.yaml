@@ -1,13 +1,16 @@
 steps:
   - name: node
+    id: Install dependencies
     entrypoint: npm
     args: ["install"]
   - name: node
+    id: Build NextJS bundle
     entrypoint: npm
     args: ["run", "build"]
     secretEnv:
       ["SERVICE_ACCOUNT_PROD", "REVALIDATE_SECRET", "STRIPE_TEST_KEY_SECRET"]
   - name: "gcr.io/cloud-builders/gcloud"
+    id: Deploy to App Engine
     args: ["app", "deploy"]
 options:
   logging: CLOUD_LOGGING_ONLY

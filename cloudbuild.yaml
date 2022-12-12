@@ -2,23 +2,30 @@ steps:
   - name: node
     id: Install dependencies
     entrypoint: npm
-    args: ["install"]
+    args:
+      - install
   - name: node
     id: Build NextJS bundle
     entrypoint: npm
-    args: ["run", "build"]
+    args:
+      - run
+      - build
     secretEnv:
       ["SERVICE_ACCOUNT_PROD", "REVALIDATE_SECRET", "STRIPE_TEST_KEY_SECRET"]
-  - name: "gcr.io/cloud-builders/gcloud"
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: Deploy to App Engine
-    args: ["app", "deploy"]
+    entrypoint: gcloud
+    args:
+      - app
+      - deploy
+      - --quiet
 options:
   logging: CLOUD_LOGGING_ONLY
 availableSecrets:
   secretManager:
-    - versionName: projects/202331496756/secrets/FIREBASE_SERVICE_ACCOUNT_PROD
+    - versionName: projects/202331496756/secrets/FIREBASE_SERVICE_ACCOUNT_PROD/versions/1
       env: "SERVICE_ACCOUNT_PROD"
-    - versionName: projects/202331496756/secrets/NEXT_REVALIDATE_SECRET
+    - versionName: projects/202331496756/secrets/NEXT_REVALIDATE_SECRET/versions/1
       env: "REVALIDATE_SECRET"
-    - versionName: projects/202331496756/secrets/STRIPE_TEST_SECRET
+    - versionName: projects/202331496756/secrets/STRIPE_TEST_SECRET/versions/1
       env: "STRIPE_TEST_KEY_SECRET"

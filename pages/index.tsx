@@ -355,7 +355,7 @@ export const MostPopularProducts = ({
 					{width && width >= 720
 						? <div className='flex xl:flex-shrink min-w-fit xl:flex-grow'>
 							<div className='xl:flex-1 w-12 xl:w-full h-full ' />
-							<div className='flex  flex-col bg-slate-50  p-8 rounded' >
+							<div className='flex  flex-col  p-8 rounded' >
 								<pre className='self-end mb-4'>Najpopularniejsze pisma</pre>
 								<FormControl className='w-full'>
 									<InputLabel>kategoria</InputLabel>
@@ -371,7 +371,7 @@ export const MostPopularProducts = ({
 									</Select>
 								</FormControl>
 								<div className='relative min-w-fit'>
-									<div className='absolute top-4 left-0 right-0 bottom-0 z-50 pointer-events-none' style={{ background: 'linear-gradient(0deg, rgba(248,250,252,1) 0%, rgba(248,250,252,0) 10%, rgba(248,250,252,0) 90%, rgba(248,250,252,1) 100%)' }} />
+									<div className='absolute top-4 left-0 right-0 bottom-0 z-50 pointer-events-none' style={{ background: 'linear-gradient(0deg, rgba(256,256,256,1) 0%, rgba(256,256,256,0) 10%, rgba(256,256,256,0) 90%, rgba(256,256,256,1) 100%)' }} />
 
 									<div className='relative mt-4 w-fit overflow-y-scroll' style={{ maxHeight: '30rem' }}>
 										<div className='gap-4 my-4 min-w-fit grid grid-cols-1 xl:grid-cols-2' >
@@ -425,7 +425,7 @@ export const MostPopularProducts = ({
 						: <div />
 					}
 
-					<div className={`flex flex-col ${width && width < 720 ? '-ml-8 sm:-ml-12 -mr-8 sm:-mr-12 bg-slate-50 pt-12' : ''} my-auto`}>
+					<div className={`flex flex-col ${width && width < 720 ? '-ml-8 sm:-ml-12 -mr-8 sm:-mr-12  pt-12' : ''} my-auto`}>
 						<div className={`flex flex-col self-end flex-shrink justify-center ${width && width < 720 ? 'px-8 sm:px-12' : ''} w-fit`} style={{ maxWidth: '25rem', minWidth: 0 }}>
 							<h2 className='font-bold text-3xl text-right'>Mamy <b className='text-blue-500'>wszystko</b>, czego potrzebujesz.</h2>
 
@@ -435,7 +435,7 @@ export const MostPopularProducts = ({
 							</p>
 						</div>
 						{width && width < 720
-							? <div className='flex flex-col w-screen bg-slate-50 pb-12 pt-12'>
+							? <div className='flex flex-col w-screen pb-12 pt-12'>
 								<FormControl className='w-full pr-16 sm:pr-24 ml-8 sm:ml-12'>
 									<InputLabel>kategoria</InputLabel>
 									<Select value={category} onChange={e => setCategory(e.target.value)} defaultValue='any' label='kategoria'>
@@ -449,7 +449,7 @@ export const MostPopularProducts = ({
 										}
 									</Select>
 								</FormControl>
-								<div className='flex items-start py-4 bg-slate-50 w-screen overflow-x-scroll'>
+								<div className='flex items-start py-4  w-screen overflow-x-scroll'>
 									{
 										mostPopularProducts[category].map(product => <ProductCard {...{ product }} first inRow />)
 									}
@@ -507,7 +507,7 @@ export const ProductCard = ({ product, first, inRow }: { product: any, first?: b
 	return <Link href={`/forms/${product.id}`} passHref>
 		<a>
 			<Button className='p-0 text-normal normal-case text-left'>
-				<div style={{ minHeight: '24rem', width: '20rem', minWidth: '20rem' }} className={`flex transition-colors p-4 sm:p-8 flex-col ${first ? 'ml-8 sm:ml-12' : inRow ? 'ml-4' : ''}  h-fit hover:bg-slate-200 text-black shadow cursor-pointer bg-slate-100 rounded-lg `}>
+				<div style={{ minHeight: '24rem', width: '20rem', minWidth: '20rem' }} className={`flex transition-colors p-4 sm:p-8 flex-col ${first ? 'ml-8 sm:ml-12' : inRow ? 'ml-4' : ''}  h-fit hover:bg-slate-200 text-black cursor-pointer bg-slate-100 rounded-lg `}>
 
 					<h2 className='flex text-inherit whitespace-normal mb-1 text-lg sm:text-xl'>
 						{

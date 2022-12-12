@@ -10,6 +10,8 @@ steps:
     args: ["run", "create-env"]
     env:
       - "NODE_ENV=production"
+    secretEnv:
+      ["SERVICE_ACCOUNT_PROD", "REVALIDATE_SECRET", "STRIPE_TEST_KEY_SECRET"]
 
   - name: node
     id: Build NextJS bundle
@@ -17,8 +19,6 @@ steps:
     args:
       - run
       - build
-    secretEnv:
-      ["SERVICE_ACCOUNT_PROD", "REVALIDATE_SECRET", "STRIPE_TEST_KEY_SECRET"]
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: Deploy to App Engine
     entrypoint: gcloud

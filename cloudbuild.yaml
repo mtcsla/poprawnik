@@ -5,6 +5,13 @@ steps:
     args:
       - install
   - name: node
+    id: Set NODE_ENV to production
+    entrypoint: npm
+    args: ["run", "create-env"]
+    env:
+      - "NODE_ENV=production"
+
+  - name: node
     id: Build NextJS bundle
     entrypoint: npm
     args:

@@ -8,7 +8,8 @@
     "start": "export NODE_ENV=production && next start -p 8080",
     "deploy": "next build && gcloud app deploy --quiet &&  afplay /System/Library/Sounds/Glass.aiff && say \"Google Cloud deploy complete.\"",
     "lint": "next lint",
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "create-env": "printenv > .env"
   },
   "engines": {
     "node": ">=14.0.0"

@@ -138,13 +138,13 @@ const FormFinalize = () => {
 						{formDoc?.description}
 					</p>
 
-					<p className='text-xs mt-8 text-slate-500'>
+					<p className='text-xs mt-8 text-slate-500 hidden sm:block'>
 						* Cena zawiera podatek VAT
 						<br />
 						† Po dokonaniu zakupu pisma nie będzie można już zmienić danych w formularzu
 					</p>
 				</div>
-				<div className='flex flex-col w-full sm:min-w-[25rem] ml-auto'>
+				<div className='flex flex-col w-full sm:max-w-[30rem] ml-auto'>
 
 					{userProfile && clientSecret && formDoc ?
 						<>
@@ -165,12 +165,17 @@ const FormFinalize = () => {
 							</span>
 							<Skeleton variant='rectangular' className='mb-6 rounded' height={50} />
 							<Skeleton variant='rectangular' className='mb-6 rounded' height={50} />
-							<LoadingButton disabled color='primary' className={`bg-gray-100 w-full normal-case sm:p-4 p-2 mt-4  self-start border-none`}>
+							<LoadingButton disabled color='primary' className={`bg-gray-100 w-full normal-case p-2 mt-4  self-start border-none`}>
 								ZAPŁAĆ {formDoc ? `${(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł` : <Skeleton className='ml-2' height={'2rem'} width={"4rem"} />}<ArrowForward className='ml-2' />
 
 							</LoadingButton>
 						</>
 					}
+					<p className='text-xs mt-8 text-slate-500 block sm:hidden'>
+						* Cena zawiera podatek VAT
+						<br />
+						† Po dokonaniu zakupu pisma nie będzie można już zmienić danych w formularzu
+					</p>
 
 				</div>
 			</div>
@@ -240,8 +245,8 @@ const PaymentForm = ({ formDoc, setError }: {
 			<pre className='text-xs mb-2'>Wybierz formę płatności </pre>
 			<PaymentElement onChange={({ complete }) => setFormFilledOut(complete)} />
 		</div>
-		<LoadingButton loading={submitting} color='primary' onClick={onSubmit} className={`w-full mt-8 ${submitting ? 'bg-gray-100 text-transparent' : 'bg-blue-500 text-white'} sm:p-4 p-2 self-start normal-case border-none`}>
-			ZAPŁAĆ {(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł<sup>†</sup><ArrowForward className='ml-2' />
+		<LoadingButton loading={submitting} color='primary' onClick={onSubmit} className={`w-full mt-8 ${submitting ? 'bg-gray-100 text-transparent' : 'bg-blue-500 text-white'} p-2 self-start normal-case border-none`}>
+			ZAPŁAĆ {(formDoc?.price / 100)?.toFixed(2)?.toString()?.replace(',', '.')}zł<sup>†</sup>*<sup></sup><ArrowForward className='ml-2' />
 		</LoadingButton>
 		{/*<>
             <div className='inline-flex w-full gap-1 mt-4 items-center'>

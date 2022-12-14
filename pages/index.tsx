@@ -25,7 +25,7 @@ const SelectAnimation = styled.div`
     color: rgb(59, 130, 246);   
   }
   .icon-selected {
-    color: rgb(147, 197, 253);   
+    color: rgb(59, 130, 246);   
   }
 `;
 
@@ -739,24 +739,24 @@ export const Footer = () => {
 
 			<div className='inline-flex gap-4 w-full justify-between items-start flex-wrap'>
 				<div className='inline-flex gap-6 flex-wrap items-start'>
-					<div className='inline-flex gap-1 flex-col mb-8 text-white text-sm'>
+					<div className='inline-flex gap-1 flex-col mb-4 text-white text-sm'>
 						<pre className='text-slate-400 '>Nawigacja</pre>
 						<a>Pisma</a>
 						<a>Artykuły</a>
 					</div>
-					<div className='inline-flex gap-1 flex-col mb-8 text-white text-sm'>
+					<div className='inline-flex gap-1 flex-col mb-4 text-white text-sm'>
+						<pre className='text-slate-400 '>Konto</pre>
+						<a>Logowanie</a>
+						<a>Rejestracja</a>
+					</div>
+					<div className='inline-flex gap-1 flex-col mb-4 text-white text-sm'>
 						<pre className='text-slate-400 '>Informacje</pre>
 						<a>FAQ <span className='text-xs'>(najczęściej zadawane pytania)</span></a>
 						<a>Polityka prywatności</a>
 						<a>Warunki korzystania z usług</a>
 					</div>
-					<div className='inline-flex gap-1 flex-col mb-8 text-white text-sm'>
-						<pre className='text-slate-400 '>Konto</pre>
-						<a>Logowanie</a>
-						<a>Rejestracja</a>
-					</div>
 				</div>
-				<div className='inline-flex w-auto flex-col'>
+				<div className='inline-flex w-auto mb-6 flex-col ml-auto'>
 					<div className='inline-flex items-center gap-2'>
 						<LogoHeader noPadding noWidth small noBackground noText border={false} textWhite />
 						<pre className='text-3xl m-0 line leading-3 text-white'>POPRAWNI<pre className='inline text-blue-500'>K</pre></pre>

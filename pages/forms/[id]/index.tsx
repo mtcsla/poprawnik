@@ -123,8 +123,8 @@ const FormIndex = ({ form, author, verifiedBy, error }: { form: any, error: stri
 						<sup>†</sup>Przejście do formularza nie oznacza zakupu pisma - decyzję o zakupie podejmujesz dopiero przy finalizacji
 					</p>
 				</div>
-				<div className='flex flex-col ml-auto w-full'>
-					<PhasedExplanationAnimation className='sm:min-w-[15rem] sm:h-[14rem]' phase={0} active />
+				<div className='flex flex-col ml-auto w-auto'>
+					<PhasedExplanationAnimation className='sm:h-[12rem] ' phase={0} active />
 					<Link href={`/forms/${router.query.id}/form`} passHref><a>
 						<Button className='bg-blue-100 w-full'><sup>†</sup>Przejdź do formularza<ArrowForward className='ml-2' /></Button>
 					</a>
@@ -133,7 +133,7 @@ const FormIndex = ({ form, author, verifiedBy, error }: { form: any, error: stri
 			</div>
 			<div className='mx-auto my-8 self-end  w-full max-w-[60rem] flex flex-col'>
 				<h1 className='text-right font-bold self-end'>Jak to działa?</h1>
-				<pre className='text-right self-end whitespace-normal'>Wątpliwośći? Spieszymy z pomocą!</pre>
+				<pre className='text-right self-end whitespace-normal'>Wątpliwości? Spieszymy z pomocą!</pre>
 			</div>
 			<Explanation reverse />
 

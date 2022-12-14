@@ -159,7 +159,7 @@ const FormFinalize = () => {
 					{userProfile && clientSecret && formDoc
 						? null
 						: <>
-							<span className='inline-flex items-center w-full mt-1 mt-4 gap-4'>
+							<span className='inline-flex items-center w-full mt-4 gap-4'>
 								<Skeleton height={100} style={{ flex: 1 / 3 }} /> <Skeleton height={100} style={{ flex: 1 / 3 }} /> <Skeleton height={100} style={{ flex: 1 / 3 }} />
 
 							</span>
@@ -177,7 +177,7 @@ const FormFinalize = () => {
 
 			<div className='mx-auto my-8 self-end  w-full max-w-[60rem] flex flex-col'>
 				<h1 className='text-right font-bold self-end'>Jak to działa?</h1>
-				<pre className='text-right self-end'>Wątpliwośći? Spieszymy z pomocą!</pre>
+				<pre className='text-right self-end'>Wątpliwości? Spieszymy z pomocą!</pre>
 			</div>
 			<Explanation reverse />
 		</div>

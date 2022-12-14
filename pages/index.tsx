@@ -88,8 +88,9 @@ const Subtitle = styled.p`
 `
 const Top = styled.div`
   @media (min-width: 728px) {
-    min-height: 50rem;
+    min-height: 40rem;
   }
+	margin-bottom: 2rem;
 `
 export function sleep(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
@@ -216,7 +217,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 		</header>
 		<Top style={{ backdropFilter: 'grayscale(20%)', backgroundSize: 'cover', backgroundImage: 'url(/bg-light-blue.svg)', zIndex: 0, }} className='w-screen pt-32 px-8 sm:px-12 flex-col flex'>
 
-			<div className='flex flex-col my-auto w-full mx-auto ' style={{ maxWidth: '60rem' }}>
+			<div className='flex flex-col w-full mx-auto my-auto ' style={{ maxWidth: '60rem' }}>
 				<div className='inline-flex sm:gap-10 md:gap-20 lg:gap-40  pb-8 bg-opacity-50 sm:pb-12 md:pb-16 pt-0 justify-between items-center'>
 					<span style={{ minHeight: '20rem' }} className='flex-col flex-1 md:flex-initial h-full justify-between relative flex'>
 						<TitleAndSearch className='flex flex-col'>
@@ -253,7 +254,6 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 					}
 				</div>
 			</div>
-			<img src='top-waves.svg' className='-ml-8 sm:-ml-12 z-50 w-screen ' style={{ maxWidth: 'none' }} />
 		</Top>
 		<div className='z-50' >
 			<div className='w-full inline-flex justify-center items-center px-8 sm:px-12 py-12 sm:py-16  bg-white'  >
@@ -271,66 +271,10 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 			<div className='sm:w-screen py-12 flex flex-col pl-8 sm:pl-12 pr-8 sm:pr-0'>
 				<Explanation />
 			</div>
-			<div className='w-full pt-8 pb-4 bg-white  sm:pt-12 sm:pb-8 overflow-x-clip'>
+			<div className='w-full mb-[2rem] pt-8 pb-4 bg-white  sm:pt-12 sm:pb-8 overflow-x-clip'>
 				<MostPopularProducts {...{ mostPopularProducts, categories }} />
 			</div>
-			<img src='/footer-waves.svg' style={{ marginBottom: -1 }} className='w-full' />
-			<footer className='mt-auto h-fit w-full flex justify-center px-8 sm:px-12 py-12 sm:py-16 bg-slate-800 ' >
-				<div className='w-full inline-flex gap-2 flex-col justify-between items-stretch' style={{ maxWidth: '60rem' }}>
-					<LogoHeader noPadding noBackground border={false} textWhite />
-					<div className='flex gap-3 ml-2 flex-wrap w-full'>
-						<div className='flex flex-col gap-1'>
-							<Link href='/dashboard' passHref>
-								<a>
-									<li className='text-white text-sm hover:text-blue-300 cursor-pointer'>Strona startowa</li>
-								</a>
-							</Link>
-							<Link href='/forms/list/all/1' passHref>
-								<a>
-									<li className='text-white text-sm hover:text-blue-300 cursor-pointer'>Pisma</li>
-								</a>
-							</Link>
-							<Link href='/articles' passHref>
-								<a>
-									<li className='text-white text-sm hover:text-blue-300 cursor-pointer'>Artykuły</li>
-								</a>
-							</Link>
-						</div>
-						<div className='flex flex-col gap-1'>
-							<li className='text-slate-400 text-sm'>Kalkulatory</li>
-							{
-								userProfile
-									? null
-									: <>
-										<Link href='/login' passHref>
-											<a>
-												<li className='text-white text-sm hover:text-blue-300 cursor-pointer'>Logowanie</li>
-											</a>
-										</Link>
-										<Link href='/signup' passHref>
-											<a>
-												<li className='text-white text-sm hover:text-blue-300 cursor-pointer'>Rejestracja</li>
-											</a>
-										</Link>
-									</>
-							}
-						</div>
-						<div className='ml-auto flex flex-col items-end self-end'>
-							<p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
-								Polityka prywatności
-							</p>
-							<p className='text-slate-300 text-sm hover:text-white cursor-pointer'>
-								Warunki korzystania z serwisu
-							</p>
-
-							<p className='text-white mt-2 text-sm font-bold'>
-								POPRAWNIK sp.j. © 2022
-							</p>
-						</div>
-					</div>
-				</div>
-			</footer>
-
+			<Footer />
 		</div >
 	</div >
 }
@@ -655,7 +599,7 @@ const longestCommonPrefix = (str1: React.ReactNode[], str2: React.ReactNode[]): 
 	return i;
 }
 
-const Explanation = () => {
+export const Explanation = ({ reverse }: { reverse?: boolean }) => {
 	const [turnedOffCurrent, setTurnedOffCurrent] = React.useState<boolean>(false);
 	const [turnedOffPrevious, setTurnedOffPrevious] = React.useState<boolean>(false);
 
@@ -697,8 +641,8 @@ const Explanation = () => {
 		}, 250)
 	}
 
-	return <div className='flex flex-col-reverse sm:flex-row justify-start' style={{ paddingLeft: 'calc(var(--margin) - var(--xpadding))' }}>
-		<div className='flex flex-col sm:mr-8 ' style={{ maxWidth: '40rem' }} >
+	return <div className={`flex flex-col-reverse sm:flex-row${reverse ? '-reverse' : ''} justify-start`} style={reverse ? { paddingRight: 'calc(var(--margin) - var(--xpadding))' } : { paddingLeft: 'calc(var(--margin) - var(--xpadding))' }}>
+		<div className={`flex flex-col sm:${reverse ? 'ml-8' : 'mr-8'}`} style={{ maxWidth: '40rem' }} >
 			<div className='relative flex items-center'>
 				<div className={`flex flex-col transition-all z-0 ${(step === 0 && !turnedOffCurrent) || (previousStep === 0 && !turnedOffPrevious) ? 'opacity-1' : `opacity-0 ${(previousStep === 0 ? outDirection : inDirection) ? 'translate-x-1/3' : '-translate-x-1/3'}`} top-0  absolute  left-0 right-0`} >
 					<pre>Krok 1</pre>
@@ -747,14 +691,14 @@ const Explanation = () => {
 		{width && width >= 720 ?
 			<div className='inline-flex flex-row pr-8 sm:pr-12 sm:flex-col flex-wrap w-full justify-evenly sm:w-auto bg-white sm:mb-0 mb-8 my-auto sm:rx-12 gap-6 z-50 flex-1 whitespace-nowrap sm:min-w-fit' style={{ maxWidth: '28rem' }}>
 				<div className='flex-1 gap-6 flex sm:flex-col'>
-					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 0 && modifyStep(0)} className={`rounded cursor-pointer ${step === 0 ? 'bg-blue-500 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
+					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 0 && modifyStep(0)} className={`rounded cursor-pointer ${step === 0 ? 'bg-slate-800 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
 						<div className='flex flex-col text-inherit'>
 							<pre className='text-inherit'>Krok 1</pre>
 							<p className='sm:inline-flex gap-3 items-center hidden '>Wprowadzanie danych</p>
 						</div>
 						<DataUsage className={`text-2xl sm:text-4xl  ${step === 0 ? 'icon-selected' : 'icon'} transition-colors`} />
 					</SelectAnimation>
-					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 1 && modifyStep(1)} className={`rounded cursor-pointer ${step === 1 ? 'bg-blue-500 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
+					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 1 && modifyStep(1)} className={`rounded cursor-pointer ${step === 1 ? 'bg-slate-800 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
 						<div className='flex flex-col text-inherit'>
 							<pre className='text-inherit'>Krok 2</pre>
 							<p className='sm:inline-flex gap-3 items-center hidden '>Zamawianie pisma</p>
@@ -763,7 +707,7 @@ const Explanation = () => {
 					</SelectAnimation>
 				</div>
 				<div className='flex-1 gap-6 flex sm:flex-col'>
-					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 2 && modifyStep(2)} className={`rounded cursor-pointer ${step === 2 ? 'bg-blue-500 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
+					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 2 && modifyStep(2)} className={`rounded cursor-pointer ${step === 2 ? 'bg-slate-800 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
 
 						<div className='flex flex-col text-inherit'>
 							<pre className='text-inherit'>Krok 3</pre>
@@ -771,7 +715,7 @@ const Explanation = () => {
 						</div>
 						<Save className={`text-2xl sm:text-4xl  ${step === 2 ? 'icon-selected' : 'icon'} transition-colors`} />
 					</SelectAnimation>
-					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 3 && modifyStep(3)} className={`rounded cursor-pointer ${step === 3 ? 'bg-blue-500 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
+					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 3 && modifyStep(3)} className={`rounded cursor-pointer ${step === 3 ? 'bg-slate-800 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
 						<div className='flex flex-col text-inherit'>
 							<pre className='text-inherit'>Krok 4</pre>
 							<p className='sm:inline-flex gap-3 items-center hidden '>Składanie do sądu</p>
@@ -786,3 +730,49 @@ const Explanation = () => {
 	</div>;
 }
 
+export const Footer = () => {
+	const { user, userProfile } = useAuth();
+
+	return <footer className='mt-auto pb-auto h-fit w-full flex flex-col items-center px-8 sm:px-12 py-6 sm:py-8 bg-slate-800 ' >
+		<div className='w-full flex flex-col max-w-[60rem] mx-auto'>
+
+			<div className='inline-flex gap-4 w-full justify-between items-start flex-wrap'>
+				<div className='inline-flex gap-6 flex-wrap items-start'>
+					<div className='inline-flex gap-1 flex-col mb-4 text-white text-sm'>
+						<pre className='text-slate-400 '>Nawigacja</pre>
+						<a>Pisma</a>
+						<a>Artykuły</a>
+					</div>
+					<div className='inline-flex gap-1 flex-col mb-4 text-white text-sm'>
+						<pre className='text-slate-400 '>Konto</pre>
+						<a>Logowanie</a>
+						<a>Rejestracja</a>
+					</div>
+					<div className='inline-flex gap-1 flex-col mb-4 text-white text-sm'>
+						<pre className='text-slate-400 '>Informacje</pre>
+						<a>FAQ <span className='text-xs'>(najczęściej zadawane pytania)</span></a>
+						<a>Polityka prywatności</a>
+						<a>Warunki korzystania z usług</a>
+					</div>
+				</div>
+				<div className='inline-flex ml-auto mb-4 w-auto flex-col'>
+					<div className='inline-flex items-center gap-2'>
+						<LogoHeader noPadding noWidth small noBackground noText border={false} textWhite />
+						<pre className='text-3xl m-0 line leading-3 text-white'>POPRAWNI<pre className='inline text-blue-500'>K</pre></pre>
+					</div>
+					<Button className='bg-blue-500 text-white'>
+						Kontakt
+					</Button>
+				</div>
+			</div>
+			<div className='w-full justify-between inline-flex gap-4 flex-wrap '>
+				<p className='text-sm text-slate-300'>
+					POPRAWNIK sp.j. &copy; 2022
+				</p>
+				<a className='text-sm text-slate-300'>
+					sitemap.xml
+				</a>
+			</div>
+		</ div>
+	</footer>
+}

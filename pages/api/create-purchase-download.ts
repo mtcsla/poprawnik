@@ -4,7 +4,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { firebaseAdmin } from "../../buildtime-deps/firebaseAdmin";
 
 import htmlPdfNode from "html-pdf-node";
-import { templateToHtmlFile } from "./template/generate.pdf";
 import { sleep } from "..";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {

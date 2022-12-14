@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { templateToHTMLString } from "../../../api-functions/templateToHTMLString";
 import { firebaseAdmin } from "../../../buildtime-deps/firebaseAdmin";
-import { templateToHtmlFile } from "../template/generate.pdf";
 import { FormValues, RootFormValue } from "../../forms/[id]/form";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -51,7 +51,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             product_description: productDoc?.description,
             discount: 0,
             paymentIntentId: req.body?.data?.object?.id,
-            contents: templateToHtmlFile(
+            contents: templateToHTMLString(
               data as FormValues<RootFormValue>,
               formDoc?.templateData,
               formDoc?.formData

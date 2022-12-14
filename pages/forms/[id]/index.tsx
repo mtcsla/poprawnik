@@ -126,7 +126,7 @@ const FormIndex = ({ form, author, verifiedBy, error }: { form: any, error: stri
 				<div className='flex flex-col ml-auto w-auto'>
 					<PhasedExplanationAnimation className='sm:h-[12rem] ' phase={0} active />
 					<Link href={`/forms/${router.query.id}/form`} passHref><a>
-						<Button className='bg-blue-100 w-full'><sup>†</sup>Przejdź do formularza<ArrowForward className='ml-2' /></Button>
+						<Button className='bg-blue-100 w-full'>Przejdź do formularza<sup>†</sup><ArrowForward className='ml-2' /></Button>
 					</a>
 					</Link>
 				</div>
@@ -138,7 +138,7 @@ const FormIndex = ({ form, author, verifiedBy, error }: { form: any, error: stri
 			<Explanation reverse />
 
 			<Link href={`/forms/${router.query.id}/form`} passHref><a className='mx-auto max-w-[60rem] w-full'>
-				<Button className='bg-blue-100 p-2 max-w-[60rem] mt-8 w-full'><sup>†</sup>Przejdź do formularza<ArrowForward className='ml-2' /></Button>
+				<Button className='bg-blue-100 p-2 max-w-[60rem] mt-8 w-full'>Przejdź do formularza<sup>†</sup><ArrowForward className='ml-2' /></Button>
 			</a>
 			</Link>
 		</div>

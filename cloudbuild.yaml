@@ -11,7 +11,13 @@ steps:
     env:
       - "NODE_ENV=production"
     secretEnv:
-      ["SERVICE_ACCOUNT_PROD", "REVALIDATE_SECRET", "STRIPE_TEST_KEY_SECRET"]
+      [
+        "SERVICE_ACCOUNT_PROD",
+        "REVALIDATE_SECRET",
+        "STRIPE_TEST_KEY_SECRET",
+        "HTML_CONVERT_SECRET",
+        "HTML_CONVERT_URL",
+      ]
 
   - name: node
     id: Build NextJS bundle
@@ -36,3 +42,7 @@ availableSecrets:
       env: "REVALIDATE_SECRET"
     - versionName: projects/202331496756/secrets/STRIPE_TEST_SECRET/versions/latest
       env: "STRIPE_TEST_KEY_SECRET"
+    - versionNAME: projects/202331496756/secrets/HTML_CONVERT_SECRET/versions/latest
+      env: "HTML_CONVERT_SECRET"
+    - versionNAME: projects/202331496756/secrets/HTML_CONVERT_URL/versions/latest
+      env: "HTML_CONVERT_URL"

@@ -641,8 +641,9 @@ export const Explanation = ({ reverse }: { reverse?: boolean }) => {
 		}, 250)
 	}
 
-	return <div className={`flex flex-col-reverse sm:flex-row${reverse ? '-reverse' : ''} justify-start`} style={reverse ? { paddingRight: 'calc(var(--margin) - var(--xpadding))' } : { paddingLeft: 'calc(var(--margin) - var(--xpadding))' }}>
-		<div className={`flex flex-col sm:${reverse ? 'ml-8' : 'mr-8'}`} style={{ maxWidth: '40rem' }} >
+
+	return <div className={`flex ${width && width >= 640 ? `flex-row${reverse ? '-reverse' : ''}` : 'flex-col-reverse'} justify-start`} style={reverse ? { paddingRight: 'calc(var(--margin) - var(--xpadding))' } : { paddingLeft: 'calc(var(--margin) - var(--xpadding))' }}>
+		<div className={`flex flex-col ${width && width >= 640 && reverse ? 'ml-8' : 'mr-8'}`} style={{ maxWidth: '40rem' }} >
 			<div className='relative flex items-center'>
 				<div className={`flex flex-col transition-all z-0 ${(step === 0 && !turnedOffCurrent) || (previousStep === 0 && !turnedOffPrevious) ? 'opacity-1' : `opacity-0 ${(previousStep === 0 ? outDirection : inDirection) ? 'translate-x-1/3' : '-translate-x-1/3'}`} top-0  absolute  left-0 right-0`} >
 					<pre>Krok 1</pre>
@@ -738,24 +739,24 @@ export const Footer = () => {
 
 			<div className='inline-flex gap-4 w-full justify-between items-start flex-wrap'>
 				<div className='inline-flex gap-6 flex-wrap items-start'>
-					<div className='inline-flex gap-1 flex-col mb-4 text-white text-sm'>
+					<div className='inline-flex gap-1 flex-col mb-8 text-white text-sm'>
 						<pre className='text-slate-400 '>Nawigacja</pre>
 						<a>Pisma</a>
 						<a>Artykuły</a>
 					</div>
-					<div className='inline-flex gap-1 flex-col mb-4 text-white text-sm'>
-						<pre className='text-slate-400 '>Konto</pre>
-						<a>Logowanie</a>
-						<a>Rejestracja</a>
-					</div>
-					<div className='inline-flex gap-1 flex-col mb-4 text-white text-sm'>
+					<div className='inline-flex gap-1 flex-col mb-8 text-white text-sm'>
 						<pre className='text-slate-400 '>Informacje</pre>
 						<a>FAQ <span className='text-xs'>(najczęściej zadawane pytania)</span></a>
 						<a>Polityka prywatności</a>
 						<a>Warunki korzystania z usług</a>
 					</div>
+					<div className='inline-flex gap-1 flex-col mb-8 text-white text-sm'>
+						<pre className='text-slate-400 '>Konto</pre>
+						<a>Logowanie</a>
+						<a>Rejestracja</a>
+					</div>
 				</div>
-				<div className='inline-flex ml-auto mb-4 w-auto flex-col'>
+				<div className='inline-flex w-auto flex-col'>
 					<div className='inline-flex items-center gap-2'>
 						<LogoHeader noPadding noWidth small noBackground noText border={false} textWhite />
 						<pre className='text-3xl m-0 line leading-3 text-white'>POPRAWNI<pre className='inline text-blue-500'>K</pre></pre>
@@ -765,13 +766,10 @@ export const Footer = () => {
 					</Button>
 				</div>
 			</div>
-			<div className='w-full justify-between inline-flex gap-4 flex-wrap '>
+			<div className='w-full inline-flex gap-4 flex-wrap '>
 				<p className='text-sm text-slate-300'>
 					POPRAWNIK sp.j. &copy; 2022
 				</p>
-				<a className='text-sm text-slate-300'>
-					sitemap.xml
-				</a>
 			</div>
 		</ div>
 	</footer>

@@ -139,7 +139,8 @@ const FormIndex = ({ form, author, verifiedBy, error }: { form: any, error: stri
 					</p>
 				</div>
 				<div className='flex flex-col ml-auto w-auto'>
-					<PhasedExplanationAnimation className='sm:h-[12rem] ' phase={0} active />
+					<PhasedExplanationAnimation className='sm:min-h-[12rem] w-full sm:w-auto ' phase={0} active />
+
 					<Link href={`/forms/${router.query.id}/form`} passHref><a>
 						<Button className='bg-blue-100 w-full'>Przejdź do formularza<sup>†</sup><ArrowForward className='ml-2' /></Button>
 					</a>

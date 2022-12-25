@@ -67,7 +67,7 @@ const FormIndex = ({ form, author, verifiedBy, error }: { form: any, error: stri
 		<meta name="description" content={form?.description}></meta>
 	</Head>
 		<DisplayHeader />
-		<div className="min-h-72 h-fit pt-16 px-8 sm:px-12" style={{
+		<div className="min-h-72 text-white h-fit pt-16 px-8 sm:px-12" style={{
 			backgroundImage: `url(/bg-light-blue.svg)`,
 			backgroundSize: 'cover'
 		}} >
@@ -89,8 +89,16 @@ const FormIndex = ({ form, author, verifiedBy, error }: { form: any, error: stri
 						} variant='rounded' className='bg-blue-100 text-blue-500' />
 						<div>
 							<pre className='text-sm text-white'>Zweryfikował/a</pre>
-							<p className='text-sm'>
-								{verifiedBy?.displayName === 'admin' ? <>serwis <pre className='inline text-white'>POPRAWNIK</pre></> : verifiedBy?.displayName}
+							<p className='text-white text-sm'>
+								{verifiedBy?.displayName === 'admin'
+									? <>
+										serwis
+										{" "}
+										<pre className='inline text-white'>
+											POPRAWNIK
+										</pre>
+									</>
+									: verifiedBy?.displayName}
 							</p>
 						</div>
 					</div>
@@ -101,10 +109,17 @@ const FormIndex = ({ form, author, verifiedBy, error }: { form: any, error: stri
 				<pre className='whitespace-normal text-white opacity-70'>
 					{form?.category}
 				</pre>
-				<p className='self-end text-lg mt-8'>
+				<p className='self-end text-lg text-white mt-8'>
 					tylko
 					{" "}
-					<strong className='text-blue-200'>{(form?.price / 100)?.toFixed(2).toString().replace(/\./g, ',')}zł</strong><sup>*</sup>
+					<strong className='text-blue-200'>{
+						(form?.price / 100)
+							?.toFixed(2)
+							?.toString()
+							?.replace(/\./g, ',')}
+						zł
+					</strong>
+					<sup>*</sup>
 				</p>
 			</div>
 		</div>
@@ -157,7 +172,7 @@ export const DisplayHeader = () => {
 	return <header className='absolute bg-transparent z-0 text-white top-0 z-80 px-8 sm:px-12 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
 		<div style={{ maxWidth: '60rem' }} className='h-full z-50 w-full flex items-center justify-between m-auto'>
 
-			<LogoHeader noText={!!width && width < 640} textWhite noBackground noPadding noWidth png />
+			<LogoHeader blueLight noText={!!width && width < 640} textWhite noBackground noPadding noWidth png />
 
 			<span className='flex items-center'>
 				<SearchBar />

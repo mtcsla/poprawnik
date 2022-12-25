@@ -1,0 +1,8 @@
+{
+	"FormDescription": {
+		"fields": ["FieldDescription"],
+		"groups": [["number", "Condition"]],
+		"steps": ["number"]
+	},
+	"TemplateDescription": {}
+}

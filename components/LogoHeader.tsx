@@ -23,8 +23,10 @@ const LogoHeader = ({
 	inAccountPage,
 	textWhite,
 	noWidth,
-	small
+	small,
+	blueLight,
 }: {
+	blueLight?: boolean;
 	border?: boolean;
 	textWhite?: boolean;
 	openSidebar?: () => void;
@@ -117,7 +119,7 @@ const LogoHeader = ({
 						<div style={{ height: "2rem" }} className="border-l-2 ml-3 mr-3"></div>
 						<div className="flex flex-col">
 							<pre className={`p-0 pt-0 pb-0 text-sm ${textWhite ? 'text-white' : ''}`}>
-								POPRAWNI<pre className="inline font-bold text-blue-300">K</pre>
+								POPRAWNI<pre className={`inline font-bold text-blue-${blueLight ? 300 : 500}`}>K</pre>
 							</pre>
 							{captionLink ?
 								<Link href={captionLink} passHref>

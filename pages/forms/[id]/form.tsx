@@ -78,7 +78,8 @@ export type FormValues<Type> = {
 	[key: string]: Type
 }
 
-const FormDisplay = () => {
+const FormDisplay = () =>
+{
 	const router = useRouter();
 	const { userProfile } = useAuth();
 
@@ -92,14 +93,17 @@ const FormDisplay = () => {
 	const [testing, setTesting] = React.useState(false);
 
 	const dataRef = React.useRef<FormValues<RootFormValue>>({});
-	React.useEffect(() => {
+	React.useEffect(() =>
+	{
 		dataRef.current = data;
 	}, [data]);
 
-	React.useEffect(() => {
+	React.useEffect(() =>
+	{
 		if (!router.isReady)
 			return;
-		if (loading) {
+		if (loading)
+		{
 			const formId = router.query.id as string;
 			const testing = router.query.testing == 'true';
 			setTesting(testing);
@@ -107,14 +111,17 @@ const FormDisplay = () => {
 			setCurrentStep(0);
 			router.replace(`/forms/${formId}/form?step=${0}${testing ? '&testing=true' : ''}`,)
 
-			if (testing && !userProfile?.roles.includes('admin') && !userProfile?.roles.includes('lawyer')) {
+			if (testing && !userProfile?.roles.includes('admin') && !userProfile?.roles.includes('lawyer'))
+			{
 				setErr404(true);
 				setLoading(false);
 			}
 
-			getDoc(doc(collection(firestore, testing ? 'forms' : 'products'), formId)).then((form) => {
+			getDoc(doc(collection(firestore, testing ? 'forms' : 'products'), formId)).then((form) =>
+			{
 
-				if (!form.exists()) {
+				if (!form.exists())
+				{
 					setErr404(true);
 					setLoading(false);
 					return;
@@ -141,18 +148,22 @@ const FormDisplay = () => {
 	}, [router.isReady])
 	const [currentStep, setCurrentStep] = React.useState(0);
 
-	React.useEffect(() => {
+	React.useEffect(() =>
+	{
 		if (parseInt(router.query.step as string) != currentStep)
 			setCurrentStep(0);
 
 
 	}, [router.query.step])
 
-	React.useEffect(() => {
+	React.useEffect(() =>
+	{
 		if (!router.isReady || !(description.length) || JSON.stringify(data) === '{}')
 			return;
-		else {
-			if (parseInt(router.query.step as string) < currentStep) {
+		else
+		{
+			if (parseInt(router.query.step as string) < currentStep)
+			{
 				setCurrentStep(parseInt(router.query.step as string));
 			}
 		}
@@ -161,16 +172,19 @@ const FormDisplay = () => {
 
 	//Form logic
 
-	const updateData = (_data: FormValues<RootFormValue>) => {
+	const updateData = (_data: FormValues<RootFormValue>) =>
+	{
 		setData({ ...Object.assign(data, _data) });
 
 		if (!testing)
 			localStorage.setItem(`--${router.query.id as string}-data`, JSON.stringify(data));
 	}
-	const nextStep = () => {
+	const nextStep = () =>
+	{
 		const dataRetrievalFunction = testing ? sessionStorage : localStorage;
 
-		if (currentStep < description.length - 1) {
+		if (currentStep < description.length - 1)
+		{
 			setCurrentStep(currentStep + 1);
 			document.getElementById('fixed-parent')?.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -245,7 +259,7 @@ const FormDisplay = () => {
 											<b className='text-blue-200'>FORMULARZ:</b> KROK {currentStep + 1} z {description.length}
 										</pre>
 									</div>
-									<p className='sm:text-lg text-right'>
+									<p className='sm:text-lg text-blue-300 text-right'>
 										{description[currentStep]?.subtitle}
 									</p>
 								</span>
@@ -292,7 +306,8 @@ const FormDisplay = () => {
 									validateOnBlur
 									validateOnChange
 									validateOnMount
-									render={({ values, errors, touched, setFieldError, setFieldValue, setFieldTouched, validateForm, isValid, submitForm }) => {
+									render={({ values, errors, touched, setFieldError, setFieldValue, setFieldTouched, validateForm, isValid, submitForm }) =>
+									{
 										const currentStepDescription = React.useMemo(() => description[currentStep], [currentStep]);
 										const isList = React.useMemo(() => currentStepDescription.type === 'list', [currentStep]);
 
@@ -301,7 +316,8 @@ const FormDisplay = () => {
 											(description[currentStep]?.listMinMaxItems?.max != null && (values[description[currentStep].name] as FormValues<NestedFormValue>[])?.length > (description[currentStep]?.listMinMaxItems?.max ?? 10000000000000))
 
 										React.useEffect(
-											() => {
+											() =>
+											{
 												validateForm();
 											}, [currentStep]
 										)
@@ -331,11 +347,13 @@ const FormDisplay = () => {
 												? <p className='text-sm text-slate-500'>Ta lista może zawierać maksymalnie {description[currentStep]?.listMinMaxItems?.max} elementów.</p>
 												: null
 											}
-											<Button disabled={buttonDisabled} onClick={async () => {
+											<Button disabled={buttonDisabled} onClick={async () =>
+											{
 												const errors = await validateForm();
 												if (Object.keys(errors).length === 0)
 													nextStep();
-												else {
+												else
+												{
 													await submitForm();
 													if (incorrectTimeout.current) clearTimeout(incorrectTimeout.current);
 													setIncorrect(true);
@@ -361,11 +379,13 @@ const FormDisplay = () => {
 
 
 
-export const Step = ({ step, listIndex, formDescription }: { step: StepDescription, listIndex?: number, formDescription: FormDescription }) => {
+export const Step = ({ step, listIndex, formDescription }: { step: StepDescription, listIndex?: number, formDescription: FormDescription }) =>
+{
 	return <div className={`flex flex-col ${listIndex == null ? 'py-8' : ''}`}>
 		{
 			step.children.map(
-				(fragment, index) => {
+				(fragment, index) =>
+				{
 					return <Fragment key={index} {...{ fragment, listIndex, formDescription, index }} />
 				}
 			)
@@ -373,16 +393,19 @@ export const Step = ({ step, listIndex, formDescription }: { step: StepDescripti
 	</div>;
 }
 
-export const Fragment = ({ fragment, listIndex, formDescription, index }: { fragment: FragmentDescription, index: number, listIndex?: number, formDescription: FormDescription }) => {
+export const Fragment = ({ fragment, listIndex, formDescription, index }: { fragment: FragmentDescription, index: number, listIndex?: number, formDescription: FormDescription }) =>
+{
 	const { values, errors, touched, setFieldError, setFieldValue, setFieldTouched } = React.useContext(formikContext);
 	const fields = React.useMemo(
-		() => fragment.children.map((element, index) => {
+		() => fragment.children.map((element, index) =>
+		{
 			return <UserField key={element.name} {...{ element, listIndex, fullWidth: element.fullWidth || undefined, formDescription, fragmentCondition: fragment.condition }} />
 		}),
 		[formDescription]
 	)
 
-	const obscured = React.useMemo(() => {
+	const obscured = React.useMemo(() =>
+	{
 		return !Evaluate.sequence(fragment.condition, values, formDescription ?? [], listIndex ?? undefined).condition()
 			? <div style={{ zIndex: 500 }} className='bg-slate-50 flex bg-opacity-75 rounded-lg absolute top-0 left-0 right-0 bottom-0 p-4 sm:p-8 box-content' >
 				<div className='flex flex-col items-center m-auto'>
@@ -409,17 +432,20 @@ export const Fragment = ({ fragment, listIndex, formDescription, index }: { frag
 	</div>
 }
 
-export const List = ({ step, formDescription }: { step: StepDescription, formDescription: FormDescription }) => {
+export const List = ({ step, formDescription }: { step: StepDescription, formDescription: FormDescription }) =>
+{
 	const { values, errors, touched, setFieldValue, setFieldError, setFieldTouched, validateForm } = useFormValue();
 
 	const [movingDown, setMovingDown] = React.useState<number>(-1);
 	const [movingUp, setMovingUp] = React.useState<number>(-1);
 
-	const swap = async (index1: number, index2: number, how: 'down' | 'up') => {
+	const swap = async (index1: number, index2: number, how: 'down' | 'up') =>
+	{
 		setMovingDown(how === 'down' ? index1 : -1);
 		setMovingUp(how === 'up' ? index1 : -1);
 	}
-	const deleteItem = (index: number) => {
+	const deleteItem = (index: number) =>
+	{
 		const list = values[step.name] as any[];
 		list.splice(index, 1);
 		setFieldValue(step.name, list);
@@ -430,19 +456,22 @@ export const List = ({ step, formDescription }: { step: StepDescription, formDes
 		[values[step.name]?.length]
 	)
 
-	const _swap = (index1: number, index2: number) => {
+	const _swap = (index1: number, index2: number) =>
+	{
 		const temp = values[step.name][index1];
 		setFieldValue(`${step.name}[${index1}]`, values[step.name][index2]);
 		setFieldValue(`${step.name}[${index2}]`, temp);
 
-		if (errors[step.name]) {
+		if (errors[step.name])
+		{
 			const tempErrror = errors[step.name][index1];
 
 			setFieldError(`${step.name}[${index1}]`, errors[step.name][index2]);
 			setFieldError(`${step.name}[${index2}]`, tempErrror);
 		}
 
-		if (touched[step.name]) {
+		if (touched[step.name])
+		{
 			const tempTouched = touched[step.name][index1];
 
 			setFieldTouched(`${step.name}[${index1}]`, touched[step.name][index2]);
@@ -453,10 +482,13 @@ export const List = ({ step, formDescription }: { step: StepDescription, formDes
 	const [heights, setHeights] = React.useState<{ [key: number]: number }>({});
 
 	React.useEffect(
-		() => {
+		() =>
+		{
 			if (movingUp === -1 && movingDown === -1) return;
-			if (movingUp !== -1) {
-				setTimeout(() => {
+			if (movingUp !== -1)
+			{
+				setTimeout(() =>
+				{
 					_swap(
 						movingUp - 1,
 						movingUp
@@ -464,9 +496,11 @@ export const List = ({ step, formDescription }: { step: StepDescription, formDes
 					setMovingUp(-1);
 				}, 500);
 			}
-			if (movingDown !== -1) {
+			if (movingDown !== -1)
+			{
 
-				setTimeout(() => {
+				setTimeout(() =>
+				{
 					_swap(
 						movingDown,
 						movingDown + 1
@@ -489,9 +523,22 @@ export const List = ({ step, formDescription }: { step: StepDescription, formDes
 				?
 				(values[step.name] as FormValues<NestedFormValue>[]).map(
 					(value, index, arr) =>
-
-						<ListElement {...{ setHeights, deleteSelf: () => deleteItem(index), movingDown, index, movingUp, arr, heights, step, swap, formDescription }} />
-
+						<ListElement
+							{
+							...{
+								setHeights,
+								deleteSelf: () => deleteItem(index),
+								movingDown,
+								index,
+								movingUp,
+								arr,
+								heights,
+								step,
+								swap,
+								formDescription
+							}
+							}
+						/>
 				)
 				: <div className='flex flex-col items-center bg-slate-100 p-8 sm:p-16 rounded-lg'>
 					<pre className='whitespace-normal'>
@@ -503,7 +550,10 @@ export const List = ({ step, formDescription }: { step: StepDescription, formDes
 		<Button className='text-blue-500 mt-4 self-end' onClick={() => setFieldValue(
 			step.name,
 			[...(values[step.name] ?? []), InitialValues.fromStep(step)]
-		)}>dodaj element <Add className='ml-2' /></Button>
+		)}>
+			dodaj element
+			<Add className='ml-2' />
+		</Button>
 	</div>
 }
 
@@ -515,13 +565,15 @@ export default FormDisplay;
 function ListElement({ movingDown, index, movingUp, arr, heights, step, swap, deleteSelf, formDescription, setHeights }:
 	{
 		movingDown: number, index: number, deleteSelf: () => void, movingUp: number, arr: FormValues<NestedFormValue>[], heights: { [key: number]: number; }, step: StepDescription, swap: (index1: number, index2: number, how: 'down' | 'up') => Promise<void>, formDescription: FormDescription, setHeights: React.Dispatch<React.SetStateAction<{ [key: number]: number }>>
-	}): JSX.Element {
+	}): JSX.Element
+{
 
 	const [ref, { height }] = useElementSize();
 	const [deleting, setDeleting] = React.useState<boolean>(false);
 
 	React.useEffect(
-		() => {
+		() =>
+		{
 			setHeights(prev => ({ ...prev, [index]: height ?? 0 }))
 		},
 		[height]
@@ -534,7 +586,7 @@ function ListElement({ movingDown, index, movingUp, arr, heights, step, swap, de
 				? `-${heights[index - 1]}px`
 				: '0px'})`
 	}} className={`w-full flex-col ${((movingDown === index || movingUp === index + 1) && index != arr.length - 1) || ((movingUp === index || movingDown === index - 1) && index != 0) ? 'transition_transform' : ''}`}>
-		<div className={'inline-flex bg-slate-800 text-white rounded p-2 w-full items-center gap-4'}>
+		<div className={'inline-flex my-6 rounded w-full p-2 bg-slate-100 items-center gap-4'}>
 			<Dialog scroll="body" open={deleting}>
 				<DialogTitle className='text-red-500'><pre>Usuwasz element listy</pre></DialogTitle>
 				<DialogContent className='sm:min-w-[40rem]'>
@@ -546,20 +598,21 @@ function ListElement({ movingDown, index, movingUp, arr, heights, step, swap, de
 				</DialogContent>
 				<DialogActions>
 					<Button color='error' onClick={() => setDeleting(false)}>Anuluj</Button>
-					<Button onClick={() => {
+					<Button onClick={() =>
+					{
 						deleteSelf();
 						setDeleting(false);
 					}}>Usuń</Button>
 				</DialogActions>
 			</Dialog>
-			<pre className='whitespace-normal text-sm text-white'>{step.listItemName || 'Element'} {index + 1}</pre>
+			<pre className='whitespace-normal text-base ml-3'>{step.listItemName || 'Element'} {index + 1}</pre>
 			<div className='flex-1' />
 			<ButtonGroup disabled={movingDown != -1 || movingUp != -1} variant='text'>
 				<Tooltip title='zamień z elementem powyżej'>
-					<Button disabled={index == 0} onClick={() => { swap(index, index - 1, 'up'); }} size='small' className={`border-none ${index == 0 ? 'text-slate-400' : 'text-blue-100'}`}><MoveUp /></Button>
+					<Button disabled={index == 0} onClick={() => { swap(index, index - 1, 'up'); }} size='small' className={`border-none ${index == 0 ? 'text-slate-200' : 'text-slate-500'}`}><MoveUp /></Button>
 				</Tooltip>
 				<Tooltip title='zamień z elementem poniżej'>
-					<Button disabled={index == arr.length - 1} onClick={() => { swap(index, index + 1, 'down'); }} size='small' className={`border-none ${index == arr.length - 1 ? 'text-slate-400' : 'text-blue-100'}`}><MoveDown /></Button>
+					<Button disabled={index == arr.length - 1} onClick={() => { swap(index, index + 1, 'down'); }} size='small' className={`border-none ${index == arr.length - 1 ? 'text-slate-200' : 'text-slate-500'}`}><MoveDown /></Button>
 				</Tooltip>
 				<Tooltip title='usuń'>
 					<Button onClick={() => setDeleting(true)} size='small' color='error' className='border-none'><Delete /></Button>

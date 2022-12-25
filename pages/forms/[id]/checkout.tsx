@@ -122,7 +122,7 @@ const FormFinalize = () => {
 				<pre className='whitespace-normal text-white opacity-70'>
 					{formDoc?.category}
 				</pre>
-				<p className='self-end text-lg mt-8'>
+				<p className='self-end text-lg mt-8 text-white'>
 					tylko
 					{" "}
 					<strong className='text-blue-200'>{(formDoc?.price / 100)?.toFixed(2).toString().replace(/\./g, ',')}zł</strong><sup>*</sup>

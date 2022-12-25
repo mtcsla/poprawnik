@@ -349,7 +349,8 @@ export const ExplanationAnimationSvg = ({ style, className, phase }: {
 	style?: HTMLAttributes<HTMLOrSVGElement>['style'];
 	className?: string;
 	phase?: number;
-}) => {
+}) =>
+{
 	const phased = typeof phase == 'number';
 	const all = [
 		'printer', 'printer_front', 'form',

@@ -1,9 +1,10 @@
 import styled from '@emotion/styled';
-import { ArrowRight, Article, Bookmark, DataUsage, Gavel, People, Save, Search, ShoppingCart } from '@mui/icons-material';
-import { Avatar, Button, FormControl, InputLabel, MenuItem, Pagination, Select } from '@mui/material';
+import { ArrowRight, Article, Bookmark, DataUsage, Gavel, Home, Login, Logout, ManageAccounts, People, Person, Save, Search, ShoppingCart } from '@mui/icons-material';
+import { Avatar, Button, FormControl, InputLabel, List, ListItem, MenuItem, Pagination, Popover, Select } from '@mui/material';
 import { GetStaticPropsContext } from 'next';
 import Link from 'next/link';
 import React, { HTMLAttributes } from 'react';
+import { useOnClickOutside } from 'usehooks-ts';
 import { firebaseAdmin } from '../buildtime-deps/firebaseAdmin';
 import { ExplanationAnimationSvg } from '../components/ExplanationAnimationSvg';
 import LogoHeader from '../components/LogoHeader';
@@ -29,19 +30,24 @@ const SelectAnimation = styled.div`
   }
 `;
 
-export const getStaticProps = async (ctx: GetStaticPropsContext) => {
+export const getStaticProps = async (ctx: GetStaticPropsContext) =>
+{
 	let categories: string[] = [];
 	let products: any[] = [];
 	let productsStats: { [id: string]: number } = {};
 
-	await firebaseAdmin.firestore().collection('product-categories').get().then(snap => {
+	await firebaseAdmin.firestore().collection('product-categories').get().then(snap =>
+	{
 		categories = snap.docs.map(doc => doc.id);
 	})
-	await firebaseAdmin.firestore().collection('products').get().then(snap => {
+	await firebaseAdmin.firestore().collection('products').get().then(snap =>
+	{
 		products = snap.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 	});
-	await firebaseAdmin.firestore().collection('productsStats').get().then(snap => {
-		snap.docs.forEach(doc => {
+	await firebaseAdmin.firestore().collection('productsStats').get().then(snap =>
+	{
+		snap.docs.forEach(doc =>
+		{
 			productsStats[doc.id] = doc.data().timesSold;
 		});
 	});
@@ -52,7 +58,8 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
 		'any': products.sort((a, b) => productsStats[b.id] - productsStats[a.id]),
 	}
 	categories.forEach(
-		category => {
+		category =>
+		{
 			mostPopularProducts[category] = products.filter(product => product.category === category).sort((a, b) => productsStats[b.id] - productsStats[a.id]);
 		}
 	)
@@ -92,12 +99,14 @@ const Top = styled.div`
   }
 	margin-bottom: 2rem;
 `
-export function sleep(ms: number) {
+export function sleep(ms: number)
+{
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 
-const MainPage = ({ categories, mostPopularProducts }: { categories: string[], mostPopularProducts: { [key: string]: any[] } }) => {
+const MainPage = ({ categories, mostPopularProducts }: { categories: string[], mostPopularProducts: { [key: string]: any[] } }) =>
+{
 	const [subtitleNumber, setSubtitleNumber] = React.useState(0);
 
 	const [title, setTitle] = React.useState<React.ReactNode[]>([]);
@@ -108,21 +117,39 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 
 
 	const [animationFinished, setAnimationFinished] = React.useState(false);
+	const [anchorEl, setAnchorEl] = React.useState<null | HTMLDivElement>(null);
+
+
+
+	const ref = React.useRef(null);
+	useOnClickOutside(ref, () =>
+	{
+		setAnchorEl(null)
+	});
+
+	const updateAnchor = (event: React.MouseEvent<HTMLDivElement>) =>
+	{
+		setAnchorEl(event.currentTarget);
+	}
+
 
 
 	const titles: (React.ReactNode[])[] = [
-		['P', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-300 inline font-semibold  uppercase'>k</pre>, <pre className='text-inherit inline'>?</pre>],
-		['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-300 inline font-semibold uppercase'>.</pre>],
-		['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-300 inline font-semibold uppercase'>k</pre>],
+		['P', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-200 inline font-semibold  uppercase'>k</pre>, <pre className='text-inherit inline'>?</pre>],
+		['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-200 inline font-semibold uppercase'>.</pre>],
+		['P', 'o', 'p', 'r', 'a', 'w', 'n', 'i', <pre className='text-blue-200 inline font-semibold uppercase'>k</pre>],
 	];
 
 	const { width } = useWindowSize();
-	const { userProfile } = useAuth();
+	const { userProfile, signOut } = useAuth();
 
 	const time = 120;
-	React.useEffect(() => {
-		(async () => {
-			for (let stage = 0; stage < titles.length; stage++) {
+	React.useEffect(() =>
+	{
+		(async () =>
+		{
+			for (let stage = 0; stage < titles.length; stage++)
+			{
 				let lastTitle = titles[stage - 1] || [];
 				const currentTitle = titles[stage];
 
@@ -133,17 +160,22 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 
 				let done = false;
 
-				while (!done) {
-					if (lastTitle.length > commonPart) {
+				while (!done)
+				{
+					if (lastTitle.length > commonPart)
+					{
 						setTitle(lastTitle.slice(0, -1).map(
 							letter => typeof letter === 'string' ? <pre className={`text-inherit inline pr-1`} >{letter}</pre> : letter
 						));
 						lastTitle = lastTitle.slice(0, -1);
 					}
-					else if (currentLetter <= currentTitle.length) {
-						if (currentSubtitleNumber < stage) {
+					else if (currentLetter <= currentTitle.length)
+					{
+						if (currentSubtitleNumber < stage)
+						{
 							setSubtitleNumber(++currentSubtitleNumber);
-							if (currentSubtitleNumber == 1) {
+							if (currentSubtitleNumber == 1)
+							{
 								setTimeout(() =>
 									setSecondSubtitleVisible(true),
 									1000
@@ -155,14 +187,19 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 						));
 						currentLetter++;
 					}
-					else {
-						if (stage < titles.length - 1) {
+					else
+					{
+						if (stage < titles.length - 1)
+						{
 							await sleep(1500);
 							done = true;
-						} else {
-							await setTimeout(async () => {
+						} else
+						{
+							await setTimeout(async () =>
+							{
 								setLogoVisible(true);
-								await setTimeout(async () => {
+								await setTimeout(async () =>
+								{
 									setTitleMoved(true);
 									await setTimeout(
 										() => setLastSubtitleVisible(true),
@@ -187,40 +224,154 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 	const { setSearchOpen } = useSearch();
 	const onSearch = () => setSearchOpen(true);
 
-	return <div
+	const topLevelComponent = React.useRef<HTMLDivElement>(null);
+
+	return <div ref={topLevelComponent}
 		className='bg-white bg-blend-darken relative flex-1 lg:flex-auto flex flex-col overflow-x-hidden items-stretch overflow-y-visible'>
 		<header className='absolute bg-transparent text-white top-0 px-8 sm:px-12 flex left-0 h-16 w-full' style={{ zIndex: 2000 }}>
 			<div style={{ maxWidth: '60rem' }} className='h-full w-full flex items-center justify-between m-auto'>
-				<div className='inline-flex items-center'>
-					<LogoHeader small noText noBackground noPadding noWidth png />
+				<div className='inline-flex gap-3 items-center'>
+					<LogoHeader small noText blueLight noBackground noPadding noWidth png />
 
-					<p className={`${width && width > 900 ? 'flex' : 'hidden'} items-center ml-4 text-sm p-1 px-3 whitespace-nowrap hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer`}>
-						<People className='mr-1' />
-						Nasza misja
-					</p>
-					<p className={`${width && width > 900 ? 'flex' : 'hidden'} items-center text-sm p-1 px-3 whitespace-nowrap  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer`}>
-						<Article className='mr-1' />
-						Jak to działa
-					</p>
-					<p className={`${width && width > 900 ? 'flex' : 'hidden'} items-center text-sm p-1 px-3 whitespace-nowrap  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer`}>
-						<Bookmark className='mr-1' />
-						Pisma
-					</p>
+					<Link passHref href="/#misja">
+						<a className={`${width && width > 900 ? 'flex' : 'hidden'} items-center ml-4 text-sm p-1 px-3 whitespace-nowrap hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer`}>
+							<People className='mr-1' />
+							Nasza misja
+						</a>
+					</Link>
+					<Link passHref href="/#jak-to-dziala">
+						<a className={`${width && width > 900 ? 'flex' : 'hidden'} items-center text-sm p-1 px-3 whitespace-nowrap  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer`}>
+							<Article className='mr-1' />
+							Jak to działa
+						</a>
+					</Link>
+					<Link passHref href="/#pisma">
+						<a className={`${width && width > 900 ? 'flex' : 'hidden'} items-center text-sm p-1 px-3 whitespace-nowrap  hover:bg-blue-50 hover:text-blue-500 transition-colors rounded-lg cursor-pointer`}>
+							<Bookmark className='mr-1' />
+							Pisma
+						</a>
+					</Link>
 				</div>
 
 				<span className='flex items-center'>
 					<SearchBar />
-					<Avatar role="button" variant='rounded' src={userProfile?.photoURL} className='w-8 h-8 hover:bg-blue-100 cursor-pointer text-blue-400 bg-slate-50' />
+					<Avatar ref={ref} onClick={updateAnchor} role="button" variant='rounded' src={userProfile?.photoURL} className='w-8 h-8 hover:bg-blue-100 cursor-pointer text-blue-400 bg-slate-50' />
+					<Popover
+						container={topLevelComponent.current}
+						className='absolute mt-4 '
+						anchorOrigin={
+							{
+								vertical: 'bottom',
+								horizontal: 'right',
+							}
+						}
+						transformOrigin={
+							{
+								vertical: 'top',
+								horizontal: 'right',
+							}
+						}
+						anchorEl={
+							anchorEl as any
+						} open={!!anchorEl}>
+						<div className='bg-slate-50 inline-flex gap-4 flex-col rounded-lg p-2'>
+							<div className='inline-flex items-center gap-4'>
+								<Avatar variant='rounded' src={userProfile?.photoURL} />
+								<div className='flex flex-col '>
+									<p className='text-sm my-0 font-semibold'>{userProfile?.displayName || "Niezalogowany/a"}</p>
+									{userProfile
+										?
+										<p className='text-xs my-0'>
+											Użytkownik
+
+										</p>
+										: <Link href='/signup' passHref>
+											<a>
+												<p className='text-sm text-blue-500 my-0'>
+													Załóż konto
+												</p>
+											</a>
+										</Link>
+									}
+								</div>
+							</div>
+							<List>
+								<Link passHref href='/dashboard'>
+									<a>
+										<ListItem className='hover:text-blue-500 hover:bg-blue-100 rounded transition-color' >
+											<Home className='mr-3' /> <p className='text-sm text-inherit'>Strona startowa</p>
+										</ListItem>
+									</a>
+								</Link>
+								{userProfile
+									? <>
+										<Link passHref href='/account'>
+											<a>
+												<ListItem className='hover:text-blue-500 hover:bg-blue-100 rounded transition-color' >
+													<Person className='mr-3' /> <p className='text-sm text-inherit'>Twoje dane</p>
+												</ListItem>
+											</a>
+										</Link>
+										{
+											userProfile.roles.includes('admin')
+												|| userProfile.roles.includes('editor')
+												|| userProfile.roles.includes('lawyer')
+												|| userProfile.roles.includes('verifier')
+												?
+												<Link passHref href='/management'>
+													<a>
+														<ListItem className='hover:text-blue-500 hover:bg-blue-100 rounded transition-color'>
+															<ManageAccounts className='mr-3' /> <p className='text-sm text-inherit'>Zarządzanie</p>
+														</ListItem>
+													</a>
+												</Link>
+												: null
+										}
+										<Link passHref href='/account/purchases'>
+											<a>
+												<ListItem className='hover:text-blue-500 hover:bg-blue-100 rounded transition-color' >
+													<ShoppingCart className='mr-3' /> <p className='text-sm text-inherit'>Zakupione produkty</p>
+												</ListItem>
+											</a>
+										</Link>
+									</>
+									: null
+								}
+							</List>
+							{userProfile
+								?
+								<Button onClick={
+									signOut
+								} className='bg-blue-500 text-white'>
+									<Logout className='mr-3' /> Wyloguj się
+								</Button>
+								:
+								<Link href='/login' passHref>
+									<a className='w-full'>
+										<Button className='bg-blue-500 w-full text-white'>
+											<Login className='mr-3' /> Zaloguj się
+										</Button>
+									</a>
+								</Link>
+							}
+						</div>
+					</Popover>
 				</span>
 
 			</div>
-		</header>
-		<Top style={{ backdropFilter: 'grayscale(20%)', backgroundSize: 'cover', backgroundImage: 'url(/bg-light-blue.svg)', zIndex: 0, }} className='w-screen pt-32 px-8 sm:px-12 flex-col flex'>
+		</header >
+		<div style={{ backdropFilter: 'grayscale(20%)', backgroundSize: 'cover', zIndex: 0, background: 'rgba(59, 130, 256, 0.9)' }} className='w-screen flex-col flex'>
 
-			<div className='flex flex-col w-full mx-auto my-auto ' style={{ maxWidth: '60rem' }}>
-				<div className='inline-flex sm:gap-10 md:gap-20 lg:gap-40  pb-8 bg-opacity-50 sm:pb-12 md:pb-16 pt-0 justify-between items-center'>
-					<span style={{ minHeight: '20rem' }} className='flex-col flex-1 md:flex-initial h-full justify-between relative flex'>
-						<TitleAndSearch className='flex flex-col'>
+			<div className='flex flex-col w-full mx-auto h-full'>
+				<div className='inline-flex h-full bg-opacity-50 p-0 justify-between items-center'>
+					<span style={{
+						paddingLeft: 'var(--margin)',
+						backgroundImage: 'url(/bg-light-blue.svg)',
+						backgroundSize: 'cover',
+						backgroundColor: 'white',
+						backgroundPositionX: 'right',
+					}} className=' pt-32 pb-8 sm:min-h-[40rem] justify-center  sm:pb-12 md:pb-16 flex-col flex-1 md:flex-initial h-full relative flex'>
+						<TitleAndSearch className='flex flex-col' >
 							<Subtitle className={`text-slate-200 text-lg sm:text-xl float-left top-0 right-0 left-0 ${subtitleNumber === 0 || (subtitleNumber == 1 && secondSubtitleVisible) ? 'opacity-100' : 'opacity-0'} `}>
 								{subtitleNumber >= 1 && secondSubtitleVisible ? 'My jesteśmy tak samo' : 'Czy w Twojej sprawie aby na pewno potrzebny jest'}
 							</Subtitle>
@@ -245,18 +396,18 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 						<ExplanationAnimation
 							style={{
 								minWidth: '20rem',
-								maxWidth: '30rem'
+								maxWidth: '30rem',
 							}}
-							className="self-end w-full py-4 px-8 bg-slate-100 rounded"
+							className="self-end box-content px-10 sm:px-20 lg:px-40 w-full mr-auto py-4 filter rounded"
 							active
 						/>
 						: null
 					}
 				</div>
 			</div>
-		</Top>
-		<div className='z-50' >
-			<div className='w-full inline-flex justify-center items-center px-8 sm:px-12 py-12 sm:py-16  bg-white'  >
+		</div>
+		<div className='z-50 my-16' id="misja" >
+			<div className='w-full my-16 inline-flex justify-center items-center px-8 sm:px-12 py-12 sm:py-16  bg-white'  >
 				<div className='inline-flex flex-wrap-reverse gap-12 items-center sm:gap-32 sm:flex-nowrap' style={{ maxWidth: '60rem' }}>
 					<img src='/judge.svg' className='mx-auto h-full' style={{ minWidth: 250 }} />
 					<div style={{ maxWidth: '60rem', minWidth: 200 }} className='inline-flex flex-col'>
@@ -268,14 +419,14 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 					</div>
 				</div>
 			</div>
-			<div className='sm:w-screen py-12 flex flex-col pl-8 sm:pl-12 pr-8 sm:pr-0'>
+			<div id="jak-to-dziala" className='sm:w-screen py-12 my-16 flex flex-col pl-8 sm:pl-12 pr-8 sm:pr-0'>
 				<Explanation />
 			</div>
-			<div className='w-full mb-[2rem] pt-8 pb-4 bg-white  sm:pt-12 sm:pb-8 overflow-x-clip'>
+			<div id="pisma" className='w-full mb-[2rem] pt-8 pb-4 bg-white my-16 sm:pt-12 sm:pb-8 overflow-x-clip'>
 				<MostPopularProducts {...{ mostPopularProducts, categories }} />
 			</div>
-			<Footer />
 		</div >
+		<Footer />
 	</div >
 }
 
@@ -288,7 +439,8 @@ export const MostPopularProducts = ({
 }: {
 	categories: string[],
 	mostPopularProducts: { [category: string]: any[] }
-}) => {
+}) =>
+{
 	const [category, setCategory] = React.useState('any');
 	const { width } = useWindowSize();
 
@@ -447,7 +599,8 @@ export const MostPopularProducts = ({
 	</div >
 }
 
-export const ProductCard = ({ product, first, inRow }: { product: any, first?: boolean, inRow?: boolean }) => {
+export const ProductCard = ({ product, first, inRow }: { product: any, first?: boolean, inRow?: boolean }) =>
+{
 	return <Link href={`/forms/${product.id}`} passHref>
 		<a>
 			<Button className='p-0 text-normal normal-case text-left'>
@@ -481,23 +634,27 @@ export const ProductCard = ({ product, first, inRow }: { product: any, first?: b
 	</Link>
 }
 
-export const PhasedExplanationAnimation = ({ className, style, active, textWhite, phase }: { className?: string, style?: HTMLAttributes<HTMLImageElement>['style'], active: boolean, textWhite?: boolean, phase: number }) => {
+export const PhasedExplanationAnimation = ({ className, style, active, textWhite, phase }: { className?: string, style?: HTMLAttributes<HTMLImageElement>['style'], active: boolean, textWhite?: boolean, phase: number }) =>
+{
 	const phaseTimings = [6000, 9000, 9000, 0];
 	const [reset, setReset] = React.useState<boolean>(true)
 
 	const ref = React.useRef<NodeJS.Timeout | null>(null);
 
-	const runAnimation = async () => {
+	const runAnimation = async () =>
+	{
 		if (ref.current != null)
 			clearTimeout(ref.current);
-		ref.current = setTimeout(async () => {
+		ref.current = setTimeout(async () =>
+		{
 			setReset(false);
 		}, phaseTimings[phase]);
 		await sleep(phaseTimings[phase]);
 	}
 	React.useEffect(() => () => (ref.current != null ? clearTimeout(ref.current) : void 0), [])
 
-	React.useEffect(() => {
+	React.useEffect(() =>
+	{
 		if (reset === false)
 			setReset(true);
 		else
@@ -505,7 +662,8 @@ export const PhasedExplanationAnimation = ({ className, style, active, textWhite
 	}, [reset])
 
 	React.useEffect(
-		() => {
+		() =>
+		{
 			setReset(false);
 		},
 		[phase]
@@ -521,7 +679,8 @@ export const PhasedExplanationAnimation = ({ className, style, active, textWhite
 	</div>
 }
 
-export const ExplanationAnimation = ({ className, style, active, textWhite, }: { className?: string, style?: HTMLAttributes<HTMLImageElement>['style'], active: boolean, textWhite?: boolean }) => {
+export const ExplanationAnimation = ({ className, style, active, textWhite, }: { className?: string, style?: HTMLAttributes<HTMLImageElement>['style'], active: boolean, textWhite?: boolean }) =>
+{
 
 
 	const [reset, setReset] = React.useState<boolean>(true)
@@ -530,15 +689,18 @@ export const ExplanationAnimation = ({ className, style, active, textWhite, }: {
 
 	const ref = React.useRef<NodeJS.Timeout | null>(null);
 
-	const runAnimation = async () => {
-		ref.current = setTimeout(async () => {
+	const runAnimation = async () =>
+	{
+		ref.current = setTimeout(async () =>
+		{
 			setReset(false);
 		}, 32000);
 		for (
 			let i = 0;
 			i < 4;
 			i++
-		) {
+		)
+		{
 			setSubtitleStage(i);
 			await sleep(timings[i]);
 		}
@@ -546,7 +708,8 @@ export const ExplanationAnimation = ({ className, style, active, textWhite, }: {
 
 	React.useEffect(() => () => (ref.current != null ? clearTimeout(ref.current) : void 0), [])
 
-	React.useEffect(() => {
+	React.useEffect(() =>
+	{
 		if (reset === false)
 			setReset(true);
 		else
@@ -588,25 +751,29 @@ export const ExplanationAnimation = ({ className, style, active, textWhite, }: {
 	</div>
 }
 
-const longestCommonPrefix = (str1: React.ReactNode[], str2: React.ReactNode[]): number => {
+const longestCommonPrefix = (str1: React.ReactNode[], str2: React.ReactNode[]): number =>
+{
 	let i = 0;
 	if (str1.length == 0 || str2.length == 0)
 		return 0;
 	//@ts-ignore
-	while (str1[i] === str2[i]) {
+	while (str1[i] === str2[i])
+	{
 		i++;
 	}
 	return i;
 }
 
-export const Explanation = ({ reverse }: { reverse?: boolean }) => {
+export const Explanation = ({ reverse }: { reverse?: boolean }) =>
+{
 	const [turnedOffCurrent, setTurnedOffCurrent] = React.useState<boolean>(false);
 	const [turnedOffPrevious, setTurnedOffPrevious] = React.useState<boolean>(false);
 
 	const [step, setStep] = React.useState<number>(0);
 	const [previousStep, setPreviousStep] = React.useState<number>(-1);
 
-	enum Directions {
+	enum Directions
+	{
 		left,
 		right
 	}
@@ -616,7 +783,8 @@ export const Explanation = ({ reverse }: { reverse?: boolean }) => {
 	const [inDirection, setInDirection] = React.useState<Directions>(Directions.left);
 	const [outDirection, setOutDirection] = React.useState<Directions>(Directions.right);
 
-	const modifyStep = (newStep: number) => {
+	const modifyStep = (newStep: number) =>
+	{
 		if (newStep == step)
 			return;
 
@@ -624,10 +792,12 @@ export const Explanation = ({ reverse }: { reverse?: boolean }) => {
 		setTurnedOffPrevious(false)
 
 
-		if (newStep > step) {
+		if (newStep > step)
+		{
 			setInDirection(Directions.right);
 			setOutDirection(Directions.left);
-		} else {
+		} else
+		{
 			setInDirection(Directions.left);
 			setOutDirection(Directions.right);
 		}
@@ -636,7 +806,8 @@ export const Explanation = ({ reverse }: { reverse?: boolean }) => {
 		setStep(newStep);
 
 		setTurnedOffPrevious(true);
-		setTimeout(() => {
+		setTimeout(() =>
+		{
 			setTurnedOffCurrent(false);
 		}, 250)
 	}
@@ -694,15 +865,23 @@ export const Explanation = ({ reverse }: { reverse?: boolean }) => {
 				<div className='flex-1 gap-6 flex sm:flex-col'>
 					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 0 && modifyStep(0)} className={`rounded cursor-pointer ${step === 0 ? 'bg-slate-800 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
 						<div className='flex flex-col text-inherit'>
-							<pre className='text-inherit'>Krok 1</pre>
-							<p className='sm:inline-flex gap-3 items-center hidden '>Wprowadzanie danych</p>
+							<pre className='text-inherit'>
+								Krok 1
+							</pre>
+							<p className='sm:inline-flex text-inherit gap-3 items-center hidden '>
+								Wprowadzanie danych
+							</p>
 						</div>
 						<DataUsage className={`text-2xl sm:text-4xl  ${step === 0 ? 'icon-selected' : 'icon'} transition-colors`} />
 					</SelectAnimation>
 					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 1 && modifyStep(1)} className={`rounded cursor-pointer ${step === 1 ? 'bg-slate-800 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
 						<div className='flex flex-col text-inherit'>
-							<pre className='text-inherit'>Krok 2</pre>
-							<p className='sm:inline-flex gap-3 items-center hidden '>Zamawianie pisma</p>
+							<pre className='text-inherit'>
+								Krok 2
+							</pre>
+							<p className='sm:inline-flex text-inherit gap-3 items-center hidden '>
+								Zamawianie pisma
+							</p>
 						</div>
 						<ShoppingCart className={`text-2xl sm:text-4xl  ${step === 1 ? 'icon-selected' : 'icon'} transition-colors`} />
 					</SelectAnimation>
@@ -711,15 +890,23 @@ export const Explanation = ({ reverse }: { reverse?: boolean }) => {
 					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 2 && modifyStep(2)} className={`rounded cursor-pointer ${step === 2 ? 'bg-slate-800 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
 
 						<div className='flex flex-col text-inherit'>
-							<pre className='text-inherit'>Krok 3</pre>
-							<p className='sm:inline-flex gap-3 items-center hidden '>Pobieranie i drukowanie</p>
+							<pre className='text-inherit'>
+								Krok 3
+							</pre>
+							<p className='sm:inline-flex text-inherit gap-3 items-center hidden '>
+								Pobieranie i drukowanie
+							</p>
 						</div>
 						<Save className={`text-2xl sm:text-4xl  ${step === 2 ? 'icon-selected' : 'icon'} transition-colors`} />
 					</SelectAnimation>
 					<SelectAnimation role='button' style={{ transitionDuration: '200ms !important', transitionTimingFunction: 'ease-in-out !important', flex: 1 / 2 }} onClick={() => step !== 3 && modifyStep(3)} className={`rounded cursor-pointer ${step === 3 ? 'bg-slate-800 text-white' : ''} border border-transparent  transition-colors  p-4 inline-flex flex-col sm:flex-row items-center justify-between gap-6  sm:w-full`}>
 						<div className='flex flex-col text-inherit'>
-							<pre className='text-inherit'>Krok 4</pre>
-							<p className='sm:inline-flex gap-3 items-center hidden '>Składanie do sądu</p>
+							<pre className='text-inherit'>
+								Krok 4
+							</pre>
+							<p className='sm:inline-flex text-inherit gap-3 items-center hidden '>
+								Składanie do sądu
+							</p>
 						</div>
 						<Gavel className={`text-2xl sm:text-4xl  ${step === 3 ? 'icon-selected' : 'icon'} transition-colors`} />
 					</SelectAnimation>
@@ -731,7 +918,8 @@ export const Explanation = ({ reverse }: { reverse?: boolean }) => {
 	</div>;
 }
 
-export const Footer = () => {
+export const Footer = () =>
+{
 	const { user, userProfile } = useAuth();
 
 	return <footer className='mt-auto pb-auto h-fit w-full flex flex-col items-center px-8 sm:px-12 py-6 sm:py-8 bg-slate-800 ' >

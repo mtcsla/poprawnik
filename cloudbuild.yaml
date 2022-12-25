@@ -18,8 +18,18 @@ steps:
         "HTML_CONVERT_SECRET",
         "HTML_CONVERT_URL",
       ]
+<<<<<<< Updated upstream
 
   - name: node
+=======
+  - name: node:16.2.0
+    id: Run Jest unit tests
+    entrypoint: npm
+    args:
+      - run
+      - test
+  - name: node:16.2.0
+>>>>>>> Stashed changes
     id: Build NextJS bundle
     entrypoint: npm
     args:

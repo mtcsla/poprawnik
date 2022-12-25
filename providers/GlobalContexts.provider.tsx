@@ -1,17 +1,18 @@
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import React from "react";
-import AuthProvider from "../../providers/AuthProvider";
-import { SidenavProvider } from "../../providers/SidenavProvider";
-import NoInternetWrapper from "./NoInternetWrapper";
+import NoInternetWrapper from "../layouts/NoInternet.layout";
+import AuthProvider from "./AuthProvider";
+import { SidenavProvider } from "./SidenavProvider";
 
 import { LocalizationProvider } from '@mui/x-date-pickers-pro';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import colors from "tailwindcss/colors";
-import BodyScrollLockProvider from '../../providers/BodyScrollLockProvider';
-import SearchProvider from '../../providers/SearchProvider';
+import BodyScrollLockProvider from './BodyScrollLockProvider';
+import SearchProvider from './SearchProvider';
 
 
-const AppContextWrapper = ({ children }: { children: React.ReactNode }) => {
+const GlobalContextsProvider = ({ children }: { children: React.ReactNode }) =>
+{
 	return <LocalizationProvider dateAdapter={AdapterDateFns}>
 		<BodyScrollLockProvider>
 			<SidenavProvider>
@@ -28,7 +29,7 @@ const AppContextWrapper = ({ children }: { children: React.ReactNode }) => {
 		</BodyScrollLockProvider>
 	</LocalizationProvider>;
 }
-export default AppContextWrapper;
+export default GlobalContextsProvider;
 
 const theme = createTheme({
 	palette: {
@@ -141,6 +142,15 @@ const theme = createTheme({
 				}
 			}
 		},
+		MuiPopover: {
+			styleOverrides: {
+				paper: {
+					zIndex: 1000,
+					boxShadow: '0 0 0 0px rgb(71, 85, 105)',
+					border: 'none'
+				}
+			}
+		},
 		MuiTooltip: {
 			styleOverrides: {
 				tooltip: {
@@ -193,7 +203,7 @@ const theme = createTheme({
 					paddingRight: '0.4rem',
 					marginRight: '0.5rem',
 					":hover": {
-						backgroundColor: colors.blue[100],
+						backgroundColor: colors.slate[50],
 						color: colors.blue[500] + ' !important'
 					},
 					minHeight: '0 !important',

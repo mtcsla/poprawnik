@@ -48,7 +48,7 @@ export class Condition extends ExpressionElement
 	{
 		if (this.type === 'date' && (!(value instanceof Date) && !(value as string).match(/^\$date:[a-z_]+[a-z_0-9]*\$$/)))
 			throw new Error("Invalid date: " + value);
-		if (this.type === 'number' && (!(value instanceof Expression<Computation>) && !(value as string).match(/^\$number:[a-z_]+[a-z_0-9]*\$$/)))
+		if (this.type === 'number' && !(value as string).match(/^\$number:[a-z_]+[a-z_0-9]*\$$/))
 			throw new Error("Invalid Expression<Computation>: " + value);
 		if (this.type === 'string' && (typeof value !== 'string' || !(value as string).match(/^\$number:[a-z_]+[a-z_0-9]*\$$/)))
 			throw new Error("Invalid string: " + value);
@@ -60,7 +60,7 @@ export class Condition extends ExpressionElement
 	{
 		if (this.type === 'date' && (!(value instanceof Date) && !(value as string).match(/^\$date:[a-z_]+[a-z_0-9]*\$$/)))
 			throw new Error("Invalid date: " + value);
-		if (this.type === 'number' && (!(value instanceof Expression<Computation>) && !(value as string).match(/^\$number:[a-z_]+[a-z_0-9]*\$$/)))
+		if (this.type === 'number' && !(value as string).match(/^\$number:[a-z_]+[a-z_0-9]*\$$/))
 			throw new Error("Invalid Expression<Computation>: " + value);
 		if (this.type === 'string' && (typeof value !== 'string' || !(value as string).match(/^\$number:[a-z_]+[a-z_0-9]*\$$/)))
 			throw new Error("Invalid string: " + value);

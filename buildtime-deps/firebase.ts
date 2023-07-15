@@ -28,8 +28,8 @@ let firebase_app;
 
 if (!getApps().length) {
   firebase_app = initializeApp(
-    dev ? devConfig : prodConfig,
-    dev ? "Iusinus" : "POPRAWNIK"
+    true ? devConfig : prodConfig,
+    false ? "Iusinus" : "POPRAWNIK"
   );
 } else firebase_app = getApp(dev ? "Iusinus" : "POPRAWNIK");
 

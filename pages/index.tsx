@@ -72,6 +72,15 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) =>
 const TitleContainer = styled.div`
   transition: margin-top .5s ease-in-out;
 `
+
+const TitleAndSearchBox = styled.span`
+  padding-left: max(var(--margin), 2rem);
+  padding-right: 2rem;
+  @media (min-width: 640px) {
+    padding-left: max(var(--margin), 3rem);
+    padding-right: 3rem;
+  }
+`
 const TitleAndSearch = styled.span`
   min-height: 8rem;
   @media (min-width: 728px) {
@@ -364,8 +373,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 
 			<div className='flex flex-col w-full mx-auto h-full'>
 				<div className='inline-flex h-full bg-opacity-50 p-0 justify-between items-center'>
-					<span style={{
-						paddingLeft: 'var(--margin)',
+					<TitleAndSearchBox style={{
 						backgroundImage: 'url(/bg-light-blue.svg)',
 						backgroundSize: 'cover',
 						backgroundColor: 'white',
@@ -389,7 +397,7 @@ const MainPage = ({ categories, mostPopularProducts }: { categories: string[], m
 							<Search className='text-2xl' />
 							Szukaj pisma...
 						</div>
-					</span>
+					</TitleAndSearchBox>
 
 					{width && width >= 848
 						?

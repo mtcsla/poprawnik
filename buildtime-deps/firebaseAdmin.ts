@@ -3,7 +3,7 @@ import * as firebaseAdmin from "firebase-admin";
 const dev = process.env.NODE_ENV == "development";
 
 const serviceAccount = JSON.parse(
-  dev
+  true
     ? (process.env.SERVICE_ACCOUNT_DEV as string)
     : (process.env.SERVICE_ACCOUNT_PROD as string)
 );

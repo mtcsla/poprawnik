@@ -32,10 +32,6 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
       }
     });
 
-
-
-
-
     if (parseInt(page as string) === 1) {
       if (category !== 'all') {
         articles = (await firebaseAdmin.firestore().collection(`articles`).where('category', '==', category).limit(10).get()).docs.map(
@@ -91,7 +87,6 @@ export const getStaticProps = async (ctx: GetStaticPropsContext) => {
   }
 }
 export const getStaticPaths = async () => {
-
   const categories = (await firebaseAdmin.firestore().collection('article-categories').get()).docs.map(
     (doc) => ({ category: doc.id, count: doc.data().count, pages: Math.floor(doc.data().count / 10) + 1 })
   );

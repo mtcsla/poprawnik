@@ -2,6 +2,7 @@ import { collection, doc, getDocs, orderBy, query, updateDoc } from '@firebase/f
 import { Delete, Download, Refresh, ShoppingBag } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Skeleton } from '@mui/material';
+import axios from 'axios';
 import { useRouter } from 'next/router';
 import React from "react";
 import { sleep } from '..';
@@ -64,7 +65,7 @@ const Purchases = () => {
   const downloadPurchase = async (id: string, name?: string) => {
     setDownloadDialogOpen(id);
     try {
-      await fetch(`/api/create-purchase-download?id=${id}`);
+      await axios.get(`/api/create-purchase-download?id=${id}`);
     } catch (e) {
       console.log(e);
       setErr('Wystąpił błąd podczas pobierania dokumentu. Spróbuj ponownie później.');
@@ -74,7 +75,7 @@ const Purchases = () => {
     setDownloading(true);
 
     await sleep(500);
-    const res = await fetch(`/api/download-purchase?id=${id}`);
+    const res = await axios.get(`/api/download-purchase?id=${id}`);
 
     if (res.status != 200) {
       setErr('Wystąpił błąd podczas pobierania dokumentu. Spróbuj ponownie później.');
@@ -83,9 +84,9 @@ const Purchases = () => {
       return;
     }
 
-    const reader = res.body!.getReader()
+    const reader = res.data!.getReader()
     const chunks: any[] = [];
-    let length = +res.headers.get('Content-Length')!;
+    let length = +(res.headers['Content-Length']!);
 
     while (true) {
       const { done, value } = await reader.read();

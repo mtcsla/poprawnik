@@ -1,34 +1,45 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Poprawnik
 
-## Getting Started
+This is a later remake of **[Trustree](https://github.com/mtcsla/trustree)**, a legal document store, built in **Next.js** with SSR & SSG and **Firebase** backend services.  
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+- **SSR & SSG**: Server-side rendering and static site generation.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Authentication**: Firebase authentication.
+    
+- **Account system**: User accounts with roles.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- **Form creation UI**: tools for lawyers to create complicated forms (with lists, conditional fields etc).
+<br/>
+    - Form step editor:
+    ![step editor](step_editor.png)
+    - Form field editor:
+    ![field editor](field_editor.png)
+    - Condition editor:
+    ![condition editor](condition_editor.png)
+    - Composite condition/calculations editor:
+    ![composite editor](composite_condition_editor.png)
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+<br/>
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- **Document template creation UI**: tools for lawyers to create document templates to be filled out by data from forms.
+<br/>
+    - Template editor:
+    ![template editor](template_editor.png)
 
-## Learn More
+<br/>
 
-To learn more about Next.js, take a look at the following resources:
+- **Generation of legal documents to pdf**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Blog**: Blog display and editing.
+<br/>
+    ![blog](blog.png)
+<br/>
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+- **Beautiful UI and landing page**
+<br/>
+    ![landing page](landing_page_screenshot.png)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

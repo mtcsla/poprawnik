@@ -1,6 +1,8 @@
 # Poprawnik
 
-This is a later remake of **[Trustree](https://github.com/mtcsla/trustree)**, a legal document store, built in **Next.js** with SSR & SSG and **Firebase** backend services.  
+This is a later remake of **[Trustree](https://github.com/mtcsla/trustree)**, a legal document store, built in **Next.js** with SSR & SSG and **Firebase** backend services, hosted on **Vercel**.  
+
+Explore here: **[https://poprawnik.vercel.app](https://poprawnik.vercel.app/)**
 
 ## Features
 
